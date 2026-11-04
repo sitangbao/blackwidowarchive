@@ -24,8 +24,8 @@ function ItemPage() {
   const { data: item, isLoading } = useQuery({
     queryKey: ["item", id],
     queryFn: async () => {
-      const { data } = await supabase.from("items").select("*").eq("id", id).maybeSingle();
-      return data as Item | null;
+      const items = await loadArchiveItems();
+      return items.find((entry) => entry.id === id) ?? null;
     },
   });
   // Only admins can read item_private (RLS); visitors always get null.
@@ -33,7 +33,6 @@ function ItemPage() {
     queryKey: ["item-private", id],
     queryFn: async () => (await supabase.from("item_private").select("purchase_price").eq("item_id", id).maybeSingle()).data,
   });
-  const urls = useSignedUrls("item-images", item?.images ?? []);
   const [idx, setIdx] = useState(0);
   const [zoom, setZoom] = useState(false);
   const [report, setReport] = useState(false);
