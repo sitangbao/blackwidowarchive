@@ -101,7 +101,15 @@ content:
         required: true
       - name: status
         label: 默认状态
-        type: string
+        type: select
+        options:
+          values:
+            - name: owned
+              label: 已拥有
+            - name: not_owned
+              label: 未拥有
+            - name: wishlist
+              label: 愿望单
       - name: person_count
         label: 人物数量
         type: select
