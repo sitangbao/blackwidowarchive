@@ -1,0 +1,79 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-display: "Bebas Neue", "Noto Sans SC", sans-serif;
+  --font-sans: "Noto Sans SC", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+/* Palette: bg #171214, card #241B1E, accent #B32632, warm white text */
+:root {
+  --radius: 0.25rem;
+  --background: oklch(0.18 0.008 350);
+  --foreground: oklch(0.94 0.015 75);
+  --card: oklch(0.23 0.015 355);
+  --card-foreground: oklch(0.94 0.015 75);
+  --popover: oklch(0.23 0.015 355);
+  --popover-foreground: oklch(0.94 0.015 75);
+  --primary: oklch(0.5 0.17 22);
+  --primary-foreground: oklch(0.96 0.01 75);
+  --secondary: oklch(0.27 0.018 355);
+  --secondary-foreground: oklch(0.94 0.015 75);
+  --muted: oklch(0.26 0.012 355);
+  --muted-foreground: oklch(0.68 0.012 60);
+  --accent: oklch(0.3 0.05 20);
+  --accent-foreground: oklch(0.96 0.01 75);
+  --destructive: oklch(0.55 0.2 25);
+  --destructive-foreground: oklch(0.96 0.01 75);
+  --border: oklch(0.32 0.02 355);
+  --input: oklch(0.32 0.02 355);
+  --ring: oklch(0.5 0.17 22);
+}
+
+@layer base {
+  * { border-color: var(--color-border); }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+  }
+}
+
+@utility archive-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-muted-foreground);
+}
+
+@utility hero-glow {
+  background: radial-gradient(ellipse at 50% 40%, color-mix(in oklab, var(--primary) 22%, transparent), transparent 65%);
+}

@@ -1,0 +1,4 @@
+[functions.notify-submission]
+# Public visitors can submit without accounts. The function sends only to the fixed archive owner address.
+# Add rate limiting / CAPTCHA before a high-traffic public launch.
+verify_jwt = false

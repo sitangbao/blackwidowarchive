@@ -1,0 +1,137 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { ItemImage } from "@/components/ItemImage";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { personLabel, readCollectionState, writeCollectionState, uploadFiles, useSignedUrls, type Item, type CollectionState } from "@/lib/archive";
+
+export const Route = createFileRoute("/item/$id")({
+  head: () => ({
+    meta: [
+      { title: "周边详情 — BLACK WIDOW ARCHIVE" },
+      { name: "description", content: "Black Widow 周边档案详情。" },
+      { property: "og:title", content: "周边详情 — BLACK WIDOW ARCHIVE" },
+      { property: "og:description", content: "Black Widow 周边档案详情。" },
+    ],
+  }),
+  component: ItemPage,
+});
+
+function ItemPage() {
+  const { id } = Route.useParams();
+  const { data: item, isLoading } = useQuery({
+    queryKey: ["item", id],
+    queryFn: async () => {
+      const { data } = await supabase.from("items").select("*").eq("id", id).maybeSingle();
+      return data as Item | null;
+    },
+  });
+  // Only admins can read item_private (RLS); visitors always get null.
+  const { data: priv } = useQuery({
+    queryKey: ["item-private", id],
+    queryFn: async () => (await supabase.from("item_private").select("purchase_price").eq("item_id", id).maybeSingle()).data,
+  });
+  const urls = useSignedUrls("item-images", item?.images ?? []);
+  const [idx, setIdx] = useState(0);
+  const [zoom, setZoom] = useState(false);
+  const [report, setReport] = useState(false);
+  const [collection, setCollection] = useState<CollectionState>(() => readCollectionState());
+
+  if (isLoading) return <p className="p-10 text-center archive-label">Loading…</p>;
+  if (!item) return <p className="p-10 text-center text-muted-foreground">找不到该周边。<Link to="/" className="underline">返回</Link></p>;
+
+  const cur = urls[item.images[idx] ?? ""];
+  const rows: [string, string | null | undefined][] = [
+    ["地区", item.region], ["系列", item.series], ["Set", item.set_name], ["类别", item.category],
+    ["商品类型", item.item_type], ["品牌／出版社", item.brand], ["尺寸", item.size],
+    ...(item.category === "卡片类" ? [["商品编号", item.item_number] as [string, string | null]] : []),
+    ["人物数量", personLabel(item.person_count)],
+    ["原价 Original Price", item.original_price],
+    ...(priv ? [["入手价格 Purchase Price（仅管理员）", priv.purchase_price || "—"] as [string, string]] : []),
+    ["备注 Notes", item.notes],
+  ];
+
+  return (
+    <section className="mx-auto max-w-5xl px-3 py-8 sm:px-6">
+      <Link to="/" hash="collection" className="archive-label hover:text-foreground">← The Collection</Link>
+      <div className="mt-4 grid gap-6 md:grid-cols-2">
+        <div>
+          <button onClick={() => cur && setZoom(true)} className="block w-full cursor-zoom-in" aria-label="放大查看">
+            <ItemImage url={cur} alt={item.name} className="rounded" />
+          </button>
+          {item.images.length > 1 && (
+            <div className="mt-2 grid grid-cols-5 gap-1.5">
+              {item.images.map((p, i) => (
+                <button key={p} onClick={() => setIdx(i)} className={`rounded ring-offset-2 ring-offset-background ${i === idx ? "ring-1 ring-primary" : "opacity-60"}`}>
+                  <ItemImage url={urls[p]} alt="" className="rounded" />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        <div>
+          <p className="archive-label">Record</p>
+          <h1 className="mt-1 text-2xl font-bold leading-tight">{item.name}</h1>
+          <dl className="mt-5 divide-y rounded bg-card text-sm">
+            {rows.map(([k, v]) => (
+              <div key={k} className="grid grid-cols-[7.5rem_1fr] gap-3 px-4 py-2.5">
+                <dt className="text-muted-foreground">{k}</dt><dd className="whitespace-pre-wrap break-words">{v || "—"}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </div>
+      <div className="mt-6 rounded border bg-card p-4">
+        <p className="archive-label">MY COLLECTION</p>
+        <p className="mt-1 text-xs text-muted-foreground">仅保存在当前浏览器，不会更改公共图鉴。</p>
+        <select aria-label="我的收藏状态" value={collection[item.id] ?? "not_owned"} onChange={e => setCollection(old => { const next = { ...old, [item.id]: e.target.value as CollectionState[string] }; writeCollectionState(next); return next; })} className="mt-3 w-full rounded border bg-background p-2 text-sm"><option value="owned">已拥有</option><option value="not_owned">未拥有</option><option value="wishlist">愿望单</option></select>
+      </div>
+      <div className="mt-10 border-t pt-4 text-center">
+        <button onClick={() => setReport(true)} className="text-sm text-muted-foreground underline hover:text-primary">报告信息有误</button>
+      </div>
+
+      <Dialog open={zoom} onOpenChange={setZoom}>
+        <DialogContent className="max-w-4xl p-2">
+          <DialogHeader className="sr-only"><DialogTitle>{item.name}</DialogTitle></DialogHeader>
+          {cur && <img src={cur} alt={item.name} className="max-h-[85vh] w-full object-contain" />}
+        </DialogContent>
+      </Dialog>
+      <ReportDialog open={report} onOpenChange={setReport} item={item} />
+    </section>
+  );
+}
+
+function ReportDialog({ open, onOpenChange, item }: { open: boolean; onOpenChange: (b: boolean) => void; item: Item }) {
+  const [content, setContent] = useState("");
+  const [files, setFiles] = useState<File[]>([]);
+  const [busy, setBusy] = useState(false);
+  const submit = async () => {
+    if (!content.trim()) { toast.error("请填写问题内容"); return; }
+    setBusy(true);
+    try {
+      const images = await uploadFiles("uploads", files, "reports/");
+      const { error } = await supabase.from("reports").insert({
+        item_id: item.id, item_name: item.name, item_url: window.location.href, content: content.trim(), images,
+      });
+      if (error) throw error;
+      const notice = await supabase.functions.invoke("notify-submission", { body: { kind: "商品资料错误报告", item: item.name, content: content.trim(), item_url: window.location.href } });
+      if (notice.error) toast.warning("报告已保存，但邮件通知尚未发送。");
+      toast.success("感谢反馈，已提交！");
+      setContent(""); setFiles([]); onOpenChange(false);
+    } catch { toast.error("提交失败，请稍后再试"); } finally { setBusy(false); }
+  };
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader><DialogTitle>报告信息有误</DialogTitle></DialogHeader>
+        <p className="text-xs text-muted-foreground">商品：{item.name}</p>
+        <textarea value={content} onChange={(e) => setContent(e.target.value)} maxLength={5000} rows={5}
+          placeholder="请描述哪里有误…" className="w-full rounded border bg-background p-2 text-sm" />
+        <input type="file" accept="image/*" multiple onChange={(e) => setFiles([...(e.target.files ?? [])])} className="text-xs" />
+        <button disabled={busy} onClick={submit} className="rounded bg-primary py-2 text-sm text-primary-foreground disabled:opacity-50">{busy ? "提交中…" : "提交"}</button>
+      </DialogContent>
+    </Dialog>
+  );
+}
