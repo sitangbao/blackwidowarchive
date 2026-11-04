@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
+export async function loadArchiveItems(): Promise<Item[]> {
+  const response = await fetch("/archive-data/items.json", { cache: "no-store" });
+  if (!response.ok) throw new Error("无法读取图鉴商品资料");
+  const data = await response.json();
+  if (!Array.isArray(data)) throw new Error("图鉴商品资料格式不正确");
+  return data as Item[];
+}
+
 export const REGIONS = ["日谷", "美谷", "韩谷", "国谷"] as const;
 export const CATEGORIES = [
   "卡片类", "吧唧", "冰箱贴", "立牌类", "挂件类", "纸杯垫", "橡胶夹子", "文具", "色纸", "贴纸",
