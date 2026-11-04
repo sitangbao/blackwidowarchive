@@ -1,0 +1,123 @@
+
+media:
+  - name: item-images
+    label: 商品图片
+    input: public/archive/items
+    output: /archive/items
+    extensions:
+      - jpg
+      - jpeg
+      - png
+      - webp
+      - gif
+    categories:
+      - image
+
+content:
+  - name: items
+    label: 商品资料
+    type: collection
+    path: content/items
+    format: json
+    filename: "{id}.json"
+    view:
+      primary: name
+      fields:
+        - name
+        - region
+        - category
+        - brand
+        - series
+        - original_price
+      sort: name
+      order: asc
+    fields:
+      - name: id
+        label: 商品 ID
+        type: string
+        required: true
+      - name: name
+        label: 商品名称
+        type: string
+        required: true
+      - name: region
+        label: 地区
+        type: select
+        required: true
+        options:
+          values:
+            - 日谷
+            - 美谷
+            - 韩谷
+            - 国谷
+      - name: series
+        label: 系列
+        type: string
+      - name: set_name
+        label: Set
+        type: string
+      - name: category
+        label: 商品类别
+        type: select
+        required: true
+        options:
+          values:
+            - 卡片类
+            - 吧唧
+            - 冰箱贴
+            - 立牌类
+            - 挂件类
+            - 纸杯垫
+            - 橡胶夹子
+            - 文具
+            - 色纸
+            - 贴纸
+            - 相卡
+            - 明信片
+            - 海报
+            - 文件夹
+            - 杯子
+            - 毛绒
+            - 手办类
+            - 影音
+            - 服饰
+            - 其他
+      - name: item_type
+        label: 商品细分类
+        type: string
+      - name: brand
+        label: 品牌／出版社
+        type: string
+      - name: size
+        label: 尺寸
+        type: string
+      - name: item_number
+        label: 卡片编号
+        type: string
+      - name: original_price
+        label: 原价
+        type: string
+        required: true
+      - name: status
+        label: 默认状态
+        type: string
+      - name: person_count
+        label: 人物数量
+        type: select
+        options:
+          values:
+            - single
+            - multi
+      - name: keywords
+        label: 搜索关键词
+        type: string
+      - name: notes
+        label: 备注
+        type: text
+      - name: images
+        label: 商品图片
+        type: image
+        options:
+          media: item-images
+          multiple:
+            max: 10
