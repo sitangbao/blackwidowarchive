@@ -33,9 +33,10 @@ content:
       order: asc
     fields:
       - name: id
-        label: 商品 ID
-        type: string
-        required: true
+        type: uuid
+        hidden: true
+        options:
+          editable: false
       - name: name
         label: 商品名称
         type: string
