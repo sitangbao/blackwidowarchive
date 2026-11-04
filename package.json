@@ -11,7 +11,9 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "prebuild": "node scripts/build-archive-data.mjs",
+    "predev": "node scripts/build-archive-data.mjs"
   },
   "overrides": {
     "rolldown": "1.2.1"
