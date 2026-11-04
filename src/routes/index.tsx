@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Hourglass } from "@/components/Hourglass";
 import { ItemImage } from "@/components/ItemImage";
@@ -15,7 +14,6 @@ const selectCls = "h-10 w-full min-w-0 rounded border bg-card px-2 text-xs sm:te
 function Index() {
   const { data: items = [], isLoading } = useQuery({ queryKey: ["items"], queryFn: async () => { const { data, error } = await supabase.from("items").select("*").order("created_at", { ascending: false }); if (error) throw error; return data as Item[]; } });
   const [f, setF] = useState<Filters>({ q: "", region: "", category: "", brand: "", item_type: "", series: "", status: "", person: "" });
-  const [menu, setMenu] = useState(false);
   const [personal, setPersonal] = useState(() => readCollectionState());
   const counts = useMemo(() => countByCategory(items), [items]);
   const brands = useMemo(() => (f.category ? brandsFor(items, f.category) : []), [items, f.category]);
@@ -34,30 +32,42 @@ function Index() {
         <p className="mt-5 text-sm tracking-wide text-muted-foreground sm:text-base">娜塔莎·罗曼诺夫官方周边收藏图鉴</p>
       </div>
     </section>
-    <section id="collection" className="mx-auto max-w-6xl scroll-mt-4 px-3 pb-28 sm:px-6">
+    <section id="collection" className="mx-auto max-w-6xl scroll-mt-4 px-3 pb-40 sm:px-6">
       <div className="pt-10 pb-5"><p className="archive-label">THE COLLECTION</p><h2 className="mt-1 text-xl font-medium tracking-widest">周边收藏图鉴</h2></div>
       <div className="mb-5 rounded border bg-card/70 p-4">
         <p className="archive-label">COLLECTION OVERVIEW</p>
         <div className="mt-2 flex items-end justify-between gap-3"><div><p className="text-xs text-muted-foreground">{categoryLabel}</p><p className="font-display text-5xl leading-none text-primary">{isLoading ? "—" : (f.category ? counts[f.category] ?? 0 : items.length)}</p></div><p className="archive-label">TOTAL COLLECTIBLES</p></div>
       </div>
-      <div className="sticky top-2 z-30 -mx-3 border-y bg-background/95 px-3 py-3 backdrop-blur sm:mx-0 sm:rounded sm:border">
-        <div className="flex items-center gap-2">
-          <button onClick={() => setMenu(v => !v)} className="flex h-10 shrink-0 items-center gap-2 rounded border bg-card px-3 text-xs tracking-wide"><span>CATEGORY FILTER</span><ChevronDown size={14} className={menu ? "rotate-180" : ""}/></button>
-          <input value={f.q} onChange={e => update("q", e.target.value)} placeholder="搜索周边名称 / 系列 / 关键词" className={`${selectCls} flex-1`} />
-        </div>
-        {menu && <><button aria-label="关闭分类菜单" className="fixed inset-0 z-40 cursor-default" onClick={() => setMenu(false)} /><div className="absolute left-3 top-[calc(100%+6px)] z-50 max-h-[min(65vh,520px)] w-[min(88vw,360px)] overflow-y-auto rounded border bg-popover p-2 shadow-2xl sm:left-0">
-          <button onClick={() => { update("category", ""); setMenu(false); }} className={`block w-full rounded px-3 py-2.5 text-left text-sm ${!f.category ? "bg-primary/15 text-primary" : "hover:bg-muted"}`}>全部类别 · {items.length}</button>
-          {CATEGORIES.map(c => <button key={c} onClick={() => { update("category", c); setMenu(false); }} className={`flex w-full items-center justify-between rounded px-3 py-2.5 text-left text-sm ${f.category === c ? "bg-primary/15 text-primary" : "hover:bg-muted"}`}><span>{c}{c === "卡片类" ? " (CARDS)" : c === "手办类" ? " (FIGURES)" : ""}</span><span className="text-xs text-muted-foreground">{counts[c] ?? 0}</span></button>)}
-        </div></>}
+      <div className="mb-4 rounded border bg-background/95 px-3 py-3 backdrop-blur sm:rounded">
+        <input value={f.q} onChange={e => update("q", e.target.value)} placeholder="搜索周边名称 / 系列 / 关键词" className={selectCls} />
         <div className="mt-2 grid grid-cols-2 gap-2">
           <select value={f.region} onChange={e => update("region", e.target.value)} className={selectCls}><option value="">全部地区</option>{REGIONS.map(x => <option key={x}>{x}</option>)}</select>
+          <select value={f.category} onChange={e => update("category", e.target.value)} className={selectCls}><option value="">全部类别</option>{CATEGORIES.map(c => <option key={c} value={c}>{c}{c === "卡片类" ? " (CARDS)" : c === "手办类" ? " (FIGURES)" : ""}</option>)}</select>
           <select value={f.status} onChange={e => update("status", e.target.value)} className={selectCls}><option value="">全部收藏状态</option><option value="owned">已拥有</option><option value="not_owned">未拥有</option><option value="wishlist">愿望单</option></select>
           <select value={f.person} onChange={e => update("person", e.target.value)} className={selectCls}><option value="">全部人物数量</option>{PERSON_COUNTS.map(x => <option key={x.value} value={x.value}>{x.label}</option>)}</select>
-          {f.category && !["卡片类", "手办类"].includes(f.category) && CATEGORY_OPTIONS[f.category] && <select value={f.item_type} onChange={e => update("item_type", e.target.value)} className={selectCls}><option value="">全部类型</option>{CATEGORY_OPTIONS[f.category].map(x => <option key={x}>{x}</option>)}</select>}
-          {f.category && brandOptions.length > 0 && <select value={f.brand} onChange={e => update("brand", e.target.value)} className={selectCls}><option value="">全部品牌</option>{brandOptions.map(x => <option key={x}>{x}</option>)}</select>}
-          {f.brand && availableSeries.length > 0 && <select value={f.series} onChange={e => update("series", e.target.value)} className={`${selectCls} col-span-2`}><option value="">全部系列</option>{availableSeries.map(x => <option key={x}>{x}</option>)}</select>}
         </div>
-        {(f.category || f.brand || f.series || f.region || f.status || f.person || f.q) && <button onClick={() => setF({ q:"", region:"", category:"", brand:"", item_type:"", series:"", status:"", person:"" })} className="mt-2 text-xs text-muted-foreground underline">清除筛选</button>}
+        {f.category && !["卡片类", "手办类"].includes(f.category) && CATEGORY_OPTIONS[f.category] && <div className="mt-3">
+          <p className="mb-2 text-[11px] tracking-wider text-muted-foreground">类型</p>
+          <div className="flex flex-wrap gap-2">
+            <button type="button" onClick={() => update("item_type", "")} className={`rounded-full border px-3 py-1.5 text-xs transition ${!f.item_type ? "border-primary bg-primary/15 text-primary" : "border-border bg-card text-muted-foreground hover:border-primary/60"}`}>全部类型</button>
+            {CATEGORY_OPTIONS[f.category].map(x => <button type="button" key={x} onClick={() => update("item_type", x)} className={`rounded-full border px-3 py-1.5 text-xs transition ${f.item_type === x ? "border-primary bg-primary/15 text-primary" : "border-border bg-card text-muted-foreground hover:border-primary/60"}`}>{x}</button>)}
+          </div>
+        </div>}
+        {f.category && brandOptions.length > 0 && <div className="mt-3">
+          <p className="mb-2 text-[11px] tracking-wider text-muted-foreground">品牌</p>
+          <div className="flex flex-wrap gap-2">
+            <button type="button" onClick={() => update("brand", "")} className={`rounded-full border px-3 py-1.5 text-xs transition ${!f.brand ? "border-primary bg-primary/15 text-primary" : "border-border bg-card text-muted-foreground hover:border-primary/60"}`}>全部品牌</button>
+            {brandOptions.map(x => <button type="button" key={x} onClick={() => update("brand", x)} className={`rounded-full border px-3 py-1.5 text-xs transition ${f.brand === x ? "border-primary bg-primary/15 text-primary" : "border-border bg-card text-muted-foreground hover:border-primary/60"}`}>{x}</button>)}
+          </div>
+        </div>}
+        {f.brand && availableSeries.length > 0 && <div className="mt-3">
+          <p className="mb-2 text-[11px] tracking-wider text-muted-foreground">系列</p>
+          <div className="flex flex-wrap gap-2">
+            <button type="button" onClick={() => update("series", "")} className={`rounded-full border px-3 py-1.5 text-xs transition ${!f.series ? "border-primary bg-primary/15 text-primary" : "border-border bg-card text-muted-foreground hover:border-primary/60"}`}>全部系列</button>
+            {availableSeries.map(x => <button type="button" key={x} onClick={() => update("series", x)} className={`rounded-full border px-3 py-1.5 text-xs transition ${f.series === x ? "border-primary bg-primary/15 text-primary" : "border-border bg-card text-muted-foreground hover:border-primary/60"}`}>{x}</button>)}
+          </div>
+        </div>}
+        {(f.category || f.brand || f.item_type || f.series || f.region || f.status || f.person || f.q) && <button type="button" onClick={() => setF({ q:"", region:"", category:"", brand:"", item_type:"", series:"", status:"", person:"" })} className="mt-3 text-xs text-muted-foreground underline">清除筛选</button>}
       </div>
       <div className="flex items-center justify-between py-4"><p className="archive-label">{isLoading ? "LOADING" : `${shown.length} RECORDS`}</p><Link to="/collection" className="text-xs text-primary underline">MY COLLECTION →</Link></div>
       {!isLoading && shown.length === 0 && <p className="py-16 text-center text-sm text-muted-foreground">没有符合条件的周边。</p>}
