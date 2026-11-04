@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { ItemImage } from "@/components/ItemImage";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { personLabel, readCollectionState, writeCollectionState, uploadFiles, useSignedUrls, type Item, type CollectionState } from "@/lib/archive";
+import { personLabel, readCollectionState, writeCollectionState, uploadFiles, loadArchiveItems, type Item, type CollectionState } from "@/lib/archive";
 
 export const Route = createFileRoute("/item/$id")({
   head: () => ({
@@ -42,7 +42,7 @@ function ItemPage() {
   if (isLoading) return <p className="p-10 text-center archive-label">Loading…</p>;
   if (!item) return <p className="p-10 text-center text-muted-foreground">找不到该周边。<Link to="/" className="underline">返回</Link></p>;
 
-  const cur = urls[item.images[idx] ?? ""];
+  const cur = item.images[idx];
   const rows: [string, string | null | undefined][] = [
     ["地区", item.region], ["系列", item.series], ["Set", item.set_name], ["类别", item.category],
     ["商品类型", item.item_type], ["品牌／出版社", item.brand], ["尺寸", item.size],
@@ -65,7 +65,7 @@ function ItemPage() {
             <div className="mt-2 grid grid-cols-5 gap-1.5">
               {item.images.map((p, i) => (
                 <button key={p} onClick={() => setIdx(i)} className={`rounded ring-offset-2 ring-offset-background ${i === idx ? "ring-1 ring-primary" : "opacity-60"}`}>
-                  <ItemImage url={urls[p]} alt="" className="rounded" />
+                  <ItemImage url={p} alt="" className="rounded" />
                 </button>
               ))}
             </div>
