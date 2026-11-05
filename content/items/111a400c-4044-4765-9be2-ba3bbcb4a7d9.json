@@ -3,6 +3,7 @@
   "name": "量子服吧唧",
   "region": "日谷",
   "series": "复仇者联盟4:终局之战",
+  "series_link_enabled": true,
   "category": "吧唧",
   "original_price": "350円(含税)",
   "person_count": "single",
