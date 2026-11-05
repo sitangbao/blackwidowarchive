@@ -11,7 +11,7 @@ export function ItemImage({
   category?: string;
 }) {
   return (
-    <div className={`relative aspect-square overflow-hidden ${className}`}>
+    <div className={`relative aspect-square overflow-hidden bg-background ${className}`}>
       {url ? (
         <img
           src={url}
