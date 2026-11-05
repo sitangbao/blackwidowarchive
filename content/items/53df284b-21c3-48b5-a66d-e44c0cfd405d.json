@@ -2,7 +2,8 @@
   "id": "53df284b-21c3-48b5-a66d-e44c0cfd405d",
   "name": "GURIHIRU吧唧",
   "region": "日谷",
-  "series_link_enabled": false,
+  "series": "GURIHIRU",
+  "series_link_enabled": true,
   "category": "吧唧",
   "original_price": "550",
   "images": [
