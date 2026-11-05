@@ -101,7 +101,6 @@ content:
       - name: original_price
         label: 原价
         type: string
-        required: true
       - name: status
         label: 默认状态
         type: select
@@ -118,8 +117,15 @@ content:
         type: select
         options:
           values:
-            - single
-            - multi
+            - name: single
+              label: 单人
+            - name: multi
+              label: 多人
+            - name: other
+              label: 其他
+      - name: characters
+        label: 人物
+        type: string
       - name: keywords
         label: 搜索关键词
         type: string
