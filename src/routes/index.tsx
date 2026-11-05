@@ -12,7 +12,7 @@ export const Route = createFileRoute("/")({
 const selectCls = "h-10 w-full min-w-0 rounded border bg-card px-2 text-xs sm:text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary";
 function Index() {
   const { data: items = [], isLoading, isError, refetch } = useQuery({ queryKey: ["items"], queryFn: loadArchiveItems });
-  const [f, setF] = useState<Filters>({ q: "", region: "", category: "", brand: "", item_type: "", series: "", status: "", person: "" });
+  const initialSeries = typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get("series") ?? "") : "";\n  const [f, setF] = useState<Filters>({ q: "", region: "", category: "", brand: "", item_type: "", series: initialSeries, status: "", person: "" });
   const [personal, setPersonal] = useState<CollectionState>(() => readCollectionState());
   const counts = useMemo(() => countByCategory(items), [items]);
   const brands = useMemo(() => (f.category ? brandsFor(items, f.category) : []), [items, f.category]);
@@ -37,7 +37,7 @@ function Index() {
         <div className="mt-2 flex items-end justify-between gap-3"><div><p className="text-xs text-muted-foreground">{categoryLabel}</p><p className="font-display text-5xl leading-none text-primary">{isLoading || isError ? "—" : (f.category ? counts[f.category] ?? 0 : items.length)}</p></div><p className="archive-label">TOTAL COLLECTIBLES</p></div>
       </div>
       <div className="mb-4 rounded border bg-background/95 px-3 py-3 backdrop-blur sm:rounded">
-        <input value={f.q} onChange={e => update("q", e.target.value)} placeholder="搜索周边名称 / 系列 / 关键词" className={selectCls} />
+        <input value={f.q} onChange={e => update("q", e.target.value)} placeholder="搜索周边名称 / 系列 / 关键词" className={selectCls} />\n        {f.series && <div className="mt-2 flex items-center justify-between gap-2 rounded border border-primary/30 bg-primary/5 px-3 py-2"><p className="min-w-0 text-xs text-foreground">系列筛选：<span className="text-primary">{f.series}</span></p><button type="button" onClick={() => update("series", "")} className="shrink-0 text-xs text-muted-foreground underline">清除</button></div>}
         <div className="mt-2 grid grid-cols-2 gap-2">
           <select value={f.region} onChange={e => update("region", e.target.value)} className={selectCls}><option value="">全部地区</option>{REGIONS.map(x => <option key={x}>{x}</option>)}</select>
           <select value={f.category} onChange={e => update("category", e.target.value)} className={selectCls}><option value="">全部类别</option>{CATEGORIES.map(c => <option key={c} value={c}>{c}{c === "卡片类" ? " (CARDS)" : c === "手办类" ? " (FIGURES)" : ""}</option>)}</select>
