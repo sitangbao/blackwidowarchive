@@ -11,7 +11,7 @@ export const Route = createFileRoute("/")({
 });
 const selectCls = "h-10 w-full min-w-0 rounded border bg-card px-2 text-xs sm:text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary";
 function Index() {
-  const { data: items = [], isLoading } = useQuery({ queryKey: ["items"], queryFn: loadArchiveItems });
+  const { data: items = [], isLoading, isError, refetch } = useQuery({ queryKey: ["items"], queryFn: loadArchiveItems });
   const [f, setF] = useState<Filters>({ q: "", region: "", category: "", brand: "", item_type: "", series: "", status: "", person: "" });
   const [personal, setPersonal] = useState(() => readCollectionState());
   const counts = useMemo(() => countByCategory(items), [items]);
@@ -34,7 +34,7 @@ function Index() {
       <div className="pt-10 pb-5"><p className="archive-label">THE COLLECTION</p><h2 className="mt-1 text-xl font-medium tracking-widest">周边收藏图鉴</h2></div>
       <div className="mb-5 rounded border bg-card/70 p-4">
         <p className="archive-label">COLLECTION OVERVIEW</p>
-        <div className="mt-2 flex items-end justify-between gap-3"><div><p className="text-xs text-muted-foreground">{categoryLabel}</p><p className="font-display text-5xl leading-none text-primary">{isLoading ? "—" : (f.category ? counts[f.category] ?? 0 : items.length)}</p></div><p className="archive-label">TOTAL COLLECTIBLES</p></div>
+        <div className="mt-2 flex items-end justify-between gap-3"><div><p className="text-xs text-muted-foreground">{categoryLabel}</p><p className="font-display text-5xl leading-none text-primary">{isLoading || isError ? "—" : (f.category ? counts[f.category] ?? 0 : items.length)}</p></div><p className="archive-label">TOTAL COLLECTIBLES</p></div>
       </div>
       <div className="mb-4 rounded border bg-background/95 px-3 py-3 backdrop-blur sm:rounded">
         <input value={f.q} onChange={e => update("q", e.target.value)} placeholder="搜索周边名称 / 系列 / 关键词" className={selectCls} />
@@ -68,7 +68,7 @@ function Index() {
         {(f.category || f.brand || f.item_type || f.series || f.region || f.status || f.person || f.q) && <button type="button" onClick={() => setF({ q:"", region:"", category:"", brand:"", item_type:"", series:"", status:"", person:"" })} className="mt-3 text-xs text-muted-foreground underline">清除筛选</button>}
       </div>
       <div className="flex items-center justify-between py-4"><p className="archive-label">{isLoading ? "LOADING" : `${shown.length} RECORDS`}</p><Link to="/collection" className="text-xs text-primary underline">MY COLLECTION →</Link></div>
-      {!isLoading && shown.length === 0 && <p className="py-16 text-center text-sm text-muted-foreground">没有符合条件的周边。</p>}
+      {isError ? <div className="my-8 rounded border border-destructive/40 bg-card p-5 text-center"><p className="text-sm text-foreground">暂时无法读取周边资料，请稍后重试。</p><button type="button" onClick={() => refetch()} className="mt-3 rounded border border-primary px-4 py-2 text-xs text-primary">重新加载</button></div> : !isLoading && shown.length === 0 ? <p className="py-16 text-center text-sm text-muted-foreground">没有符合条件的周边。</p> : null}
       <div className="grid grid-cols-3 gap-2 sm:gap-4">{shown.map(it => <Link key={it.id} to="/item/$id" params={{ id: it.id }} className="group overflow-hidden rounded border border-border/60 bg-card transition hover:border-primary"><ItemImage url={it.images[0]} alt={it.name} category={it.category}/><div className="p-2 sm:p-3"><p className="line-clamp-2 text-[11px] leading-snug sm:text-sm">{it.name}</p></div></Link>)}</div>
     </section>
   </>;
