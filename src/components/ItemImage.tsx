@@ -9,6 +9,7 @@ export function ItemImage({
   url?: string | undefined;
   alt: string;
   className?: string;
+  category?: string;
 }) {
   const [displayUrl, setDisplayUrl] = useState<string | undefined>(undefined);
   const [isTransparentBadge, setIsTransparentBadge] = useState(false);
@@ -97,7 +98,7 @@ export function ItemImage({
     return () => {
       cancelled = true;
     };
-  }, [url, category]);
+  }, [url]);
 
   const resolvedUrl = displayUrl ?? url;
   return (
