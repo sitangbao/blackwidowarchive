@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Hourglass } from "@/components/Hourglass";
 import { ItemImage } from "@/components/ItemImage";
-import { CATEGORIES, REGIONS, PERSON_COUNTS, CATEGORY_OPTIONS, UPPER_DECK_SERIES, brandsFor, countByCategory, filterItems, loadArchiveItems, readCollectionState, writeCollectionState, type Filters, type CollectionState } from "@/lib/archive";
+import { CATEGORIES, REGIONS, PERSON_COUNTS, CATEGORY_OPTIONS, UPPER_DECK_SERIES, brandsFor, countByCategory, filterItems, loadArchiveItems, readCollectionState, writeCollectionState, seriesIdFor, type Filters, type CollectionState } from "@/lib/archive";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [{ title: "BLACK WIDOW ARCHIVE — Natasha Romanoff 周边收藏图鉴" }, { name: "description", content: "Marvel Natasha Romanoff / Black Widow 官方周边收藏图鉴。" }] }),
@@ -12,7 +12,7 @@ export const Route = createFileRoute("/")({
 const selectCls = "h-10 w-full min-w-0 rounded border bg-card px-2 text-xs sm:text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary";
 function Index() {
   const { data: items = [], isLoading, isError, refetch } = useQuery({ queryKey: ["items"], queryFn: loadArchiveItems });
-  const initialSeries = typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get("series") ?? "") : "";\n  const [f, setF] = useState<Filters>({ q: "", region: "", category: "", brand: "", item_type: "", series: initialSeries, status: "", person: "" });
+  const initialSeries = typeof window !== "undefined" ? ((() => { const p = new URLSearchParams(window.location.search); const id = p.get("seriesId"); return id ? id : (p.get("series") ?? ""); })()) : "";\n  const [f, setF] = useState<Filters>({ q: "", region: "", category: "", brand: "", item_type: "", series: initialSeries, status: "", person: "" });
   const [personal, setPersonal] = useState<CollectionState>(() => readCollectionState());
   const counts = useMemo(() => countByCategory(items), [items]);
   const brands = useMemo(() => (f.category ? brandsFor(items, f.category) : []), [items, f.category]);
