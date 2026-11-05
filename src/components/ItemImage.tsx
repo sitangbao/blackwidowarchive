@@ -4,12 +4,10 @@ import { Hourglass } from "./Hourglass";
 export function ItemImage({
   url,
   alt,
-  category,
   className = "",
 }: {
   url?: string | undefined;
   alt: string;
-  category?: string;
   className?: string;
 }) {
   const [displayUrl, setDisplayUrl] = useState<string | undefined>(undefined);
@@ -18,7 +16,7 @@ export function ItemImage({
   useEffect(() => {
     setDisplayUrl(undefined);
     setIsTransparentBadge(false);
-    if (!url || category !== "吧唧") return;
+    if (!url) return;
 
     let cancelled = false;
     const image = new Image();
