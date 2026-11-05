@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { ItemImage } from "@/components/ItemImage";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { personLabel, readCollectionState, writeCollectionState, uploadFiles, loadArchiveItems, type Item, type CollectionState } from "@/lib/archive";
+import { personLabel, readCollectionState, writeCollectionState, uploadFiles, loadArchiveItems, seriesIdFor, type Item, type CollectionState } from "@/lib/archive";
 
 export const Route = createFileRoute("/item/$id")({
   head: () => ({
@@ -44,7 +44,7 @@ function ItemPage() {
   const updateCollection = (value: "owned" | "wishlist" | null) => setCollection(old => { const next = { ...old }; if (value) next[item.id] = value; else delete next[item.id]; writeCollectionState(next); return next; });
   const cur = item.images[idx];
   const rows: [string, string | null | undefined][] = [
-    ["地区", item.region], ...(item.series?.trim() ? [["系列", item.series] as [string, string]] : []), ["Set", item.set_name], ["类别", item.category],
+    ["地区", item.region], ["系列", item.series], ["Set", item.set_name], ["类别", item.category],
     ...( (item.category === "卡片类" || item.category === "手办类") && item.item_type?.trim()
       ? [["第二层", item.item_type] as [string, string]] : []),
     ...(item.category === "卡片类" && item.brand?.trim() ? [["品牌／出版社", item.brand] as [string, string]] : []), ["尺寸", item.size],
@@ -87,7 +87,7 @@ function ItemPage() {
           <dl className="mt-5 divide-y rounded bg-card text-sm">
             {rows.map(([k, v]) => (
               <div key={k} className="grid grid-cols-[7.5rem_1fr] gap-3 px-4 py-2.5">
-                <dt className="text-muted-foreground">{k}</dt><dd className="whitespace-pre-wrap break-words">{k === "系列" && v ? <a href={`/?series=${encodeURIComponent(v)}#collection`} className="text-primary underline underline-offset-4 hover:text-foreground">{v}</a> : (v || "—")}</dd>
+                <dt className="text-muted-foreground">{k}</dt><dd className="whitespace-pre-wrap break-words">{k === "系列" && v && item.series_link_enabled ? <a href={`/?seriesId=${encodeURIComponent(seriesIdFor(v))}#collection`} className="text-primary underline underline-offset-4 hover:text-foreground">{v}</a> : (v || "—")}</dd>
               </div>
             ))}
           </dl>
