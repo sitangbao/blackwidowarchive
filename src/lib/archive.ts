@@ -41,7 +41,7 @@ export const statusLabel = (s: string) => STATUSES.find((x) => x.value === s)?.l
 export const personLabel = (s: string) => PERSON_COUNTS.find((x) => x.value === s)?.label ?? s;
 
 export type Item = {
-  id: string; name: string; region: string; series: string | null; set_name: string | null;
+  id: string; name: string; region: string; series: string | null; series_link_enabled?: boolean; set_name: string | null;
   category: string; item_type: string | null; brand: string | null; size: string | null; item_number: string | null;
   original_price: string; status: string; person_count: string; keywords: string | null;
   notes: string | null; images: string[];
@@ -50,7 +50,7 @@ export type Item = {
 export type Filters = { q: string; region: string; category: string; brand: string; item_type: string; series: string; status: string; person: string };
 
 export function seriesIdFor(value: string) {
-  return value.trim().replace(/\\s+/g, " ").toLocaleLowerCase();
+  return value.trim().replace(/\s+/g, " ").toLocaleLowerCase();
 }
 
 /** Pure filter used by the collection grid (tested). */
