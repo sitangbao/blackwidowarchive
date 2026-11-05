@@ -41,10 +41,11 @@ function ItemPage() {
   if (isLoading) return <p className="p-10 text-center archive-label">Loading…</p>;
   if (!item) return <p className="p-10 text-center text-muted-foreground">找不到该周边。<Link to="/" className="underline">返回</Link></p>;
 
+  const updateCollection = (value: "owned" | "wishlist" | null) => setCollection(old => { const next = { ...old }; if (value) next[item.id] = value; else delete next[item.id]; writeCollectionState(next); return next; });
   const cur = item.images[idx];
   const rows: [string, string | null | undefined][] = [
-    ["地区", item.region], ["系列", item.series], ["Set", item.set_name], ["类别", item.category],
-    ["商品类型", item.item_type], ["品牌／出版社", item.brand], ["尺寸", item.size],
+    ["地区", item.region], ["系列", item.series], ["Set", item.set_name], ["周边大类", item.category],
+    ["具体类型", item.item_type], ["品牌／出版社", item.brand], ["尺寸", item.size],
     ...(item.category === "卡片类" ? [["商品编号", item.item_number] as [string, string | null]] : []),
     ["人物数量", personLabel(item.person_count)],
     ["原价 Original Price", item.original_price],
@@ -71,8 +72,16 @@ function ItemPage() {
           )}
         </div>
         <div>
-          <p className="archive-label">Record</p>
+          <p className="archive-label">ITEM DETAILS</p>
           <h1 className="mt-1 text-2xl font-bold leading-tight">{item.name}</h1>
+          <div className="mt-3 rounded border bg-card p-3">
+            <p className="archive-label">MY COLLECTION</p>
+            <p className="mt-1 text-[11px] text-muted-foreground">仅保存在当前浏览器</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <button type="button" aria-pressed={collection[item.id] === "owned"} onClick={() => updateCollection(collection[item.id] === "owned" ? null : "owned")} className={`rounded-full border px-4 py-2 text-xs transition ${collection[item.id] === "owned" ? "border-primary bg-primary/15 text-primary" : "border-border text-muted-foreground"}`}>已拥有</button>
+              <button type="button" aria-pressed={collection[item.id] === "wishlist"} onClick={() => updateCollection(collection[item.id] === "wishlist" ? null : "wishlist")} className={`rounded-full border px-4 py-2 text-xs transition ${collection[item.id] === "wishlist" ? "border-amber-500 bg-amber-500/10 text-amber-700 dark:text-amber-300" : "border-border text-muted-foreground"}`}>愿望单</button>
+            </div>
+          </div>
           <dl className="mt-5 divide-y rounded bg-card text-sm">
             {rows.map(([k, v]) => (
               <div key={k} className="grid grid-cols-[7.5rem_1fr] gap-3 px-4 py-2.5">
@@ -81,11 +90,6 @@ function ItemPage() {
             ))}
           </dl>
         </div>
-      </div>
-      <div className="mt-6 rounded border bg-card p-4">
-        <p className="archive-label">MY COLLECTION</p>
-        <p className="mt-1 text-xs text-muted-foreground">仅保存在当前浏览器，不会更改公共图鉴。</p>
-        <select aria-label="我的收藏状态" value={collection[item.id] ?? "not_owned"} onChange={e => setCollection(old => { const next = { ...old, [item.id]: e.target.value as CollectionState[string] }; writeCollectionState(next); return next; })} className="mt-3 w-full rounded border bg-background p-2 text-sm"><option value="owned">已拥有</option><option value="not_owned">未拥有</option><option value="wishlist">愿望单</option></select>
       </div>
       <div className="mt-10 border-t pt-4 text-center">
         <button onClick={() => setReport(true)} className="text-sm text-muted-foreground underline hover:text-primary">报告信息有误</button>
