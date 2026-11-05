@@ -69,7 +69,7 @@ function Index() {
       </div>
       <div className="flex items-center justify-between py-4"><p className="archive-label">{isLoading ? "LOADING" : `${shown.length} RECORDS`}</p><Link to="/collection" className="text-xs text-primary underline">MY COLLECTION →</Link></div>
       {!isLoading && shown.length === 0 && <p className="py-16 text-center text-sm text-muted-foreground">没有符合条件的周边。</p>}
-      <div className="grid grid-cols-3 gap-2 sm:gap-4">{shown.map(it => <Link key={it.id} to="/item/$id" params={{ id: it.id }} className="group overflow-hidden rounded border border-border/60 bg-card transition hover:border-primary"><ItemImage url={it.images[0]} alt={it.name}/><div className="p-2 sm:p-3"><p className="line-clamp-2 text-[11px] leading-snug sm:text-sm">{it.name}</p></div></Link>)}</div>
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">{shown.map(it => <Link key={it.id} to="/item/$id" params={{ id: it.id }} className="group overflow-hidden rounded border border-border/60 bg-card transition hover:border-primary"><ItemImage url={it.images[0]} alt={it.name} category={it.category}/><div className="p-2 sm:p-3"><p className="line-clamp-2 text-[11px] leading-snug sm:text-sm">{it.name}</p></div></Link>)}</div>
     </section>
   </>;
 }
