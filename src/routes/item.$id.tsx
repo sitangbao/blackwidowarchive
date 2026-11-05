@@ -44,11 +44,13 @@ function ItemPage() {
   const updateCollection = (value: "owned" | "wishlist" | null) => setCollection(old => { const next = { ...old }; if (value) next[item.id] = value; else delete next[item.id]; writeCollectionState(next); return next; });
   const cur = item.images[idx];
   const rows: [string, string | null | undefined][] = [
-    ["地区", item.region], ["系列", item.series], ["Set", item.set_name], ["周边大类", item.category],
-    ["具体类型", item.item_type], ["品牌／出版社", item.brand], ["尺寸", item.size],
+    ["地区", item.region], ["系列", item.series], ["Set", item.set_name], ["类别", item.category],
+    ...( (item.category === "卡片类" || item.category === "手办类") && item.item_type?.trim()
+      ? [["第二层", item.item_type] as [string, string]] : []),
+    ["品牌／出版社", item.brand], ["尺寸", item.size],
     ...(item.category === "卡片类" ? [["商品编号", item.item_number] as [string, string | null]] : []),
     ["人物数量", personLabel(item.person_count)],
-    ["原价 Original Price", item.original_price],
+    ...(item.original_price?.trim() ? [["原价 Original Price", item.original_price] as [string, string]] : []),
     ...(priv ? [["入手价格 Purchase Price（仅管理员）", priv.purchase_price || "—"] as [string, string]] : []),
     ...(item.notes?.trim() ? [["备注 Notes", item.notes] as [string, string]] : []),
   ];
