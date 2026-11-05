@@ -49,6 +49,10 @@ export type Item = {
 
 export type Filters = { q: string; region: string; category: string; brand: string; item_type: string; series: string; status: string; person: string };
 
+export function seriesIdFor(value: string) {
+  return value.trim().replace(/\\s+/g, " ").toLocaleLowerCase();
+}
+
 /** Pure filter used by the collection grid (tested). */
 export function filterItems(items: Item[], f: Filters) {
   const q = f.q.trim().toLowerCase();
@@ -61,7 +65,7 @@ export function filterItems(items: Item[], f: Filters) {
     if (f.category && it.category !== f.category) return false;
     if (f.category && f.brand && it.brand !== f.brand) return false;
     if (f.category && f.item_type && it.item_type !== f.item_type) return false;
-    if (f.series && it.series !== f.series) return false;
+    if (f.series && seriesIdFor(it.series ?? "") !== f.series && it.series !== f.series) return false;
     if (f.status && it.status !== f.status) return false;
     if (f.person && it.person_count !== f.person) return false;
     return true;
