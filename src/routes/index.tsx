@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Hourglass } from "@/components/Hourglass";
 import { ItemImage } from "@/components/ItemImage";
-import { CATEGORIES, REGIONS, PERSON_COUNTS, CATEGORY_OPTIONS, UPPER_DECK_SERIES, brandsFor, countByCategory, filterItems, loadArchiveItems, readCollectionState, writeCollectionState, type Filters, type Item, type CollectionState } from "@/lib/archive";
+import { CATEGORIES, REGIONS, PERSON_COUNTS, CATEGORY_OPTIONS, UPPER_DECK_SERIES, brandsFor, countByCategory, filterItems, loadArchiveItems, readCollectionState, writeCollectionState, type Filters, type CollectionState } from "@/lib/archive";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [{ title: "BLACK WIDOW ARCHIVE — Natasha Romanoff 周边收藏图鉴" }, { name: "description", content: "Marvel Natasha Romanoff / Black Widow 官方周边收藏图鉴。" }] }),
