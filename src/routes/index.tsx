@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
+import { ChevronDown } from "lucide-react";
 import { Hourglass } from "@/components/Hourglass";
 import { ItemImage } from "@/components/ItemImage";
-import { CATEGORIES, REGIONS, PERSON_COUNTS, CATEGORY_OPTIONS, UPPER_DECK_SERIES, brandsFor, countByCategory, filterItems, loadArchiveItems, readCollectionState, type Filters, type Item } from "@/lib/archive";
+import { CATEGORIES, REGIONS, PERSON_COUNTS, CATEGORY_OPTIONS, UPPER_DECK_SERIES, brandsFor, countByCategory, filterItems, loadArchiveItems, readCollectionState, writeCollectionState, type Filters, type Item, type CollectionState } from "@/lib/archive";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [{ title: "BLACK WIDOW ARCHIVE — Natasha Romanoff 周边收藏图鉴" }, { name: "description", content: "Marvel Natasha Romanoff / Black Widow 官方周边收藏图鉴。" }] }),
@@ -13,14 +14,27 @@ const selectCls = "h-10 w-full min-w-0 rounded border bg-card px-2 text-xs sm:te
 function Index() {
   const { data: items = [], isLoading, isError, refetch } = useQuery({ queryKey: ["items"], queryFn: loadArchiveItems });
   const [f, setF] = useState<Filters>({ q: "", region: "", category: "", brand: "", item_type: "", series: "", status: "", person: "" });
-  const [personal, setPersonal] = useState(() => readCollectionState());
+  const [personal, setPersonal] = useState<CollectionState>(() => readCollectionState());
+  const [openStatusId, setOpenStatusId] = useState<string | null>(null);
   const counts = useMemo(() => countByCategory(items), [items]);
   const brands = useMemo(() => (f.category ? brandsFor(items, f.category) : []), [items, f.category]);
   const brandOptions = ["卡片类", "手办类"].includes(f.category) ? (CATEGORY_OPTIONS[f.category] ?? []) : brands;
-  const shown = useMemo(() => filterItems(items, { ...f, status: "" }).filter(it => !f.status || (personal[it.id] ?? "not_owned") === f.status), [items, f, personal]);
+  const shown = useMemo(() => filterItems(items, { ...f, status: "" }).filter(it => !f.status || (personal[it.id] ?? "") === f.status), [items, f, personal]);
   const categoryLabel = f.category || "周边收藏总数";
   const availableSeries = f.category === "卡片类" && f.brand === "UPPER DECK (UD)" ? [...UPPER_DECK_SERIES] : [...new Set(items.filter(i => i.category === f.category && i.brand === f.brand && i.series).map(i => i.series as string))].sort();
   const update = (key: keyof Filters, value: string) => setF(old => ({ ...old, [key]: value, ...(key === "category" ? { brand: "", item_type: "", series: "" } : {}), ...(key === "brand" ? { series: "" } : {}) }));
+  const updatePersonal = (id: string, value: "owned" | "wishlist" | null) => setPersonal(old => { const next = { ...old }; if (value) next[id] = value; else delete next[id]; writeCollectionState(next); return next; });
+  const statusControl = (it: Item) => {
+    const value = personal[it.id];
+    return <div className="relative" onClick={e => e.stopPropagation()}>
+      <button type="button" aria-expanded={openStatusId === it.id} onClick={() => setOpenStatusId(openStatusId === it.id ? null : it.id)} className={`flex w-full items-center justify-center gap-1 rounded-full border px-1 py-1.5 text-[9px] leading-none transition sm:px-2 sm:text-[10px] ${value === "owned" ? "border-primary/50 bg-primary/10 text-primary" : value === "wishlist" ? "border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300" : "border-dashed border-border text-muted-foreground"}`}>{value === "owned" ? "已拥有" : value === "wishlist" ? "愿望单" : "添加状态"}<ChevronDown size={10}/></button>
+      {openStatusId === it.id && <div className="absolute bottom-full left-1/2 z-30 mb-1 flex -translate-x-1/2 gap-1 whitespace-nowrap rounded-full border bg-card p-1 shadow-lg">
+        <button type="button" onClick={() => { updatePersonal(it.id, "owned"); setOpenStatusId(null); }} className={`rounded-full border px-2.5 py-1.5 text-[10px] ${value === "owned" ? "border-primary bg-primary/15 text-primary" : "border-transparent"}`}>已拥有</button>
+        <button type="button" onClick={() => { updatePersonal(it.id, "wishlist"); setOpenStatusId(null); }} className={`rounded-full border px-2.5 py-1.5 text-[10px] ${value === "wishlist" ? "border-primary bg-primary/15 text-primary" : "border-transparent"}`}>愿望单</button>
+        {value && <button type="button" onClick={() => { updatePersonal(it.id, null); setOpenStatusId(null); }} className="rounded-full px-2 py-1.5 text-[10px] text-muted-foreground">清除</button>}
+      </div>}
+    </div>;
+  };
   return <>
     <section className="relative overflow-hidden border-b">
       <div className="hero-glow absolute inset-0" /><Hourglass className="pointer-events-none absolute right-[-5%] top-1/2 h-[115%] -translate-y-1/2 text-primary/10 sm:right-[8%]" />
@@ -41,7 +55,7 @@ function Index() {
         <div className="mt-2 grid grid-cols-2 gap-2">
           <select value={f.region} onChange={e => update("region", e.target.value)} className={selectCls}><option value="">全部地区</option>{REGIONS.map(x => <option key={x}>{x}</option>)}</select>
           <select value={f.category} onChange={e => update("category", e.target.value)} className={selectCls}><option value="">全部类别</option>{CATEGORIES.map(c => <option key={c} value={c}>{c}{c === "卡片类" ? " (CARDS)" : c === "手办类" ? " (FIGURES)" : ""}</option>)}</select>
-          <select value={f.status} onChange={e => update("status", e.target.value)} className={selectCls}><option value="">全部收藏状态</option><option value="owned">已拥有</option><option value="not_owned">未拥有</option><option value="wishlist">愿望单</option></select>
+          <select value={f.status} onChange={e => update("status", e.target.value)} className={selectCls}><option value="">全部收藏状态</option><option value="owned">已拥有</option><option value="wishlist">愿望单</option></select>
           <select value={f.person} onChange={e => update("person", e.target.value)} className={selectCls}><option value="">全部人物数量</option>{PERSON_COUNTS.map(x => <option key={x.value} value={x.value}>{x.label}</option>)}</select>
         </div>
         {f.category && !["卡片类", "手办类"].includes(f.category) && CATEGORY_OPTIONS[f.category] && <div className="mt-3">
@@ -67,9 +81,15 @@ function Index() {
         </div>}
         {(f.category || f.brand || f.item_type || f.series || f.region || f.status || f.person || f.q) && <button type="button" onClick={() => setF({ q:"", region:"", category:"", brand:"", item_type:"", series:"", status:"", person:"" })} className="mt-3 text-xs text-muted-foreground underline">清除筛选</button>}
       </div>
-      <div className="flex items-center justify-between py-4"><p className="archive-label">{isLoading ? "LOADING" : `${shown.length} RECORDS`}</p><Link to="/collection" className="text-xs text-primary underline">MY COLLECTION →</Link></div>
+      <div className="flex items-center justify-between py-4"><p className="archive-label">{isLoading ? "LOADING" : `${shown.length} COLLECTIBLES`}</p><Link to="/collection" className="text-xs text-primary underline">MY COLLECTION →</Link></div>
       {isError ? <div className="my-8 rounded border border-destructive/40 bg-card p-5 text-center"><p className="text-sm text-foreground">暂时无法读取周边资料，请稍后重试。</p><button type="button" onClick={() => refetch()} className="mt-3 rounded border border-primary px-4 py-2 text-xs text-primary">重新加载</button></div> : !isLoading && shown.length === 0 ? <p className="py-16 text-center text-sm text-muted-foreground">没有符合条件的周边。</p> : null}
-      <div className="grid grid-cols-3 gap-2 sm:gap-4">{shown.map(it => <Link key={it.id} to="/item/$id" params={{ id: it.id }} className="group overflow-hidden rounded border border-border/60 bg-card transition hover:border-primary"><ItemImage url={it.images[0]} alt={it.name} category={it.category}/><div className="p-2 sm:p-3"><p className="line-clamp-2 text-[11px] leading-snug sm:text-sm">{it.name}</p></div></Link>)}</div>
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">{shown.map(it => <div key={it.id} className="overflow-visible rounded border border-border/60 bg-card transition hover:border-primary">
+        <Link to="/item/$id" params={{ id: it.id }} className="block">
+          <div className="flex aspect-square items-center justify-center overflow-hidden rounded-t bg-muted/40 p-2"><ItemImage url={it.images[0]} alt={it.name} category={it.category} className="h-[82%] w-[82%] rounded"/></div>
+          <div className="space-y-1 px-2 pt-2 sm:px-3"><p className="line-clamp-2 min-h-[2.5em] text-[11px] leading-snug sm:text-sm">{it.name}</p><p className="text-[9px] leading-snug text-muted-foreground sm:text-[10px]">{it.category} · {it.region}</p><p className="truncate text-[9px] text-muted-foreground sm:text-[10px]">Natasha Romanoff</p></div>
+        </Link>
+        <div className="p-2 pt-2">{statusControl(it)}</div>
+      </div>)}</div>
     </section>
   </>;
 }
