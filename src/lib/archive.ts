@@ -34,6 +34,7 @@ export const STATUSES = [
 export const PERSON_COUNTS = [
   { value: "single", label: "单人" },
   { value: "multi", label: "多人" },
+  { value: "other", label: "其他" },
 ] as const;
 export const SUBMISSION_KINDS = ["新增周边", "信息修正", "留言反馈"] as const;
 
@@ -43,7 +44,7 @@ export const personLabel = (s: string) => PERSON_COUNTS.find((x) => x.value === 
 export type Item = {
   id: string; name: string; region: string; series: string | null; series_link_enabled?: boolean; set_name: string | null;
   category: string; item_type: string | null; brand: string | null; size: string | null; item_number: string | null;
-  original_price: string; status: string; person_count: string; keywords: string | null;
+  original_price: string; status: string; person_count: string; characters?: string | null; keywords: string | null;
   notes: string | null; images: string[];
 };
 
