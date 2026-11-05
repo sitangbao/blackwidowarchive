@@ -87,7 +87,7 @@ function ItemPage() {
               <button type="button" aria-pressed={collection[item.id] === "wishlist"} onClick={() => updateCollection(collection[item.id] === "wishlist" ? null : "wishlist")} className={`rounded-full border px-4 py-2 text-xs transition ${collection[item.id] === "wishlist" ? "border-amber-500 bg-amber-500/10 text-amber-700 dark:text-amber-300" : "border-border text-muted-foreground"}`}>愿望单</button>
             </div>
           </div>
-          <dl className="mt-5 divide-y rounded bg-card text-sm">
+          <dl className="mt-5 rounded bg-card text-sm">
             {rows.map(([k, v]) => (
               <div key={k} className="grid grid-cols-[7.5rem_1fr] gap-3 px-4 py-2.5">
                 <dt className="text-muted-foreground">{k}</dt><dd className="whitespace-pre-wrap break-words">{k === "系列" && v && item.series_link_enabled ? <a href={`/?seriesId=${encodeURIComponent(seriesIdFor(v))}#collection`} className="text-primary underline underline-offset-4 hover:text-foreground">{v}</a> : (v || "—")}</dd>
@@ -96,7 +96,7 @@ function ItemPage() {
           </dl>
         </div>
       </div>
-      <div className="mt-10 border-t pt-4 text-center">
+      <div className="mt-10 pt-4 text-center">
         <button onClick={() => setReport(true)} className="text-sm text-muted-foreground underline hover:text-primary">报告信息有误</button>
       </div>
 
