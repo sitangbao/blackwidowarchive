@@ -74,7 +74,7 @@ function Index() {
       {isError ? <div className="my-8 rounded border border-destructive/40 bg-card p-5 text-center"><p className="text-sm text-foreground">暂时无法读取周边资料，请稍后重试。</p><button type="button" onClick={() => refetch()} className="mt-3 rounded border border-primary px-4 py-2 text-xs text-primary">重新加载</button></div> : !isLoading && shown.length === 0 ? <p className="py-16 text-center text-sm text-muted-foreground">没有符合条件的周边。</p> : null}
       <div className="grid grid-cols-3 gap-2 sm:gap-4">{shown.map(it => <div key={it.id} className="overflow-visible rounded border border-border/60 bg-card transition hover:border-primary">
         <Link to="/item/$id" params={{ id: it.id }} className="block">
-          <div className="flex aspect-square items-center justify-center overflow-hidden rounded-t bg-card"><ItemImage url={it.images[0]} alt={it.name} category={it.category} className="h-full w-full rounded-t"/></div>
+          <div className="flex aspect-square items-center justify-center overflow-hidden rounded-t bg-card"><ItemImage url={it.images[0]} alt={it.name} category={it.category} className="h-[82%] w-[82%] rounded-t"/></div>
           <div className="space-y-1 px-2 pt-2 sm:px-3"><p className="line-clamp-2 min-h-[2.5em] text-[11px] leading-snug sm:text-sm">{it.name}</p><p className="text-[9px] leading-snug text-muted-foreground sm:text-[10px]">{it.category} · {it.region}</p><p className="truncate text-[9px] text-muted-foreground sm:text-[10px]">Natasha Romanoff</p></div>
         </Link>
       </div>)}</div>
