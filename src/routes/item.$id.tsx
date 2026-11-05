@@ -50,7 +50,7 @@ function ItemPage() {
     ["人物数量", personLabel(item.person_count)],
     ["原价 Original Price", item.original_price],
     ...(priv ? [["入手价格 Purchase Price（仅管理员）", priv.purchase_price || "—"] as [string, string]] : []),
-    ["备注 Notes", item.notes],
+    ...(item.notes?.trim() ? [["备注 Notes", item.notes] as [string, string]] : []),
   ];
 
   return (
