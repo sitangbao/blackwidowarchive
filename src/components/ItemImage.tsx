@@ -42,6 +42,10 @@ export function ItemImage({
         const imageData = context.getImageData(0, 0, width, height);
         const pixels = imageData.data;
         const total = width * height;
+        let hadTransparency = false;
+        for (let i = 3; i < pixels.length; i += 4) {
+          if (pixels[i] < 250) { hadTransparency = true; break; }
+        }
 
         const isNearWhite = (index: number) => {
           const r = pixels[index];
@@ -140,7 +144,7 @@ export function ItemImage({
         outputContext.putImageData(imageData, -left, -top);
         if (!cancelled) {
           setDisplayUrl(output.toDataURL("image/png"));
-          setIsTransparentBadge(true);
+          setIsTransparentBadge(hadTransparency || tail > 0);
         }
       } catch {
         if (!cancelled) setDisplayUrl(url);
