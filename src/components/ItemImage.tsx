@@ -24,31 +24,93 @@ export function ItemImage({
     image.onload = () => {
       if (cancelled) return;
       try {
-        const maxSide = 512;
+        // Work on a reasonably sized copy so large uploads do not consume
+        // excessive memory on mobile devices.
+        const maxSide = 1024;
         const scale = Math.min(1, maxSide / Math.max(image.naturalWidth, image.naturalHeight));
-        const scanWidth = Math.max(1, Math.round(image.naturalWidth * scale));
-        const scanHeight = Math.max(1, Math.round(image.naturalHeight * scale));
-        const scan = document.createElement("canvas");
-        scan.width = scanWidth;
-        scan.height = scanHeight;
-        const scanContext = scan.getContext("2d", { willReadFrequently: true });
-        if (!scanContext) {
+        const width = Math.max(1, Math.round(image.naturalWidth * scale));
+        const height = Math.max(1, Math.round(image.naturalHeight * scale));
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const context = canvas.getContext("2d", { willReadFrequently: true });
+        if (!context) {
           setDisplayUrl(url);
           return;
         }
-        scanContext.drawImage(image, 0, 0, scanWidth, scanHeight);
-        const pixels = scanContext.getImageData(0, 0, scanWidth, scanHeight).data;
+        context.drawImage(image, 0, 0, width, height);
+        const imageData = context.getImageData(0, 0, width, height);
+        const pixels = imageData.data;
+        const total = width * height;
 
-        let minX = scanWidth;
-        let minY = scanHeight;
+        const isNearWhite = (index: number) => {
+          const r = pixels[index];
+          const g = pixels[index + 1];
+          const b = pixels[index + 2];
+          return Math.min(r, g, b) > 230 && Math.max(r, g, b) - Math.min(r, g, b) < 22;
+        };
+
+        // Only remove white when the corners strongly suggest a white studio background.
+        const cornerPoints = [
+          [0, 0], [width - 1, 0], [0, height - 1], [width - 1, height - 1],
+        ];
+        const whiteCorners = cornerPoints.filter(([cx, cy]) => {
+          let matches = 0;
+          for (let oy = 0; oy < 5; oy++) {
+            for (let ox = 0; ox < 5; ox++) {
+              const x = cx === 0 ? ox : width - 1 - ox;
+              const y = cy === 0 ? oy : height - 1 - oy;
+              if (x < width && y < height && isNearWhite((y * width + x) * 4)) matches++;
+            }
+          }
+          return matches >= 18;
+        }).length;
+
+        const visited = new Uint8Array(total);
+        const queue = new Int32Array(total);
+        let head = 0;
+        let tail = 0;
+        const add = (x: number, y: number) => {
+          if (x < 0 || y < 0 || x >= width || y >= height) return;
+          const pixel = y * width + x;
+          if (visited[pixel]) return;
+          const index = pixel * 4;
+          if (pixels[index + 3] < 250 || !isNearWhite(index)) return;
+          visited[pixel] = 1;
+          queue[tail++] = pixel;
+        };
+
+        if (whiteCorners >= 2) {
+          for (let x = 0; x < width; x++) {
+            add(x, 0);
+            add(x, height - 1);
+          }
+          for (let y = 0; y < height; y++) {
+            add(0, y);
+            add(width - 1, y);
+          }
+          while (head < tail) {
+            const pixel = queue[head++];
+            const x = pixel % width;
+            const y = Math.floor(pixel / width);
+            const index = pixel * 4;
+            const brightness = (pixels[index] + pixels[index + 1] + pixels[index + 2]) / 3;
+            pixels[index + 3] = Math.max(0, Math.min(255, Math.round((255 - brightness) / 25 * 255)));
+            add(x - 1, y);
+            add(x + 1, y);
+            add(x, y - 1);
+            add(x, y + 1);
+          }
+        }
+
+        let minX = width;
+        let minY = height;
         let maxX = -1;
         let maxY = -1;
-        let transparentPixels = 0;
-        for (let y = 0; y < scanHeight; y++) {
-          for (let x = 0; x < scanWidth; x++) {
-            const alpha = pixels[(y * scanWidth + x) * 4 + 3];
-            if (alpha < 250) transparentPixels++;
-            if (alpha > 12) {
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            const index = (y * width + x) * 4;
+            if (pixels[index + 3] > 12) {
               if (x < minX) minX = x;
               if (y < minY) minY = y;
               if (x > maxX) maxX = x;
@@ -57,33 +119,27 @@ export function ItemImage({
           }
         }
 
-        const totalPixels = scanWidth * scanHeight;
-        const hasTransparentBackground = transparentPixels / totalPixels > 0.01;
-        if (!hasTransparentBackground || maxX < minX || maxY < minY) {
+        if (maxX < minX || maxY < minY) {
           setDisplayUrl(url);
           return;
         }
-
-        const padX = Math.max(2, Math.round((maxX - minX + 1) * 0.04));
-        const padY = Math.max(2, Math.round((maxY - minY + 1) * 0.04));
-        const left = Math.max(0, Math.floor((minX - padX) / scale));
-        const top = Math.max(0, Math.floor((minY - padY) / scale));
-        const right = Math.min(image.naturalWidth, Math.ceil((maxX + 1 + padX) / scale));
-        const bottom = Math.min(image.naturalHeight, Math.ceil((maxY + 1 + padY) / scale));
-        const cropWidth = right - left;
-        const cropHeight = bottom - top;
-
-        const cropped = document.createElement("canvas");
-        cropped.width = cropWidth;
-        cropped.height = cropHeight;
-        const croppedContext = cropped.getContext("2d");
-        if (!croppedContext) {
+        const padX = Math.max(2, Math.round((maxX - minX + 1) * 0.035));
+        const padY = Math.max(2, Math.round((maxY - minY + 1) * 0.035));
+        const left = Math.max(0, minX - padX);
+        const top = Math.max(0, minY - padY);
+        const cropWidth = Math.min(width - left, maxX - minX + 1 + padX * 2);
+        const cropHeight = Math.min(height - top, maxY - minY + 1 + padY * 2);
+        const output = document.createElement("canvas");
+        output.width = cropWidth;
+        output.height = cropHeight;
+        const outputContext = output.getContext("2d");
+        if (!outputContext) {
           setDisplayUrl(url);
           return;
         }
-        croppedContext.drawImage(image, left, top, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+        outputContext.putImageData(imageData, -left, -top);
         if (!cancelled) {
-          setDisplayUrl(cropped.toDataURL("image/png"));
+          setDisplayUrl(output.toDataURL("image/png"));
           setIsTransparentBadge(true);
         }
       } catch {
