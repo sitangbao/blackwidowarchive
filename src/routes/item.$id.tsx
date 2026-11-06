@@ -60,7 +60,7 @@ function ItemPage() {
 
   return (
     <section className="mx-auto max-w-5xl px-3 py-8 sm:px-6">
-      <Link to="/" hash="collection" className="archive-label hover:text-foreground">← The Collection</Link>
+      <Link to="/" hash="collection" className="archive-label hover:text-foreground" onClick={(event) => { if (sessionStorage.getItem("bwa-collection-scroll-y") !== null) { event.preventDefault(); window.history.back(); } }}>← The Collection</Link>
       <div className="mt-4 grid gap-6 md:grid-cols-2">
         <div className="mx-auto w-full max-w-[280px] sm:max-w-[340px]">
           <button onClick={() => cur && setZoom(true)} className="block w-full cursor-zoom-in" aria-label="放大查看">
