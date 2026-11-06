@@ -7,5 +7,8 @@
   "set_name": "F",
   "category": "吧唧",
   "notes_preset": "set",
-  "notes": "Set内包括鹰眼"
+  "notes": "Set内包括鹰眼",
+  "images": [
+    "/archive/items/IMG_4334.png"
+  ]
 }
