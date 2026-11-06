@@ -64,7 +64,7 @@ async function main() {
       status: item.status ?? "not_owned",
       person_count: item.person_count ?? "single",
       keywords: item.keywords ?? null,
-      notes: item.notes ?? null,
+      notes: [item.notes_preset === "blind_box" ? "盲盒" : item.notes_preset === "blind_box_hidden" ? "盲盒隐藏款" : null, item.notes ?? null].filter(Boolean).join("；") || null,
       images,
     });
   }
