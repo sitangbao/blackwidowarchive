@@ -75,7 +75,7 @@ function Index() {
       <div className="grid grid-cols-3 gap-2 sm:gap-4">{shown.map(it => <div key={it.id} className="overflow-visible rounded border border-border/60 bg-card transition hover:border-primary">
         <Link to="/item/$id" params={{ id: it.id }} className="block">
           <div className="flex aspect-square items-center justify-center overflow-hidden rounded-t bg-card"><ItemImage url={it.images[0]} alt={it.name} category={it.category} className="h-[82%] w-[82%] rounded-t"/></div>
-          <div className="px-2 pt-0 sm:px-3"><p className="line-clamp-2 min-h-[2.5em] text-[11px] leading-snug sm:text-sm">{it.name}</p><p className="-mt-1.5 text-[9px] leading-snug text-muted-foreground sm:text-[10px]">{it.category} · {it.region}</p></div>
+          <div className="px-2 pt-1.5 pb-2.5 sm:px-3"><p className="line-clamp-2 min-h-[2.5em] text-[11px] leading-snug sm:text-sm">{it.name}</p><div className="mt-1.5 flex flex-wrap items-center gap-1"><span className="rounded-full border border-border/70 bg-background/60 px-1.5 py-0.5 text-[8px] leading-none text-muted-foreground sm:text-[10px]">{it.category}</span><span className="rounded-full border border-border/70 bg-background/60 px-1.5 py-0.5 text-[8px] leading-none text-muted-foreground sm:text-[10px]">{it.region}</span></div></div>
         </Link>
       </div>)}</div>
     </section>
