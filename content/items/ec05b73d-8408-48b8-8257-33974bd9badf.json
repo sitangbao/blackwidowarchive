@@ -5,5 +5,8 @@
   "series": "漫威争锋",
   "series_link_enabled": true,
   "category": "吧唧",
-  "notes_preset": "blind_draw"
+  "notes_preset": "blind_draw",
+  "images": [
+    "/archive/items/IMG_4300.webp"
+  ]
 }
