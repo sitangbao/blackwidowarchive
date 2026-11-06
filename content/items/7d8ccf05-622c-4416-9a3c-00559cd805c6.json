@@ -1,0 +1,13 @@
+{
+  "id": "7d8ccf05-622c-4416-9a3c-00559cd805c6",
+  "name": "A3相卡",
+  "region": "日谷",
+  "series_preset": "infinity_war",
+  "series_link_enabled": true,
+  "category": "相卡",
+  "person_count": "single",
+  "character_preset": "natasha_romanoff",
+  "images": [
+    "/archive/items/IMG_4362.webp"
+  ]
+}
