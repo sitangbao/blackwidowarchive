@@ -1,0 +1,13 @@
+{
+  "id": "984bce37-e7ac-42cf-9f0c-85e0060cdb0a",
+  "name": "A3明信片",
+  "region": "日谷",
+  "series_preset": "infinity_war",
+  "series_link_enabled": true,
+  "category": "明信片",
+  "person_count": "multi",
+  "characters": "群像",
+  "images": [
+    "/archive/items/IMG_4400.jpeg"
+  ]
+}
