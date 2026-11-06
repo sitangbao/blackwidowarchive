@@ -53,7 +53,7 @@ async function main() {
       id: String(item.id),
       name: String(item.name),
       region: item.region ?? "",
-      series: item.series ?? null,
+      series: item.series_preset === "iron_man_2" ? "钢铁侠2" : item.series_preset === "avengers_1" ? "复仇者联盟1" : item.series_preset === "winter_soldier" ? "美国队长2:冬日战士" : item.series_preset === "age_of_ultron" ? "复仇者联盟2:奥创纪元" : item.series_preset === "civil_war" ? "美国队长3:内战" : item.series_preset === "infinity_war" ? "复仇者联盟3:无限战争" : item.series_preset === "endgame" ? "复仇者联盟4:终局之战" : item.series_preset === "black_widow" ? "黑寡妇" : (item.series ?? null),
       set_name: item.set_name ?? null,
       category: item.category ?? "",
       item_type: item.item_type ?? null,
