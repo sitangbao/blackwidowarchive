@@ -1,0 +1,13 @@
+{
+  "id": "d475bb65-1ecf-4cd0-b39b-4884dac2105c",
+  "name": "A4 Vol.2便利店相卡",
+  "region": "日谷",
+  "series_preset": "endgame",
+  "series_link_enabled": true,
+  "category": "相卡",
+  "person_count": "multi",
+  "characters": "初代A6",
+  "images": [
+    "/archive/items/IMG_4395.jpeg"
+  ]
+}
