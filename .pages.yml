@@ -123,8 +123,15 @@ content:
               label: 多人
             - name: other
               label: 其他
+      - name: character_preset
+        label: 人物快捷选项
+        type: select
+        options:
+          values:
+            - name: natasha_romanoff
+              label: 娜塔莎·罗曼诺夫（Natasha Romanoff）
       - name: characters
-        label: 人物
+        label: 其他人物（可自由填写）
         type: string
       - name: keywords
         label: 搜索关键词
