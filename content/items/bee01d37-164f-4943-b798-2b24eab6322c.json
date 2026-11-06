@@ -2,9 +2,9 @@
   "id": "bee01d37-164f-4943-b798-2b24eab6322c",
   "name": "白底吧唧",
   "region": "日谷",
-  "series": "复仇者联盟3:无限战争",
+  "series_preset": "infinity_war",
   "series_link_enabled": true,
   "category": "吧唧",
   "person_count": "single",
-  "characters": "娜塔莎罗曼诺夫"
+  "character_preset": "natasha_romanoff"
 }
