@@ -1,4 +1,3 @@
-
 media:
   - name: item-images
     label: 商品图片
@@ -177,7 +176,7 @@ content:
         options:
           values:
             - name: natasha_romanoff
-              label: 娜塔莎·罗曼诺夫（Natasha Romanoff）
+              label: 娜塔莎·罗曼诺夫
       - name: characters
         label: 其他人物（可自由填写）
         type: string
