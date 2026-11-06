@@ -110,8 +110,35 @@ content:
       - name: item_type
         label: 商品细分类
         type: string
+      - name: brand_preset
+        label: 品牌快捷选项
+        type: select
+        options:
+          values:
+            - name: upper_deck
+              label: UPPER DECK (UD)
+            - name: kakawow
+              label: KAKAWOW
+            - name: topps
+              label: TOPPS
+            - name: finding_card
+              label: FINDING CARD
+            - name: hot_toys
+              label: HOT TOYS
+            - name: marvel_legends
+              label: MARVEL LEGENDS
+            - name: cosbaby
+              label: COSBABY
+            - name: lego
+              label: LEGO
+            - name: pop_mart
+              label: POP MART
+            - name: bandai
+              label: BANDAI
+            - name: titan_hero_series
+              label: TITAN HERO SERIES
       - name: brand
-        label: 品牌／出版社
+        label: 其他品牌／出版社（可自由填写）
         type: string
       - name: size
         label: 尺寸
