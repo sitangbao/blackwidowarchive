@@ -52,7 +52,7 @@ function ItemPage() {
     ...(item.category === "卡片类" && item.brand?.trim() ? [["品牌／出版社", item.brand] as [string, string]] : []),
     ["尺寸", item.size],
     ...(item.category === "卡片类" ? [["商品编号", item.item_number] as [string, string | null]] : []),
-    ...(item.characters?.trim() ? [["人物", item.characters] as [string, string]] : []),
+    ...((item.characters?.trim() || item.character_preset?.trim()) ? [["人物", [item.character_preset === "natasha_romanoff" ? "娜塔莎·罗曼诺夫（Natasha Romanoff）" : "", item.characters?.trim() ?? ""].filter(Boolean).join("、")] as [string, string]] : []),
     ...(item.original_price?.trim() ? [["原价", item.original_price] as [string, string]] : []),
     ...(priv ? [["入手价格 Purchase Price（仅管理员）", priv.purchase_price || "—"] as [string, string]] : []),
     ...(item.notes?.trim() ? [["备注 Notes", item.notes] as [string, string]] : []),
