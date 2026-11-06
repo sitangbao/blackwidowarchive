@@ -49,7 +49,7 @@ function ItemPage() {
     ["类别", item.category],
     ...( (item.category === "卡片类" || item.category === "手办类") && item.item_type?.trim()
       ? [["第二层", item.item_type] as [string, string]] : []),
-    ...(item.category === "卡片类" && item.brand?.trim() ? [["品牌／出版社", item.brand] as [string, string]] : []),
+    ...((item.category === "卡片类" || item.category === "手办类") && item.brand?.trim() ? [["品牌／出版社", item.brand] as [string, string]] : []),
     ["尺寸", item.size],
     ...(item.category === "卡片类" ? [["商品编号", item.item_number] as [string, string | null]] : []),
     ...((item.characters?.trim() || item.character_preset?.trim()) ? [["人物", [item.character_preset === "natasha_romanoff" ? "娜塔莎·罗曼诺夫（Natasha Romanoff）" : "", item.characters?.trim() ?? ""].filter(Boolean).join("、")] as [string, string]] : []),
