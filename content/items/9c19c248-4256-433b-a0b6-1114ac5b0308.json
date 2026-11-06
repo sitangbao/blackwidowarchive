@@ -5,5 +5,8 @@
   "series_link_enabled": false,
   "category": "吧唧",
   "person_count": "single",
-  "notes_preset": "set"
+  "notes_preset": "set",
+  "images": [
+    "/archive/items/IMG_4391.webp"
+  ]
 }
