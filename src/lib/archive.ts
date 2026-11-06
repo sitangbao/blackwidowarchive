@@ -42,7 +42,7 @@ export const statusLabel = (s: string) => STATUSES.find((x) => x.value === s)?.l
 export const personLabel = (s: string) => PERSON_COUNTS.find((x) => x.value === s)?.label ?? s;
 
 export type Item = {
-  id: string; name: string; region: string; series: string | null; series_link_enabled?: boolean; set_name: string | null;
+  id: string; name: string; region: string; series: string | null; series_preset?: string | null; series_link_enabled?: boolean; set_name: string | null;
   category: string; item_type: string | null; brand: string | null; size: string | null; item_number: string | null;
   original_price: string; status: string; person_count: string; characters?: string | null; character_preset?: string | null; keywords: string | null;
   notes: string | null; images: string[];
