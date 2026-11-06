@@ -2,11 +2,12 @@
   "id": "dc66b18f-0904-415e-9938-fa679f3dd353",
   "name": "镜面吧唧",
   "region": "日谷",
-  "series": "复仇者联盟4:终局之战",
+  "series_preset": "endgame",
   "series_link_enabled": true,
   "category": "吧唧",
   "original_price": "350円(含税)",
   "person_count": "single",
+  "character_preset": "natasha_romanoff",
   "images": [
     "/archive/items/IMG_4259.webp"
   ]
