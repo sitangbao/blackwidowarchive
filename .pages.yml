@@ -188,10 +188,10 @@ content:
         type: select
         options:
           values:
-            - name: blind_box
-              label: 盲盒
-            - name: blind_box_hidden
-              label: 盲盒隐藏款
+            - name: blind_draw
+              label: 盲抽
+            - name: set
+              label: 套装
       - name: notes
         label: 其他备注（可自由填写）
         type: text
