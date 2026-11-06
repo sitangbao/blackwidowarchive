@@ -1,0 +1,13 @@
+{
+  "id": "ba9689e7-8894-44ce-a712-0acbf55b620b",
+  "name": "A4 Vol.2便利店相卡",
+  "region": "日谷",
+  "series_preset": "endgame",
+  "series_link_enabled": true,
+  "category": "相卡",
+  "person_count": "multi",
+  "characters": "群像",
+  "images": [
+    "/archive/items/IMG_4394.jpeg"
+  ]
+}
