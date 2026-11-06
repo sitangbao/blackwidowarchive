@@ -51,8 +51,29 @@ content:
             - 美谷
             - 韩谷
             - 国谷
+      - name: series_preset
+        label: 系列快捷选项
+        type: select
+        options:
+          values:
+            - name: iron_man_2
+              label: 钢铁侠2
+            - name: avengers_1
+              label: 复仇者联盟1
+            - name: winter_soldier
+              label: 美国队长2:冬日战士
+            - name: age_of_ultron
+              label: 复仇者联盟2:奥创纪元
+            - name: civil_war
+              label: 美国队长3:内战
+            - name: infinity_war
+              label: 复仇者联盟3:无限战争
+            - name: endgame
+              label: 复仇者联盟4:终局之战
+            - name: black_widow
+              label: 黑寡妇
       - name: series
-        label: 系列
+        label: 其他系列（可自由填写）
         type: string
       - name: series_link_enabled
         label: 系列名称启用可点击链接
