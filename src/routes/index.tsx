@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Hourglass } from "@/components/Hourglass";
 import { ItemImage } from "@/components/ItemImage";
 import { CATEGORIES, REGIONS, PERSON_COUNTS, CATEGORY_OPTIONS, UPPER_DECK_SERIES, brandsFor, countByCategory, filterItems, loadArchiveItems, readCollectionState, writeCollectionState, seriesIdFor, type Filters, type CollectionState } from "@/lib/archive";
@@ -15,6 +15,15 @@ function Index() {
   const initialSeries = typeof window !== "undefined" ? ((() => { const p = new URLSearchParams(window.location.search); const id = p.get("seriesId"); return id ? id : (p.get("series") ?? ""); })()) : "";
   const [f, setF] = useState<Filters>({ q: "", region: "", category: "", brand: "", item_type: "", series: initialSeries, status: "", person: "" });
   const [personal, setPersonal] = useState<CollectionState>(() => readCollectionState());
+  useEffect(() => {
+    if (isLoading) return;
+    const saved = sessionStorage.getItem("bwa-collection-scroll-y");
+    if (saved === null) return;
+    sessionStorage.removeItem("bwa-collection-scroll-y");
+    const y = Number(saved);
+    if (!Number.isFinite(y)) return;
+    requestAnimationFrame(() => requestAnimationFrame(() => window.scrollTo(0, y)));
+  }, [isLoading]);
   const counts = useMemo(() => countByCategory(items), [items]);
   const brands = useMemo(() => (f.category ? brandsFor(items, f.category) : []), [items, f.category]);
   const brandOptions = ["卡片类", "手办类"].includes(f.category) ? (CATEGORY_OPTIONS[f.category] ?? []) : brands;
@@ -73,7 +82,7 @@ function Index() {
       <div className="flex items-center justify-between py-4"><p className="archive-label">{isLoading ? "LOADING" : `${shown.length} COLLECTIBLES`}</p><Link to="/collection" className="text-xs text-primary underline">MY COLLECTION →</Link></div>
       {isError ? <div className="my-8 rounded border border-destructive/40 bg-card p-5 text-center"><p className="text-sm text-foreground">暂时无法读取周边资料，请稍后重试。</p><button type="button" onClick={() => refetch()} className="mt-3 rounded border border-primary px-4 py-2 text-xs text-primary">重新加载</button></div> : !isLoading && shown.length === 0 ? <p className="py-16 text-center text-sm text-muted-foreground">没有符合条件的周边。</p> : null}
       <div className="grid grid-cols-3 gap-2 sm:gap-4">{shown.map(it => <div key={it.id} className="overflow-visible rounded border border-border/60 bg-card transition hover:border-primary">
-        <Link to="/item/$id" params={{ id: it.id }} className="block">
+        <Link to="/item/$id" params={{ id: it.id }} className="block" onClick={(event) => { if (event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) sessionStorage.setItem("bwa-collection-scroll-y", String(window.scrollY)); }}>
           <div className="flex aspect-square items-center justify-center overflow-hidden rounded-t bg-card"><ItemImage url={it.images[0]} alt={it.name} category={it.category} className="h-[82%] w-[82%] rounded-t"/></div>
           <div className="px-2 pt-1.5 pb-2.5 sm:px-3"><p className="line-clamp-2 min-h-[2.5em] text-[12px] leading-snug sm:text-[15px]">{it.name}</p><div className="mt-1.5 flex flex-wrap items-center gap-1"><span className="rounded-full border border-border/70 bg-background/60 px-1.5 py-0.5 text-[9px] leading-none text-muted-foreground sm:text-[11px]">{it.category}</span><span className="rounded-full border border-border/70 bg-background/60 px-1.5 py-0.5 text-[8px] leading-none text-muted-foreground sm:text-[10px]">{it.region}</span></div></div>
         </Link>
