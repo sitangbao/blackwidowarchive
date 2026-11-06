@@ -4,5 +4,7 @@
   "region": "日谷",
   "series": "-",
   "series_link_enabled": false,
-  "category": "吧唧"
+  "category": "吧唧",
+  "person_count": "single",
+  "notes_preset": "blind_draw"
 }
