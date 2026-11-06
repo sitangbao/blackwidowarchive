@@ -1,0 +1,13 @@
+{
+  "id": "eeb6e707-3ed4-476b-9b7a-8adc3f8ebfed",
+  "name": "A3明信片",
+  "region": "日谷",
+  "series_preset": "infinity_war",
+  "series_link_enabled": true,
+  "category": "明信片",
+  "person_count": "single",
+  "character_preset": "natasha_romanoff",
+  "images": [
+    "/archive/items/IMG_4401.jpeg"
+  ]
+}
