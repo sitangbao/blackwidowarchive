@@ -3,7 +3,7 @@
   "name": "金底吧唧",
   "region": "日谷",
   "series": "美国队长2:冬日战士",
-  "series_link_enabled": false,
+  "series_link_enabled": true,
   "category": "吧唧",
   "person_count": "single",
   "characters": "娜塔莎罗曼诺夫"
