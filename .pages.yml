@@ -183,8 +183,17 @@ content:
       - name: keywords
         label: 搜索关键词
         type: string
+      - name: notes_preset
+        label: 备注快捷选项
+        type: select
+        options:
+          values:
+            - name: blind_box
+              label: 盲盒
+            - name: blind_box_hidden
+              label: 盲盒隐藏款
       - name: notes
-        label: 备注
+        label: 其他备注（可自由填写）
         type: text
       - name: images
         label: 商品图片
