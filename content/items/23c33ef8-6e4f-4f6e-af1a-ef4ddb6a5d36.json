@@ -2,9 +2,9 @@
   "id": "23c33ef8-6e4f-4f6e-af1a-ef4ddb6a5d36",
   "name": "天空树吧唧",
   "region": "日谷",
-  "series": "复仇者联盟3:无限战争",
+  "series_preset": "infinity_war",
   "series_link_enabled": true,
   "category": "吧唧",
   "person_count": "single",
-  "characters": "娜塔莎罗曼诺夫"
+  "character_preset": "natasha_romanoff"
 }
