@@ -1,0 +1,14 @@
+{
+  "id": "eb62a776-b017-4344-9fea-8b1622e1e888",
+  "name": "A4第一弹亚克力立牌",
+  "region": "日谷",
+  "series_preset": "endgame",
+  "series_link_enabled": true,
+  "category": "立牌类",
+  "original_price": "800円+税",
+  "person_count": "single",
+  "notes_preset": "blind_draw",
+  "images": [
+    "/archive/items/IMG_4528.png"
+  ]
+}
