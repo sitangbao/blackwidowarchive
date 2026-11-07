@@ -1,14 +1,15 @@
 {
   "id": "6d615eec-54cb-435f-a92f-f5673f44243b",
-  "name": "扭蛋吧唧",
+  "name": "A4扭蛋吧唧",
   "region": "日谷",
   "series_preset": "endgame",
   "series_link_enabled": true,
   "category": "吧唧",
-  "size": "70mm",
+  "size": "直径70mm",
+  "original_price": "一次500円(含税) ",
   "person_count": "single",
   "character_preset": "natasha_romanoff",
   "images": [
-    "/archive/optimized/IMG_4420-5c37c3d9224b.webp"
+    "/archive/items/IMG_4432.webp"
   ]
 }
