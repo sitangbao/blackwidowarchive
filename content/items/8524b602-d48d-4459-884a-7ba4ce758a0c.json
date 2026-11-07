@@ -1,0 +1,14 @@
+{
+  "id": "8524b602-d48d-4459-884a-7ba4ce758a0c",
+  "name": "漫威吧唧",
+  "region": "日谷",
+  "series_link_enabled": false,
+  "category": "吧唧",
+  "original_price": "440円(含税)",
+  "person_count": "single",
+  "character_preset": "natasha_romanoff",
+  "notes_preset": "blind_draw",
+  "images": [
+    "/archive/items/IMG_4428.png"
+  ]
+}
