@@ -105,6 +105,7 @@ content:
             - 手办类
             - 影音
             - 服饰
+            - 包袋类
             - 其他
       - name: item_type
         label: 商品细分类
