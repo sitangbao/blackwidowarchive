@@ -144,7 +144,7 @@ content:
         label: 尺寸
         type: string
       - name: item_number
-        label: 卡片编号
+        label: 编号
         type: string
       - name: original_price
         label: 原价
