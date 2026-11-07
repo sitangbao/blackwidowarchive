@@ -6,5 +6,8 @@
   "series_link_enabled": false,
   "category": "吧唧",
   "person_count": "single",
-  "notes_preset": "blind_draw"
+  "notes_preset": "blind_draw",
+  "images": [
+    "/archive/items/IMG_4426.png"
+  ]
 }
