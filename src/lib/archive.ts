@@ -11,7 +11,7 @@ export async function loadArchiveItems(): Promise<Item[]> {
 
 export const REGIONS = ["日谷", "美谷", "韩谷", "国谷"] as const;
 export const CATEGORIES = [
-  "卡片类", "吧唧", "冰箱贴", "立牌类", "挂件类", "杯垫", "橡胶夹子", "文具", "色纸", "贴纸",
+  "卡片类", "徽章", "冰箱贴", "立牌类", "挂件类", "杯垫", "橡胶夹子", "文具", "色纸", "贴纸",
   "相卡", "明信片", "海报", "文件夹", "杯子", "毛绒", "手办类", "影音", "服饰", "包袋类", "其他",
 ] as const;
 export const CATEGORY_OPTIONS: Record<string, string[]> = {
