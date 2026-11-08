@@ -193,8 +193,9 @@ function MyCollection() {
     if (!file) return;
     try {
       const parsed = JSON.parse(await file.text());
+      if (!parsed || typeof parsed !== "object" || !parsed.items || typeof parsed.items !== "object" || Array.isArray(parsed.items)) throw new Error("invalid backup");
       const next = normalizeCollectionState(parsed.items);
-      if (!Object.keys(next).length && Object.keys(parsed.items ?? {}).length) throw new Error("invalid backup");
+      if (!Object.keys(next).length && Object.keys(parsed.items).length) throw new Error("invalid backup");
       if (!window.confirm("导入备份会覆盖目前这台设备上的收藏状态，确定继续吗？")) return;
       setState(next);
       writeCollectionState(next);
