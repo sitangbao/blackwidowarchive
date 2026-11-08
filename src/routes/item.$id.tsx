@@ -131,7 +131,7 @@ function ItemPage() {
               ) : (
                 <>
                   <button type="button" aria-pressed={collection[item.id]?.status === "owned"} onClick={openOwnedEditor} className={`rounded-full border px-4 py-2 text-xs transition ${collection[item.id]?.status === "owned" ? "border-primary bg-primary/15 text-primary" : "border-border text-muted-foreground"}`}>已拥有{collection[item.id]?.status === "owned" ? ` ×${collection[item.id].quantity}` : ""}</button>
-                  {collection[item.id]?.status !== "owned" && <button type="button" aria-pressed={collection[item.id]?.status === "wishlist"} onClick={() => updateCollection(collection[item.id]?.status === "wishlist" ? null : "wishlist")} className={`rounded-full border px-4 py-2 text-xs transition ${collection[item.id]?.status === "wishlist" ? "border-amber-500 bg-amber-500/10 text-amber-700 dark:text-amber-300" : "border-border text-muted-foreground"}`}>愿望单</button>}
+                  <button type="button" aria-pressed={collection[item.id]?.status === "wishlist"} onClick={() => updateCollection(collection[item.id]?.status === "wishlist" ? null : "wishlist")} className={`rounded-full border px-4 py-2 text-xs transition ${collection[item.id]?.status === "wishlist" ? "border-amber-500 bg-amber-500/10 text-amber-700 dark:text-amber-300" : "border-border text-muted-foreground"}`}>愿望单</button>
                 </>
               )}
             </div>
