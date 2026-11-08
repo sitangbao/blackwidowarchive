@@ -43,7 +43,7 @@ export const personLabel = (s: string) => PERSON_COUNTS.find((x) => x.value === 
 
 export type Item = {
   id: string; name: string; region: string; series: string | null; series_preset?: string | null; series_link_enabled?: boolean; set_name: string | null;
-  category: string; item_type: string | null; brand: string | null; brand_preset?: string | null; size: string | null; item_number: string | null;
+  category: string; item_type: string | null; brand: string | null; brand_preset?: string | null; size: string | null; box_number?: string | null; item_number?: string | null; card_number?: string | null;
   product_spec?: string | null; release_type?: string | null;
   original_price: string; status: string; person_count: string; characters?: string | null; character_preset?: string | null; keywords: string | null;
   notes: string | null; images: string[];
@@ -60,7 +60,7 @@ export function filterItems(items: Item[], f: Filters) {
   const q = f.q.trim().toLowerCase();
   return items.filter((it) => {
     if (q) {
-      const hay = [it.name, it.series, it.set_name, it.keywords, it.brand, it.item_type].filter(Boolean).join(" ").toLowerCase();
+      const hay = [it.name, it.series, it.set_name, it.keywords, it.brand, it.item_type, it.box_number, it.item_number, it.card_number].filter(Boolean).join(" ").toLowerCase();
       if (!hay.includes(q)) return false;
     }
     if (f.region && it.region !== f.region) return false;
