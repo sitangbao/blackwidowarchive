@@ -44,6 +44,7 @@ export const personLabel = (s: string) => PERSON_COUNTS.find((x) => x.value === 
 export type Item = {
   id: string; name: string; region: string; series: string | null; series_preset?: string | null; series_link_enabled?: boolean; set_name: string | null;
   category: string; item_type: string | null; brand: string | null; brand_preset?: string | null; size: string | null; item_number: string | null;
+  product_spec?: string | null; release_type?: string | null;
   original_price: string; status: string; person_count: string; characters?: string | null; character_preset?: string | null; keywords: string | null;
   notes: string | null; images: string[];
 };
