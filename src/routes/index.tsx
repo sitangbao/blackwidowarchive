@@ -27,7 +27,7 @@ function Index() {
   const counts = useMemo(() => countByCategory(items), [items]);
   const brands = useMemo(() => (f.category ? brandsFor(items, f.category) : []), [items, f.category]);
   const brandOptions = ["卡片类", "手办类"].includes(f.category) ? (CATEGORY_OPTIONS[f.category] ?? []) : brands;
-  const shown = useMemo(() => filterItems(items, { ...f, status: "" }).filter(it => !f.status || (personal[it.id] ?? "") === f.status), [items, f, personal]);
+  const shown = useMemo(() => filterItems(items, { ...f, status: "" }).filter(it => !f.status || (personal[it.id]?.status ?? "") === f.status), [items, f, personal]);
   const categoryLabel = f.category || "周边收藏总数";
   const seriesFilterLabel = items.find(it => seriesIdFor(it.series ?? "") === f.series)?.series ?? f.series;
   const availableSeries = f.category === "卡片类" && f.brand === "UPPER DECK (UD)" ? [...UPPER_DECK_SERIES] : [...new Set(items.filter(i => i.category === f.category && i.brand === f.brand && i.series).map(i => i.series as string))].sort();
