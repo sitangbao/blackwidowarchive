@@ -56,12 +56,17 @@ export function seriesIdFor(value: string) {
 }
 
 /** Pure filter used by the collection grid (tested). */
+function normalizeSearchText(value: string) {
+  return value.toLocaleLowerCase().replace(/[\\s\\p{P}\\p{S}]+/gu, "");
+}
+
 export function filterItems(items: Item[], f: Filters) {
-  const q = f.q.trim().toLowerCase();
+  const q = normalizeSearchText(f.q);
   return items.filter((it) => {
     if (q) {
-      const hay = [it.name, it.series, it.set_name, it.keywords, it.brand, it.item_type, it.box_number, it.item_number, it.card_number].filter(Boolean).join(" ").toLowerCase();
-      if (!hay.includes(q)) return false;
+      const hay = normalizeSearchText([it.name, it.series, it.set_name, it.keywords, it.brand, it.item_type, it.box_number, it.item_number, it.card_number, it.character_preset, it.characters, it.category, it.region].filter(Boolean).join(" "));
+      const terms = f.q.trim().toLocaleLowerCase().split(/\\s+/).map(normalizeSearchText).filter(Boolean);
+      if (!terms.every(term => hay.includes(term))) return false;
     }
     if (f.region && it.region !== f.region) return false;
     if (f.category && it.category !== f.category) return false;
