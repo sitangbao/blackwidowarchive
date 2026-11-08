@@ -196,7 +196,7 @@ function L({ t, children }: { t: string; children: React.ReactNode }) {
 
 type Form = Omit<Item, "id"> & { purchase_price: string };
 const emptyForm: Form = {
-  name: "", region: REGIONS[0], series: "", set_name: "", category: CATEGORIES[0], item_type: "", brand: "", size: "", item_number: "",
+  name: "", region: REGIONS[0], series: "", set_name: "", category: CATEGORIES[0], item_type: "", brand: "", size: "", box_number: "", item_number: "", card_number: "",
   original_price: "", status: "owned", person_count: "single", keywords: "", notes: "", images: [], purchase_price: "",
 };
 
@@ -226,7 +226,7 @@ function ItemEditor({ item, onClose }: { item: Item | null; onClose: () => void 
     if (!f.name.trim() || !f.original_price.trim()) { toast.error("商品名称和原价为必填"); return; }
     setBusy(true);
     const { purchase_price, ...rest } = f;
-    const payload = { ...rest, item_number: f.category === "卡片类" ? f.item_number : "", item_type: f.item_type || null };
+    const payload = { ...rest, box_number: f.category === "手办类" ? f.box_number : "", item_number: f.category === "手办类" ? f.item_number : "", card_number: f.category === "卡片类" ? f.card_number : "", item_type: f.item_type || null };
     const res = item
       ? await supabase.from("items").update({ ...payload, updated_at: new Date().toISOString() }).eq("id", item.id).select("id").single()
       : await supabase.from("items").insert(payload).select("id").single();
@@ -249,7 +249,7 @@ function ItemEditor({ item, onClose }: { item: Item | null; onClose: () => void 
           <L t="Set"><input value={f.set_name ?? ""} onChange={up("set_name")} className={input} /></L>
           <L t="品牌／出版社"><input value={f.brand ?? ""} onChange={up("brand")} className={input} /></L>
           <L t="尺寸"><input value={f.size ?? ""} onChange={up("size")} className={input} /></L>
-          {f.category === "卡片类" && <L t="商品编号"><input value={f.item_number ?? ""} onChange={up("item_number")} className={input} /></L>}
+          {f.category === "手办类" && <><L t="盒号"><input value={f.box_number ?? ""} onChange={up("box_number")} className={input} /></L><L t="商品编号（Item Number）"><input value={f.item_number ?? ""} onChange={up("item_number")} className={input} /></L></>}{f.category === "卡片类" && <L t="卡片编号"><input value={f.card_number ?? ""} onChange={up("card_number")} className={input} /></L>}
           <L t="人物数量（图片中）"><select value={f.person_count} onChange={up("person_count")} className={input}>{PERSON_COUNTS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}</select></L>
           <L t="原价 Original Price *"><input value={f.original_price} onChange={up("original_price")} className={input} /></L>
           <L t="入手价格 Purchase Price（仅管理员可见）"><input value={f.purchase_price} onChange={up("purchase_price")} className={input} /></L>
