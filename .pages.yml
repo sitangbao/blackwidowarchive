@@ -143,8 +143,14 @@ content:
       - name: size
         label: 尺寸
         type: string
+      - name: box_number
+        label: 盒号
+        type: string
       - name: item_number
-        label: 编号
+        label: 商品编号（Item Number）
+        type: string
+      - name: card_number
+        label: 卡片编号
         type: string
       - name: product_spec
         label: 产品规格
