@@ -37,11 +37,41 @@ function ItemPage() {
   const [zoom, setZoom] = useState(false);
   const [report, setReport] = useState(false);
   const [collection, setCollection] = useState<CollectionState>(() => readCollectionState());
+  const [quantityDialogOpen, setQuantityDialogOpen] = useState(false);
+  const [quantityInput, setQuantityInput] = useState("1");
 
   if (isLoading) return <p className="p-10 text-center archive-label">Loading…</p>;
   if (!item) return <p className="p-10 text-center text-muted-foreground">找不到该周边。<Link to="/" className="underline">返回</Link></p>;
 
-  const updateCollection = (value: "owned" | "wishlist" | null) => setCollection(old => { const next = { ...old }; if (value) next[item.id] = value; else delete next[item.id]; writeCollectionState(next); return next; });
+  const updateCollection = (value: "wishlist" | null) => setCollection(old => {
+    const next = { ...old };
+    if (value) next[item.id] = { status: value, quantity: 0 };
+    else delete next[item.id];
+    writeCollectionState(next);
+    return next;
+  });
+  const openOwnedQuantity = () => {
+    setQuantityInput(String(collection[item.id]?.status === "owned" ? collection[item.id].quantity : 1));
+    setQuantityDialogOpen(true);
+  };
+  const saveOwnedQuantity = () => {
+    const quantity = Math.max(1, Math.floor(Number(quantityInput) || 1));
+    setCollection(old => {
+      const next = { ...old, [item.id]: { status: "owned" as const, quantity } };
+      writeCollectionState(next);
+      return next;
+    });
+    setQuantityDialogOpen(false);
+  };
+  const removeOwned = () => {
+    setCollection(old => {
+      const next = { ...old };
+      delete next[item.id];
+      writeCollectionState(next);
+      return next;
+    });
+    setQuantityDialogOpen(false);
+  };
   const cur = item.images[idx];
   const rows: [string, string | null | undefined][] = [
     ["地区", item.region], ["系列", item.series],
@@ -87,8 +117,8 @@ function ItemPage() {
             <p className="archive-label">MY COLLECTION</p>
             <p className="mt-1 text-[11px] text-muted-foreground">仅保存在当前浏览器</p>
             <div className="mt-2 flex flex-wrap gap-2">
-              <button type="button" aria-pressed={collection[item.id] === "owned"} onClick={() => updateCollection(collection[item.id] === "owned" ? null : "owned")} className={`rounded-full border px-4 py-2 text-xs transition ${collection[item.id] === "owned" ? "border-primary bg-primary/15 text-primary" : "border-border text-muted-foreground"}`}>已拥有</button>
-              <button type="button" aria-pressed={collection[item.id] === "wishlist"} onClick={() => updateCollection(collection[item.id] === "wishlist" ? null : "wishlist")} className={`rounded-full border px-4 py-2 text-xs transition ${collection[item.id] === "wishlist" ? "border-amber-500 bg-amber-500/10 text-amber-700 dark:text-amber-300" : "border-border text-muted-foreground"}`}>愿望单</button>
+              <button type="button" aria-pressed={collection[item.id]?.status === "owned"} onClick={openOwnedQuantity} className={`rounded-full border px-4 py-2 text-xs transition ${collection[item.id]?.status === "owned" ? "border-primary bg-primary/15 text-primary" : "border-border text-muted-foreground"}`}>已拥有{collection[item.id]?.status === "owned" ? ` ×${collection[item.id].quantity}` : ""}</button>
+              <button type="button" aria-pressed={collection[item.id]?.status === "wishlist"} onClick={() => updateCollection(collection[item.id]?.status === "wishlist" ? null : "wishlist")} className={`rounded-full border px-4 py-2 text-xs transition ${collection[item.id]?.status === "wishlist" ? "border-amber-500 bg-amber-500/10 text-amber-700 dark:text-amber-300" : "border-border text-muted-foreground"}`}>愿望单</button>
             </div>
           </div>
           <dl className="mt-5 rounded bg-card text-sm">
@@ -108,6 +138,19 @@ function ItemPage() {
         <DialogContent className="max-w-4xl p-2">
           <DialogHeader className="sr-only"><DialogTitle>{item.name}</DialogTitle></DialogHeader>
           {cur && <img src={cur} alt={item.name} className="max-h-[85vh] w-full object-contain" />}
+        </DialogContent>
+      </Dialog>
+      <Dialog open={quantityDialogOpen} onOpenChange={setQuantityDialogOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader><DialogTitle>设置拥有数量</DialogTitle></DialogHeader>
+          <p className="text-sm text-muted-foreground">{item.name}</p>
+          <label className="text-sm" htmlFor="owned-quantity">你拥有的数量</label>
+          <input id="owned-quantity" type="number" min="1" step="1" inputMode="numeric" value={quantityInput} onChange={(event) => setQuantityInput(event.target.value)} className="h-11 w-full rounded border bg-background px-3 text-base" />
+          <div className="flex gap-2">
+            <button type="button" onClick={() => setQuantityDialogOpen(false)} className="flex-1 rounded border py-2 text-sm">取消</button>
+            <button type="button" onClick={saveOwnedQuantity} className="flex-1 rounded bg-primary py-2 text-sm text-primary-foreground">确认</button>
+          </div>
+          {collection[item.id]?.status === "owned" && <button type="button" onClick={removeOwned} className="text-xs text-muted-foreground underline">移除已拥有状态</button>}
         </DialogContent>
       </Dialog>
       <ReportDialog open={report} onOpenChange={setReport} item={item} />
