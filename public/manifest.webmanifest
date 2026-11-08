@@ -1,0 +1,22 @@
+{
+  "id": "/",
+  "name": "BLACK WIDOW ARCHIVE",
+  "short_name": "BW ARCHIVE",
+  "description": "娜塔莎·罗曼诺夫官方周边收藏图鉴",
+  "lang": "zh-CN",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#241c1e",
+  "theme_color": "#241c1e",
+  "icons": [
+    {
+      "src": "/icons/archive-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
