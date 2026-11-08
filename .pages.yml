@@ -146,6 +146,25 @@ content:
       - name: item_number
         label: 编号
         type: string
+      - name: product_spec
+        label: 产品规格
+        type: select
+        options:
+          values:
+            - 普通版
+            - 豪华版
+            - 超级豪华版
+            - 双人套装
+            - 三人套装
+            - 电影场景款
+      - name: release_type
+        label: 发行属性
+        type: select
+        options:
+          values:
+            - 普通发行
+            - 独家版
+            - 展会独家
       - name: original_price
         label: 原价
         type: string
