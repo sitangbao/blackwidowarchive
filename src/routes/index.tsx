@@ -48,7 +48,7 @@ function Index() {
         <div className="mt-2 flex items-end justify-between gap-3"><div><p className="text-xs text-muted-foreground">{categoryLabel}</p><p className="font-display text-5xl leading-none text-primary">{isLoading || isError ? "—" : (f.category ? counts[f.category] ?? 0 : items.length)}</p></div><p className="archive-label">TOTAL COLLECTIBLES</p></div>
       </div>
       <div className="mb-4 rounded border bg-background/95 px-3 py-3 backdrop-blur sm:rounded">
-        <input value={f.q} onChange={e => update("q", e.target.value)} placeholder="搜索周边名称 / 系列 / 关键词" className={selectCls} />
+        <input value={f.q} onChange={e => update("q", e.target.value)} placeholder="搜索名称 / 系列 / 关键词 / 盒号 / 商品编号 / 卡片编号" className={selectCls} />
         {f.series && <div className="mt-2 flex items-center justify-between gap-2 rounded border border-primary/30 bg-primary/5 px-3 py-2"><p className="min-w-0 text-xs text-foreground">系列筛选：<span className="text-primary">{seriesFilterLabel}</span></p><button type="button" onClick={() => update("series", "")} className="shrink-0 text-xs text-muted-foreground underline">清除</button></div>}
         <div className="mt-2 grid grid-cols-2 gap-2">
           <select value={f.region} onChange={e => update("region", e.target.value)} className={selectCls}><option value="">全部地区</option>{REGIONS.map(x => <option key={x}>{x}</option>)}</select>
