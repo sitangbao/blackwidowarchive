@@ -117,10 +117,35 @@ export async function uploadFiles(bucket: string, files: File[], prefix = "") {
 }
 
 export const COLLECTION_STORAGE_KEY = "bwa-my-collection-v1";
-export type CollectionState = Record<string, "owned" | "not_owned" | "wishlist">;
+export type CollectionStatus = "owned" | "not_owned" | "wishlist";
+export type CollectionEntry = { status: CollectionStatus; quantity: number };
+export type CollectionState = Record<string, CollectionEntry>;
+
+export function normalizeCollectionState(input: unknown): CollectionState {
+  if (!input || typeof input !== "object" || Array.isArray(input)) return {};
+  const result: CollectionState = {};
+  for (const [id, raw] of Object.entries(input as Record<string, unknown>)) {
+    if (raw === "owned" || raw === "not_owned" || raw === "wishlist") {
+      result[id] = { status: raw, quantity: raw === "owned" ? 1 : 0 };
+      continue;
+    }
+    if (raw && typeof raw === "object") {
+      const entry = raw as { status?: unknown; quantity?: unknown };
+      if (entry.status === "owned" || entry.status === "not_owned" || entry.status === "wishlist") {
+        const quantity = Number(entry.quantity);
+        result[id] = {
+          status: entry.status,
+          quantity: entry.status === "owned" && Number.isFinite(quantity) ? Math.max(1, Math.floor(quantity)) : entry.status === "owned" ? 1 : 0,
+        };
+      }
+    }
+  }
+  return result;
+}
+
 export function readCollectionState(): CollectionState {
   if (typeof window === "undefined") return {};
-  try { return JSON.parse(localStorage.getItem(COLLECTION_STORAGE_KEY) || "{}"); } catch { return {}; }
+  try { return normalizeCollectionState(JSON.parse(localStorage.getItem(COLLECTION_STORAGE_KEY) || "{}")); } catch { return {}; }
 }
 export function writeCollectionState(state: CollectionState) {
   if (typeof window !== "undefined") localStorage.setItem(COLLECTION_STORAGE_KEY, JSON.stringify(state));
