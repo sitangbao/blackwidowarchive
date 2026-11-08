@@ -28,6 +28,18 @@ content:
         - brand
         - series
         - original_price
+      search:
+        - name
+        - region
+        - category
+        - brand
+        - series
+        - box_number
+        - item_number
+        - card_number
+        - character_preset
+        - characters
+        - keywords
       sort: name
       order: asc
     fields:
