@@ -66,7 +66,8 @@ export function filterItems(items: Item[], f: Filters) {
     if (f.category && it.category !== f.category) return false;
     if (f.brand && it.brand !== f.brand) return false;
     if (f.category && f.item_type && it.item_type !== f.item_type) return false;
-    const itemSeries = f.category === "卡片类" ? (it.card_series ?? it.series) : it.series;\n    if (f.series && seriesIdFor(itemSeries ?? "") !== f.series && itemSeries !== f.series) return false;
+    const itemSeries = f.category === "卡片类" ? (it.card_series ?? it.series) : it.series;
+    if (f.series && seriesIdFor(itemSeries ?? "") !== f.series && itemSeries !== f.series) return false;
     if (f.status && it.status !== f.status) return false;
     if (f.person && it.person_count !== f.person) return false;
     return true;
