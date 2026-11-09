@@ -251,7 +251,7 @@ content:
         options:
           values:
             - name: natasha_romanoff
-              label: 娜塔莎·罗曼诺夫
+              label: 娜塔莎·罗曼诺夫 
       - name: characters
         label: 其他人物（可自由填写）
         type: string
