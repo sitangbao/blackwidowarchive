@@ -2,6 +2,9 @@
   "id": "02f86169-2ca1-4c76-aacd-474a1a57455b",
   "name": "UD IRON MAN2 普卡 #13",
   "region": "美谷",
+  "card_series": "2010 IRON MAN 2",
+  "series_link_enabled": false,
+  "card_series_link_enabled": true,
   "category": "卡片类",
   "brand_preset": "upper_deck",
   "card_number": "13",
@@ -10,6 +13,5 @@
   "characters": "黑寡妇｜小辣椒",
   "images": [
     "/archive/optimized/IMG_6989-6d84c9746188.webp"
-  ],
-  "card_series": "2010 IRON MAN 2"
+  ]
 }
