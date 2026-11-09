@@ -3,10 +3,15 @@
   "name": "UD 钢铁侠2 普卡 #28",
   "region": "美谷",
   "card_series": "2010 IRON MAN 2",
+  "series_link_enabled": false,
   "card_series_link_enabled": true,
   "category": "卡片类",
   "brand_preset": "upper_deck",
   "card_number": "28",
   "card_title": "Fun or Foolish?",
-  "person_count": "single"
+  "person_count": "single",
+  "images": [
+    "/archive/items/IMG_4702.jpeg",
+    "/archive/items/IMG_4703.jpeg"
+  ]
 }
