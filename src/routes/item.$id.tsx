@@ -74,7 +74,7 @@ function ItemPage() {
   };
   const cur = item.images[idx];
   const displayBrand = item.brand ?? (item.series?.trim().toLowerCase() === "funko" ? "FUNKO" : null);
-  const displaySeries = item.series?.trim().toLowerCase() === "funko" ? null : item.series;
+  const displaySeries = item.series?.trim().toLowerCase() === "funko" ? null : item.category === "卡片类" ? (item.card_series ?? item.series) : item.series;
   const rows: [string, string | null | undefined][] = [
     ["地区", item.region], ["系列", displaySeries],
     ...(displayBrand ? [["品牌", displayBrand] as [string, string]] : []),
@@ -142,7 +142,7 @@ function ItemPage() {
           <dl className="mt-5 rounded bg-card text-sm">
             {rows.map(([k, v]) => (
               <div key={k} className="grid grid-cols-[7.5rem_1fr] gap-3 px-4 py-2.5">
-                <dt className="text-muted-foreground">{k}</dt><dd className="whitespace-pre-wrap break-words">{k === "品牌" && v ? <a href={`/?brand=${encodeURIComponent(v)}#collection`} className="text-primary underline underline-offset-4 hover:text-foreground">{v}</a> : (v || "—")}</dd>
+                <dt className="text-muted-foreground">{k}</dt><dd className="whitespace-pre-wrap break-words">{k === "品牌" && v ? <a href={`/?category=${encodeURIComponent(item.category)}&brand=${encodeURIComponent(v)}#collection`} className="text-primary underline underline-offset-4 hover:text-foreground">{v}</a> : k === "系列" && v && displayBrand ? <a href={`/?category=${encodeURIComponent(item.category)}&brand=${encodeURIComponent(displayBrand)}&series=${encodeURIComponent(v)}#collection`} className="text-primary underline underline-offset-4 hover:text-foreground">{v}</a> : (v || "—")}</dd>
               </div>
             ))}
           </dl>
