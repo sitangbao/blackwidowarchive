@@ -10,5 +10,8 @@
   "brand_preset": "upper_deck",
   "card_number": "138",
   "card_title": "S.H.I.E.L.D. Agent Natasha Romanoff",
-  "person_count": "single"
+  "person_count": "single",
+  "images": [
+    "/archive/items/IMG_6983.jpeg"
+  ]
 }
