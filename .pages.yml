@@ -39,6 +39,7 @@ content:
         - box_number
         - item_number
         - card_number
+        - card_title
         - character_preset
         - characters
         - keywords
@@ -195,6 +196,10 @@ content:
         type: string
       - name: card_number
         label: 卡片编号
+        type: string
+      - name: card_title
+        label: 卡片名称（Card Title）
+        description: 卡片本身的官方名称，不是商品名称。
         type: string
       - name: product_spec
         label: 产品规格
