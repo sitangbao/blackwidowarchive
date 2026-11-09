@@ -22,6 +22,21 @@ async function getJson(url) {
   return response.json();
 }
 
+const CARD_SERIES = {
+  ud_2010_iron_man_2: "2010｜Iron Man 2",
+  ud_2012_the_avengers: "2012｜The Avengers",
+  ud_2014_winter_soldier: "2014｜Captain America: The Winter Soldier",
+  ud_2015_age_of_ultron: "2015｜Avengers: Age of Ultron",
+  ud_2016_civil_war: "2016｜Captain America: Civil War",
+  ud_2018_infinity_war: "2018｜Avengers: Infinity War",
+  ud_2019_mcu_10th_anniversary: "2019｜MCU 10th Anniversary",
+  ud_2020_endgame_captain_marvel: "2020｜Avengers: Endgame & Captain Marvel",
+  ud_2021_black_widow: "2021｜Black Widow",
+  ud_2021_marvel_black_diamond: "2021｜Marvel Black Diamond",
+  ud_2022_marvel_allure: "2022｜Marvel Allure",
+};
+
+const resolveCardSeries = (item) => CARD_SERIES[item.card_series_preset] ?? item.card_series ?? null;
 async function main() {
   const listingResponse = await fetch(apiUrl, { headers });
   let files = [];
@@ -54,6 +69,7 @@ async function main() {
       name: String(item.name),
       region: item.region ?? "",
       series: String(item.series ?? "").trim().toLowerCase() === "funko" ? null : item.series_preset === "iron_man_2" ? "钢铁侠2" : item.series_preset === "avengers_1" ? "复仇者联盟1" : item.series_preset === "winter_soldier" ? "美国队长2:冬日战士" : item.series_preset === "age_of_ultron" ? "复仇者联盟2:奥创纪元" : item.series_preset === "civil_war" ? "美国队长3:内战" : item.series_preset === "infinity_war" ? "复仇者联盟3:无限战争" : item.series_preset === "endgame" ? "复仇者联盟4:终局之战" : item.series_preset === "black_widow" ? "黑寡妇" : (item.series ?? null),
+      card_series: resolveCardSeries(item),
       set_name: item.set_name ?? null,
       category: item.category ?? "",
       item_type: item.item_type ?? null,
