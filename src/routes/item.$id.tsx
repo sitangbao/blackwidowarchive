@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { ItemImage } from "@/components/ItemImage";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { personLabel, readCollectionState, writeCollectionState, uploadFiles, loadArchiveItems, seriesIdFor, type Item, type CollectionState } from "@/lib/archive";
+import { personLabel, readCollectionState, writeCollectionState, uploadFiles, loadArchiveItems, type Item, type CollectionState } from "@/lib/archive";
 
 export const Route = createFileRoute("/item/$id")({
   head: () => ({
