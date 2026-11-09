@@ -277,3 +277,5 @@ content:
           media: item-images
           multiple:
             max: 10
+
+# Refresh Pages CMS configuration cache
