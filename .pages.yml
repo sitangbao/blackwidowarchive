@@ -92,6 +92,14 @@ content:
       - name: card_series
         label: 其他卡片系列（可自由填写）
         type: string
+      - name: series_link_enabled
+        label: 普通系列名称启用可点击链接
+        type: boolean
+        description: 开启后，商品详情中的普通系列名称可点击并跳转至对应系列筛选；关闭则显示普通文字。
+      - name: card_series_link_enabled
+        label: 卡片系列名称启用可点击链接
+        type: boolean
+        description: 开启后，卡片商品详情中的系列名称可点击并跳转至对应卡片系列筛选；关闭则显示普通文字。
       - name: set_name
         label: Set
         type: string
