@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { Hourglass } from "@/components/Hourglass";
 import { ItemImage } from "@/components/ItemImage";
-import { CATEGORIES, REGIONS, PERSON_COUNTS, CATEGORY_OPTIONS, UPPER_DECK_SERIES, brandsFor, countByCategory, filterItems, loadArchiveItems, readCollectionState, writeCollectionState, seriesIdFor, type Filters, type CollectionState } from "@/lib/archive";
+import { CATEGORIES, REGIONS, PERSON_COUNTS, CATEGORY_OPTIONS, brandsFor, countByCategory, filterItems, loadArchiveItems, readCollectionState, writeCollectionState, seriesIdFor, type Filters, type CollectionState } from "@/lib/archive";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [{ title: "BLACK WIDOW ARCHIVE — Natasha Romanoff 周边收藏图鉴" }, { name: "description", content: "Marvel Natasha Romanoff / Black Widow 官方周边收藏图鉴。" }] }),
@@ -13,8 +13,8 @@ const selectCls = "h-10 w-full min-w-0 rounded border bg-card px-2 text-xs sm:te
 function Index() {
   const { data: items = [], isLoading, isError, refetch } = useQuery({ queryKey: ["items"], queryFn: loadArchiveItems });
   const initialSeries = typeof window !== "undefined" ? ((() => { const p = new URLSearchParams(window.location.search); const id = p.get("seriesId"); return id ? id : (p.get("series") ?? ""); })()) : "";
-  const initialBrand = typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get("brand") ?? "") : "";
-  const [f, setF] = useState<Filters>({ q: "", region: "", category: "", brand: initialBrand, item_type: "", series: initialSeries, status: "", person: "" });
+  const initialBrand = typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get("brand") ?? "") : "";\n  const initialCategory = typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get("category") ?? "") : "";
+  const [f, setF] = useState<Filters>({ q: "", region: "", category: initialCategory, brand: initialBrand, item_type: "", series: initialSeries, status: "", person: "" });
   const [personal, setPersonal] = useState<CollectionState>(() => readCollectionState());
   useEffect(() => {
     if (isLoading) return;
@@ -27,11 +27,11 @@ function Index() {
   }, [isLoading]);
   const counts = useMemo(() => countByCategory(items), [items]);
   const brands = useMemo(() => (f.category ? brandsFor(items, f.category) : [...new Set(items.map(i => i.brand).filter((x): x is string => !!x))].sort()), [items, f.category]);
-  const brandOptions = ["卡片类", "手办类"].includes(f.category) ? (CATEGORY_OPTIONS[f.category] ?? []) : brands;
+  const brandOptions = brands;
   const shown = useMemo(() => filterItems(items, { ...f, status: "" }).filter(it => !f.status || (personal[it.id]?.status ?? "") === f.status), [items, f, personal]);
   const categoryLabel = f.category || "周边收藏总数";
-  const seriesFilterLabel = items.find(it => seriesIdFor(it.series ?? "") === f.series)?.series ?? f.series;
-  const availableSeries = f.category === "卡片类" && f.brand === "UPPER DECK (UD)" ? [...UPPER_DECK_SERIES] : [...new Set(items.filter(i => i.category === f.category && i.brand === f.brand && i.series).map(i => i.series as string))].sort();
+  const seriesFilterLabel = items.find(it => seriesIdFor((f.category === "卡片类" ? (it.card_series ?? it.series) : it.series) ?? "") === f.series)?.[f.category === "卡片类" ? "card_series" : "series"] ?? f.series;
+  const availableSeries = [...new Set(items.filter(i => i.category === f.category && i.brand === f.brand).map(i => f.category === "卡片类" ? (i.card_series ?? i.series) : i.series).filter((x): x is string => !!x))].sort();
   const update = (key: keyof Filters, value: string) => setF(old => ({ ...old, [key]: value, ...(key === "category" ? { brand: "", item_type: "", series: "" } : {}), ...(key === "brand" ? { series: "" } : {}) }));
   return <>
     <section className="relative overflow-hidden border-b">
