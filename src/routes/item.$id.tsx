@@ -143,7 +143,7 @@ function ItemPage() {
           <dl className="mt-5 rounded bg-card text-sm">
             {rows.map(([k, v]) => (
               <div key={k} className="grid grid-cols-[7.5rem_1fr] gap-3 px-4 py-2.5">
-                <dt className="text-muted-foreground">{k}</dt><dd className="whitespace-pre-wrap break-words">{k === "品牌" && v ? <a href={`/?category=${encodeURIComponent(item.category)}&brand=${encodeURIComponent(v)}#collection`} className="text-primary underline underline-offset-4 hover:text-foreground">{v}</a> : k === "系列" && v && displayBrand ? <a href={`/?category=${encodeURIComponent(item.category)}&brand=${encodeURIComponent(displayBrand)}&series=${encodeURIComponent(v)}#collection`} className="text-primary underline underline-offset-4 hover:text-foreground">{v}</a> : (v || "—")}</dd>
+                <dt className="text-muted-foreground">{k}</dt><dd className="whitespace-pre-wrap break-words">{k === "品牌" && v ? <a href={`/?category=${encodeURIComponent(item.category)}&brand=${encodeURIComponent(v)}#collection`} className="inline-flex items-center gap-1 text-primary no-underline transition-colors hover:text-foreground">{v}<span aria-hidden="true" className="text-xs opacity-70">→</span></a> : k === "系列" && v && displayBrand ? <a href={`/?category=${encodeURIComponent(item.category)}&brand=${encodeURIComponent(displayBrand)}&series=${encodeURIComponent(v)}#collection`} className="inline-flex items-center gap-1 text-primary no-underline transition-colors hover:text-foreground">{v}<span aria-hidden="true" className="text-xs opacity-70">→</span></a> : (v || "—")}</dd>
               </div>
             ))}
           </dl>
