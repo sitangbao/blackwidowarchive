@@ -73,13 +73,16 @@ function ItemPage() {
     setEditingOwned(false);
   };
   const cur = item.images[idx];
+  const displayBrand = item.brand ?? (item.series?.trim().toLowerCase() === "funko" ? "FUNKO" : null);
+  const displaySeries = item.series?.trim().toLowerCase() === "funko" ? null : item.series;
   const rows: [string, string | null | undefined][] = [
-    ["地区", item.region], ["系列", item.series],
+    ["地区", item.region], ["系列", displaySeries],
+    ...(displayBrand ? [["品牌", displayBrand] as [string, string]] : []),
     ...(item.set_name?.trim() ? [["Set", item.set_name] as [string, string]] : []),
     ["类别", item.category],
     ...( (item.category === "卡片类" || item.category === "手办类") && item.item_type?.trim()
       ? [["第二层", item.item_type] as [string, string]] : []),
-    ...((item.category === "卡片类" || item.category === "手办类") && item.brand?.trim() ? [["品牌／出版社", item.brand] as [string, string]] : []),
+    
     ["尺寸", item.size],
     ...(item.box_number?.trim() ? [["盒号", item.box_number] as [string, string]] : []),
     ...(item.item_number?.trim() ? [["商品编号（Item Number）", item.item_number] as [string, string]] : []),
@@ -139,7 +142,7 @@ function ItemPage() {
           <dl className="mt-5 rounded bg-card text-sm">
             {rows.map(([k, v]) => (
               <div key={k} className="grid grid-cols-[7.5rem_1fr] gap-3 px-4 py-2.5">
-                <dt className="text-muted-foreground">{k}</dt><dd className="whitespace-pre-wrap break-words">{k === "系列" && v && item.series_link_enabled ? <a href={`/?seriesId=${encodeURIComponent(seriesIdFor(v))}#collection`} className="text-primary underline underline-offset-4 hover:text-foreground">{v}</a> : (v || "—")}</dd>
+                <dt className="text-muted-foreground">{k}</dt><dd className="whitespace-pre-wrap break-words">{k === "品牌" && v ? <a href={`/?brand=${encodeURIComponent(v)}#collection`} className="text-primary underline underline-offset-4 hover:text-foreground">{v}</a> : (v || "—")}</dd>
               </div>
             ))}
           </dl>
