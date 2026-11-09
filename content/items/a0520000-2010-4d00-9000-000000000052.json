@@ -1,13 +1,14 @@
 {
   "id": "a0520000-2010-4d00-9000-000000000052",
-  "name": "UD IRON MAN2 #52",
+  "name": "UD IRON MAN2 普卡 #52",
   "region": "美谷",
   "series": "2010 IRON MAN 2",
-  "series_link_enabled": true,
   "category": "卡片类",
   "brand_preset": "upper_deck",
   "card_number": "52",
   "card_title": "Smooth Moves",
   "person_count": "single",
-  "images": []
+  "images": [
+    "/archive/items/IMG_6996.jpeg"
+  ]
 }
