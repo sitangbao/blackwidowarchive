@@ -10,5 +10,8 @@
   "brand_preset": "upper_deck",
   "card_number": "161",
   "card_title": "Avengers",
-  "person_count": "single"
+  "person_count": "single",
+  "images": [
+    "/archive/items/IMG_6978.jpeg"
+  ]
 }
