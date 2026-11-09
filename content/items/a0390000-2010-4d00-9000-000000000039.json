@@ -1,13 +1,14 @@
 {
   "id": "a0390000-2010-4d00-9000-000000000039",
-  "name": "UD IRON MAN2 #39",
+  "name": "UD IRON MAN2 普卡 #39",
   "region": "美谷",
   "series": "2010 IRON MAN 2",
-  "series_link_enabled": true,
   "category": "卡片类",
   "brand_preset": "upper_deck",
   "card_number": "39",
   "card_title": "I Am the Black Widow",
   "person_count": "single",
-  "images": []
+  "images": [
+    "/archive/items/IMG_6995.jpeg"
+  ]
 }
