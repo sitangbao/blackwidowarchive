@@ -20,12 +20,6 @@ export const CATEGORY_OPTIONS: Record<string, string[]> = {
   "立牌类": ["亚克力立牌"],
   "挂件类": ["亚克力挂件", "亚克力砖", "金属挂件", "橡胶挂件", "布艺挂件"],
 };
-export const UPPER_DECK_SERIES = [
-  "2010 Iron Man 2", "2012 The Avengers", "2014 Captain America: The Winter Soldier",
-  "2015 Avengers: Age of Ultron", "2016 Captain America: Civil War", "2018 Avengers: Infinity War",
-  "2019 MCU 10th Anniversary", "2020 Avengers: Endgame & Captain Marvel", "2021 Black Widow",
-  "2021 Marvel Black Diamond", "2022 Marvel Allure",
-] as const;
 export const STATUSES = [
   { value: "owned", label: "已拥有" },
   { value: "not_owned", label: "未拥有" },
@@ -42,7 +36,7 @@ export const statusLabel = (s: string) => STATUSES.find((x) => x.value === s)?.l
 export const personLabel = (s: string) => PERSON_COUNTS.find((x) => x.value === s)?.label ?? s;
 
 export type Item = {
-  id: string; name: string; region: string; series: string | null; series_preset?: string | null; series_link_enabled?: boolean; set_name: string | null;
+  id: string; name: string; region: string; series: string | null; card_series?: string | null; series_preset?: string | null; series_link_enabled?: boolean; set_name: string | null;
   category: string; item_type: string | null; brand: string | null; brand_preset?: string | null; size: string | null; box_number?: string | null; item_number?: string | null; card_number?: string | null;
   product_spec?: string | null; release_type?: string | null;
   original_price: string; status: string; person_count: string; characters?: string | null; character_preset?: string | null; keywords: string | null;
@@ -64,7 +58,7 @@ export function filterItems(items: Item[], f: Filters) {
   const q = normalizeSearchText(f.q);
   return items.filter((it) => {
     if (q) {
-      const hay = normalizeSearchText([it.name, it.series, it.set_name, it.keywords, it.brand, it.item_type, it.box_number, it.item_number, it.card_number, it.character_preset, it.characters, it.category, it.region].filter(Boolean).join(" "));
+      const hay = normalizeSearchText([it.name, it.series, it.card_series, it.set_name, it.keywords, it.brand, it.item_type, it.box_number, it.item_number, it.card_number, it.character_preset, it.characters, it.category, it.region].filter(Boolean).join(" "));
       const terms = f.q.trim().toLocaleLowerCase().split(/\s+/).map(normalizeSearchText).filter(Boolean);
       if (!terms.every(term => hay.includes(term))) return false;
     }
@@ -72,7 +66,7 @@ export function filterItems(items: Item[], f: Filters) {
     if (f.category && it.category !== f.category) return false;
     if (f.brand && it.brand !== f.brand) return false;
     if (f.category && f.item_type && it.item_type !== f.item_type) return false;
-    if (f.series && seriesIdFor(it.series ?? "") !== f.series && it.series !== f.series) return false;
+    const itemSeries = f.category === "卡片类" ? (it.card_series ?? it.series) : it.series;\n    if (f.series && seriesIdFor(itemSeries ?? "") !== f.series && itemSeries !== f.series) return false;
     if (f.status && it.status !== f.status) return false;
     if (f.person && it.person_count !== f.person) return false;
     return true;
