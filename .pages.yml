@@ -259,3 +259,4 @@ content:
             max: 10
 
 # Refresh Pages CMS configuration cache
+# Trigger config reload after adding series link toggles
