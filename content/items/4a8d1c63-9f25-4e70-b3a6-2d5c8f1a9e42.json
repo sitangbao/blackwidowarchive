@@ -9,5 +9,8 @@
   "brand_preset": "upper_deck",
   "card_number": "42",
   "card_title": "Black Widow",
-  "person_count": "single"
+  "person_count": "single",
+  "images": [
+    "/archive/items/IMG_5183.jpeg"
+  ]
 }
