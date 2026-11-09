@@ -1,13 +1,14 @@
 {
   "id": "a0620000-2010-4d00-9000-000000000062",
-  "name": "UD IRON MAN2 #62",
+  "name": "UD IRON MAN2 普卡 #62",
   "region": "美谷",
   "series": "2010 IRON MAN 2",
-  "series_link_enabled": true,
   "category": "卡片类",
   "brand_preset": "upper_deck",
   "card_number": "62",
   "card_title": "Cinematographer Matthew Libatique Frames a Shot",
   "person_count": "single",
-  "images": []
+  "images": [
+    "/archive/items/IMG_6990.jpeg"
+  ]
 }
