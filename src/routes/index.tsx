@@ -13,7 +13,8 @@ const selectCls = "h-10 w-full min-w-0 rounded border bg-card px-2 text-xs sm:te
 function Index() {
   const { data: items = [], isLoading, isError, refetch } = useQuery({ queryKey: ["items"], queryFn: loadArchiveItems });
   const initialSeries = typeof window !== "undefined" ? ((() => { const p = new URLSearchParams(window.location.search); const id = p.get("seriesId"); return id ? id : (p.get("series") ?? ""); })()) : "";
-  const [f, setF] = useState<Filters>({ q: "", region: "", category: "", brand: "", item_type: "", series: initialSeries, status: "", person: "" });
+  const initialBrand = typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get("brand") ?? "") : "";
+  const [f, setF] = useState<Filters>({ q: "", region: "", category: "", brand: initialBrand, item_type: "", series: initialSeries, status: "", person: "" });
   const [personal, setPersonal] = useState<CollectionState>(() => readCollectionState());
   useEffect(() => {
     if (isLoading) return;
@@ -25,7 +26,7 @@ function Index() {
     requestAnimationFrame(() => requestAnimationFrame(() => window.scrollTo(0, y)));
   }, [isLoading]);
   const counts = useMemo(() => countByCategory(items), [items]);
-  const brands = useMemo(() => (f.category ? brandsFor(items, f.category) : []), [items, f.category]);
+  const brands = useMemo(() => (f.category ? brandsFor(items, f.category) : [...new Set(items.map(i => i.brand).filter((x): x is string => !!x))].sort()), [items, f.category]);
   const brandOptions = ["卡片类", "手办类"].includes(f.category) ? (CATEGORY_OPTIONS[f.category] ?? []) : brands;
   const shown = useMemo(() => filterItems(items, { ...f, status: "" }).filter(it => !f.status || (personal[it.id]?.status ?? "") === f.status), [items, f, personal]);
   const categoryLabel = f.category || "周边收藏总数";
@@ -63,7 +64,7 @@ function Index() {
             {CATEGORY_OPTIONS[f.category].map(x => <button type="button" key={x} onClick={() => update("item_type", x)} className={`rounded-full border px-3 py-1.5 text-xs transition ${f.item_type === x ? "border-primary bg-primary/15 text-primary" : "border-border bg-card text-muted-foreground hover:border-primary/60"}`}>{x}</button>)}
           </div>
         </div>}
-        {f.category && brandOptions.length > 0 && <div className="mt-3">
+        {(f.category || f.brand) && brandOptions.length > 0 && <div className="mt-3">
           <p className="mb-2 text-[11px] tracking-wider text-muted-foreground">品牌</p>
           <div className="flex flex-wrap gap-2">
             <button type="button" onClick={() => update("brand", "")} className={`rounded-full border px-3 py-1.5 text-xs transition ${!f.brand ? "border-primary bg-primary/15 text-primary" : "border-border bg-card text-muted-foreground hover:border-primary/60"}`}>全部品牌</button>
