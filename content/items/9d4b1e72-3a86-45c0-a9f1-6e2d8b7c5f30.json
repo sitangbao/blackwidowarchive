@@ -10,5 +10,8 @@
   "brand_preset": "upper_deck",
   "card_number": "114",
   "card_title": "An unexpected burst of rage from Dr. Bruce Banner",
-  "person_count": "single"
+  "person_count": "single",
+  "images": [
+    "/archive/items/IMG_1416.jpeg"
+  ]
 }
