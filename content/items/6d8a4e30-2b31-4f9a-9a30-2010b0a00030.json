@@ -7,7 +7,8 @@
   "category": "卡片类",
   "brand_preset": "upper_deck",
   "card_number": "30",
-  "card_title": "Double Agent",
   "person_count": "single",
-  "images": []
+  "images": [
+    "/archive/items/IMG_6988.jpeg"
+  ]
 }
