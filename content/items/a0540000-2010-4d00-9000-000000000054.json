@@ -2,7 +2,6 @@
   "id": "a0540000-2010-4d00-9000-000000000054",
   "name": "UD IRON MAN2 普卡 #54",
   "region": "美谷",
-  "series": "2010 IRON MAN 2",
   "category": "卡片类",
   "brand_preset": "upper_deck",
   "card_number": "54",
@@ -10,5 +9,6 @@
   "person_count": "single",
   "images": [
     "/archive/optimized/IMG_6991-c4a97aa3edac.webp"
-  ]
+  ],
+  "card_series": "2010 IRON MAN 2"
 }
