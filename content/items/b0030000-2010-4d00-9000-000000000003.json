@@ -3,11 +3,16 @@
   "name": "UD 钢铁侠2 衣料卡 #IMC-3",
   "region": "美谷",
   "card_series": "2010 IRON MAN 2",
+  "series_link_enabled": false,
   "card_series_link_enabled": true,
   "category": "卡片类",
   "item_type": "衣料卡",
   "brand_preset": "upper_deck",
   "card_number": "IMC-3",
   "card_title": "Natasha Romanoff",
-  "person_count": "single"
+  "person_count": "single",
+  "images": [
+    "/archive/items/IMG_4700.jpeg",
+    "/archive/items/IMG_4697.jpeg"
+  ]
 }
