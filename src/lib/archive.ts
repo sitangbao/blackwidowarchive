@@ -16,7 +16,7 @@ export const CATEGORIES = [
 ] as const;
 export const CATEGORY_OPTIONS: Record<string, string[]> = {
   "卡片类": ["UPPER DECK (UD)", "KAKAWOW", "TOPPS", "FINDING CARD"],
-  "手办类": ["HOT TOYS", "MARVEL LEGENDS", "COSBABY", "LEGO", "POP MART", "BANDAI", "TITAN HERO SERIES"],
+  "手办类": ["FUNKO", "HOT TOYS", "MARVEL LEGENDS", "COSBABY", "LEGO", "POP MART", "BANDAI", "TITAN HERO SERIES"],
   "立牌类": ["亚克力立牌"],
   "挂件类": ["亚克力挂件", "亚克力砖", "金属挂件", "橡胶挂件", "布艺挂件"],
 };
