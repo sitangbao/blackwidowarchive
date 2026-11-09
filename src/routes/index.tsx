@@ -13,7 +13,8 @@ const selectCls = "h-10 w-full min-w-0 rounded border bg-card px-2 text-xs sm:te
 function Index() {
   const { data: items = [], isLoading, isError, refetch } = useQuery({ queryKey: ["items"], queryFn: loadArchiveItems });
   const initialSeries = typeof window !== "undefined" ? ((() => { const p = new URLSearchParams(window.location.search); const id = p.get("seriesId"); return id ? id : (p.get("series") ?? ""); })()) : "";
-  const initialBrand = typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get("brand") ?? "") : "";\n  const initialCategory = typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get("category") ?? "") : "";
+  const initialBrand = typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get("brand") ?? "") : "";
+  const initialCategory = typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get("category") ?? "") : "";
   const [f, setF] = useState<Filters>({ q: "", region: "", category: initialCategory, brand: initialBrand, item_type: "", series: initialSeries, status: "", person: "" });
   const [personal, setPersonal] = useState<CollectionState>(() => readCollectionState());
   useEffect(() => {
