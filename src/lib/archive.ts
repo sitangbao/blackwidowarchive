@@ -37,7 +37,7 @@ export const personLabel = (s: string) => PERSON_COUNTS.find((x) => x.value === 
 
 export type Item = {
   id: string; name: string; region: string; series: string | null; card_series?: string | null; series_preset?: string | null; series_link_enabled?: boolean; set_name: string | null;
-  category: string; item_type: string | null; brand: string | null; brand_preset?: string | null; size: string | null; box_number?: string | null; item_number?: string | null; card_number?: string | null;
+  category: string; item_type: string | null; brand: string | null; brand_preset?: string | null; size: string | null; box_number?: string | null; item_number?: string | null; card_number?: string | null; card_title?: string | null;
   product_spec?: string | null; release_type?: string | null;
   original_price: string; status: string; person_count: string; characters?: string | null; character_preset?: string | null; keywords: string | null;
   notes: string | null; images: string[];
@@ -58,7 +58,7 @@ export function filterItems(items: Item[], f: Filters) {
   const q = normalizeSearchText(f.q);
   return items.filter((it) => {
     if (q) {
-      const hay = normalizeSearchText([it.name, it.series, it.card_series, it.set_name, it.keywords, it.brand, it.item_type, it.box_number, it.item_number, it.card_number, it.character_preset, it.characters, it.category, it.region].filter(Boolean).join(" "));
+      const hay = normalizeSearchText([it.name, it.series, it.card_series, it.set_name, it.keywords, it.brand, it.item_type, it.box_number, it.item_number, it.card_number, it.card_title, it.character_preset, it.characters, it.category, it.region].filter(Boolean).join(" "));
       const terms = f.q.trim().toLocaleLowerCase().split(/\s+/).map(normalizeSearchText).filter(Boolean);
       if (!terms.every(term => hay.includes(term))) return false;
     }
