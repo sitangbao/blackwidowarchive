@@ -119,9 +119,6 @@ content:
       - name: card_series
         label: 其他卡片系列（可自由填写）
         type: string
-      - name: series_link_enabled
-        label: 系列名称启用可点击链接
-        type: boolean
       - name: set_name
         label: Set
         type: string
@@ -160,6 +157,8 @@ content:
         type: select
         options:
           values:
+            - name: funko
+              label: FUNKO
             - name: upper_deck
               label: UPPER DECK (UD)
             - name: kakawow
