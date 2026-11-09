@@ -70,7 +70,7 @@ export function filterItems(items: Item[], f: Filters) {
     }
     if (f.region && it.region !== f.region) return false;
     if (f.category && it.category !== f.category) return false;
-    if (f.category && f.brand && it.brand !== f.brand) return false;
+    if (f.brand && it.brand !== f.brand) return false;
     if (f.category && f.item_type && it.item_type !== f.item_type) return false;
     if (f.series && seriesIdFor(it.series ?? "") !== f.series && it.series !== f.series) return false;
     if (f.status && it.status !== f.status) return false;
