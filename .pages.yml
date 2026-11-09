@@ -27,6 +27,7 @@ content:
         - category
         - brand
         - series
+        - card_series
         - original_price
       search:
         - name
@@ -34,6 +35,7 @@ content:
         - category
         - brand
         - series
+        - card_series
         - box_number
         - item_number
         - card_number
@@ -85,6 +87,37 @@ content:
               label: 黑寡妇
       - name: series
         label: 其他系列（可自由填写）
+        type: string
+      - name: card_series_preset
+        label: 卡片系列快捷选项（UPPER DECK）
+        description: 选择卡片所属的发行系列。此清单目前对应 UPPER DECK (UD)；其他品牌系列可先使用下方自由填写栏。
+        type: select
+        options:
+          values:
+            - name: ud_2010_iron_man_2
+              label: 2010｜Iron Man 2
+            - name: ud_2012_the_avengers
+              label: 2012｜The Avengers
+            - name: ud_2014_winter_soldier
+              label: 2014｜Captain America: The Winter Soldier
+            - name: ud_2015_age_of_ultron
+              label: 2015｜Avengers: Age of Ultron
+            - name: ud_2016_civil_war
+              label: 2016｜Captain America: Civil War
+            - name: ud_2018_infinity_war
+              label: 2018｜Avengers: Infinity War
+            - name: ud_2019_mcu_10th_anniversary
+              label: 2019｜MCU 10th Anniversary
+            - name: ud_2020_endgame_captain_marvel
+              label: 2020｜Avengers: Endgame & Captain Marvel
+            - name: ud_2021_black_widow
+              label: 2021｜Black Widow
+            - name: ud_2021_marvel_black_diamond
+              label: 2021｜Marvel Black Diamond
+            - name: ud_2022_marvel_allure
+              label: 2022｜Marvel Allure
+      - name: card_series
+        label: 其他卡片系列（可自由填写）
         type: string
       - name: series_link_enabled
         label: 系列名称启用可点击链接
