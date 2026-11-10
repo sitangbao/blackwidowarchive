@@ -9,6 +9,9 @@
   "item_type": "Red Foil",
   "brand_preset": "upper_deck",
   "card_number": "86",
-  "person_count": "multiple",
-  "characters": "黑寡妇｜美国队长"
+  "person_count": "multi",
+  "characters": "黑寡妇｜美国队长",
+  "images": [
+    "/archive/items/86.jpg"
+  ]
 }
