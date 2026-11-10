@@ -131,7 +131,7 @@ content:
             - 包袋类
             - 其他
       - name: item_type
-        label: 商品细分类
+        label: 卡片类型
         type: string
       - name: brand_preset
         label: 品牌快捷选项
