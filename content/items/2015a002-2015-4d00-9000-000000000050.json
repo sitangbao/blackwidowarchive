@@ -10,5 +10,8 @@
   "brand_preset": "upper_deck",
   "card_number": "50",
   "person_count": "multi",
-  "characters": "黑寡妇｜班纳博士｜钢铁侠"
+  "characters": "黑寡妇｜班纳博士｜钢铁侠",
+  "images": [
+    "/archive/items/img4746.jpeg"
+  ]
 }
