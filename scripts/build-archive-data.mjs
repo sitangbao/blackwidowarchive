@@ -93,18 +93,39 @@ async function main() {
   const cardPositions = items.flatMap((item, index) => item.category === "卡片类" ? [index] : []);
   const cardTypeOrder = new Map([
     ["Base Card", 0], ["Base", 0], ["普卡", 0],
-    ["Silver Foil", 1], ["Red Foil", 2], ["Blue Foil", 3],
+    ["Silver Foil", 1], ["银折", 1],
+    ["Red Foil", 2], ["红折", 2],
+    ["Blue Foil", 3], ["蓝折", 3],
   ]);
+  const getCardType = (item) => {
+    if (item.item_type) return String(item.item_type).trim();
+    const name = String(item.name ?? "");
+    if (/普卡|Base Card/i.test(name)) return "Base Card";
+    if (/银折|Silver Foil/i.test(name)) return "Silver Foil";
+    if (/红折|Red Foil/i.test(name)) return "Red Foil";
+    if (/蓝折|Blue Foil/i.test(name)) return "Blue Foil";
+    return "";
+  };
+  const getCardNumber = (item) => {
+    const stored = String(item.card_number ?? "").trim();
+    if (stored) return stored;
+    return String(item.name ?? "").match(/#\\s*([A-Z]*-?\\d+)/i)?.[1] ?? "";
+  };
   const cards = cardPositions.map((index) => items[index]).sort((a, b) => {
     const seriesA = String(a.card_series ?? a.series ?? "");
     const seriesB = String(b.card_series ?? b.series ?? "");
     const seriesCompare = seriesA.localeCompare(seriesB, "zh-Hans", { numeric: true });
     if (seriesCompare) return seriesCompare;
-    const typeA = String(a.item_type ?? "");
-    const typeB = String(b.item_type ?? "");
-    const typeCompare = (cardTypeOrder.get(typeA) ?? 4) - (cardTypeOrder.get(typeB) ?? 4);
-    if (typeCompare) return typeCompare;
-    return String(a.card_number ?? "").localeCompare(String(b.card_number ?? ""), "en", { numeric: true });
+    const typeA = getCardType(a);
+    const typeB = getCardType(b);
+    const rankA = cardTypeOrder.get(typeA) ?? 4;
+    const rankB = cardTypeOrder.get(typeB) ?? 4;
+    if (rankA !== rankB) return rankA - rankB;
+    if (rankA === 4 && typeA !== typeB) {
+      const otherTypeCompare = typeA.localeCompare(typeB, "zh-Hans", { numeric: true });
+      if (otherTypeCompare) return otherTypeCompare;
+    }
+    return getCardNumber(a).localeCompare(getCardNumber(b), "en", { numeric: true });
   });
   cardPositions.forEach((position, index) => { items[position] = cards[index]; });
   await mkdir("public/archive-data", { recursive: true });
