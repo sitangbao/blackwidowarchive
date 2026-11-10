@@ -76,6 +76,8 @@ async function main() {
       brand: item.brand_preset === "funko" ? "FUNKO" : item.brand_preset === "upper_deck" ? "UPPER DECK (UD)" : item.brand_preset === "kakawow" ? "KAKAWOW" : item.brand_preset === "topps" ? "TOPPS" : item.brand_preset === "finding_card" ? "FINDING CARD" : item.brand_preset === "hot_toys" ? "HOT TOYS" : item.brand_preset === "marvel_legends" ? "MARVEL LEGENDS" : item.brand_preset === "cosbaby" ? "COSBABY" : item.brand_preset === "lego" ? "LEGO" : item.brand_preset === "pop_mart" ? "POP MART" : item.brand_preset === "bandai" ? "BANDAI" : item.brand_preset === "titan_hero_series" ? "TITAN HERO SERIES" : (item.brand ?? (String(item.series ?? "").trim().toLowerCase() === "funko" ? "FUNKO" : null)),
       size: item.size ?? null,
       item_number: item.item_number ?? null,
+      card_number: item.card_number ?? null,
+      card_title: item.card_title ?? null,
       original_price: item.original_price ?? "",
       status: item.status ?? "not_owned",
       person_count: item.person_count ?? "single",
@@ -85,7 +87,26 @@ async function main() {
     });
   }
 
+  // Keep non-card items in their existing alphabetical positions, while sorting
+  // card items by card series, card type, then card number.
   items.sort((a, b) => a.name.localeCompare(b.name, "zh-Hans"));
+  const cardPositions = items.flatMap((item, index) => item.category === "卡片类" ? [index] : []);
+  const cardTypeOrder = new Map([
+    ["Base Card", 0], ["Base", 0], ["普卡", 0],
+    ["Silver Foil", 1], ["Red Foil", 2], ["Blue Foil", 3],
+  ]);
+  const cards = cardPositions.map((index) => items[index]).sort((a, b) => {
+    const seriesA = String(a.card_series ?? a.series ?? "");
+    const seriesB = String(b.card_series ?? b.series ?? "");
+    const seriesCompare = seriesA.localeCompare(seriesB, "zh-Hans", { numeric: true });
+    if (seriesCompare) return seriesCompare;
+    const typeA = String(a.item_type ?? "");
+    const typeB = String(b.item_type ?? "");
+    const typeCompare = (cardTypeOrder.get(typeA) ?? 4) - (cardTypeOrder.get(typeB) ?? 4);
+    if (typeCompare) return typeCompare;
+    return String(a.card_number ?? "").localeCompare(String(b.card_number ?? ""), "en", { numeric: true });
+  });
+  cardPositions.forEach((position, index) => { items[position] = cards[index]; });
   await mkdir("public/archive-data", { recursive: true });
   await writeFile("public/archive-data/items.json", JSON.stringify(items, null, 2) + "\n", "utf8");
   console.log(`Generated public/archive-data/items.json with ${items.length} item(s).`);
