@@ -77,9 +77,7 @@ function ItemPage() {
   const displaySeries = item.series?.trim().toLowerCase() === "funko" ? null : item.category === "卡片类" ? (item.card_series ?? item.series) : item.series;
   const seriesLinkEnabled = item.category === "卡片类"
     ? item.card_series_link_enabled === true
-    : item.category === "手办类"
-      ? item.series_link_enabled === true
-      : Boolean(displaySeries);
+    : item.series_link_enabled === true;
   const rows: [string, string | null | undefined][] = [
     ["地区", item.region],
     ...(displayBrand ? [["品牌", displayBrand] as [string, string]] : []),
