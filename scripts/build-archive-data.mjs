@@ -92,7 +92,7 @@ async function main() {
   items.sort((a, b) => a.name.localeCompare(b.name, "zh-Hans"));
   const cardPositions = items.flatMap((item, index) => item.category === "卡片类" ? [index] : []);
   const cardTypeOrder = new Map([
-    ["Base Card", 0], ["Base", 0], ["普卡", 0],
+    ["Base Card", 0], ["Base Card-Roll Call", 0], ["Base", 0], ["普卡", 0],
     ["Silver Foil", 1], ["银折", 1],
     ["Red Foil", 2], ["红折", 2],
     ["Blue Foil", 3], ["蓝折", 3],
