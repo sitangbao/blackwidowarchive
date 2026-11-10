@@ -109,7 +109,7 @@ async function main() {
   const getCardNumber = (item) => {
     const stored = String(item.card_number ?? "").trim();
     if (stored) return stored;
-    return String(item.name ?? "").match(/#\\s*([A-Z]*-?\\d+)/i)?.[1] ?? "";
+    return String(item.name ?? "").match(/#\s*([A-Z]*-?\d+)/i)?.[1] ?? "";
   };
   const cards = cardPositions.map((index) => items[index]).sort((a, b) => {
     const seriesA = String(a.card_series ?? a.series ?? "");
