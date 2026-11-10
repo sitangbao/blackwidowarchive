@@ -10,5 +10,8 @@
   "brand_preset": "upper_deck",
   "card_number": "49",
   "person_count": "multi",
-  "characters": "初代"
+  "characters": "初代",
+  "images": [
+    "/archive/items/img4761.jpeg"
+  ]
 }
