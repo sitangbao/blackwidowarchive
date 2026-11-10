@@ -38,13 +38,14 @@ const CARD_SERIES = {
 
 const resolveCardSeries = (item) => CARD_SERIES[item.card_series_preset] ?? item.card_series ?? null;
 
-// Compact the UD card name: keep one space before the card number,
-// but remove the spaces between "UD", the Chinese series, and card type.
+// Standardize UD card names: no space after "UD", one space before the card type,
+// and one space between the card type and its number.
 const normalizeCardName = (item) => {
   const name = String(item.name ?? "");
-  if (item.category !== "卡片类" || !/^UD\s+/.test(name)) return name;
-  let normalized = name.replace(/^UD\s+/, "UD");
-  normalized = normalized.replace(/\s+(?=(?:普卡|衣料卡|双人衣料卡|三人衣料卡|镭射卡|银折|红折|蓝折|签字卡|概念卡|透明卡|贴纸卡|拼图卡|金属卡|角色卡|场景卡)\s+#)/, "");
+  if (item.category !== "卡片类" || !/^UD\s*/.test(name)) return name;
+  let normalized = name.replace(/^UD\s*/, "UD");
+  const cardTypes = "双人衣料卡|三人衣料卡|普卡|衣料卡|镭射卡|银折|红折|蓝折|签字卡|概念卡|透明卡|贴纸卡|拼图卡|金属卡|角色卡|场景卡";
+  normalized = normalized.replace(new RegExp(`(${cardTypes})\\s*#`), "$1 #");
   return normalized;
 };
 async function main() {
