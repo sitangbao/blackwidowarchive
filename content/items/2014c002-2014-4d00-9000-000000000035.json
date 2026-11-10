@@ -10,5 +10,8 @@
   "brand_preset": "upper_deck",
   "card_number": "35",
   "person_count": "multi",
-  "characters": "黑寡妇｜美国队长"
+  "characters": "黑寡妇｜美国队长",
+  "images": [
+    "/archive/items/#35.jpg"
+  ]
 }
