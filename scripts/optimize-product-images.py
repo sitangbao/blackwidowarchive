@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import re
 import json
 from pathlib import Path
 
@@ -64,7 +65,8 @@ def main() -> None:
                 continue
 
             identity = hashlib.sha256(image_url.encode("utf-8")).hexdigest()[:12]
-            destination_name = f"{source.stem}-{identity}.webp"
+            safe_stem = re.sub(r"[^A-Za-z0-9._-]+", "-", source.stem).strip("-._") or "image"
+            destination_name = f"{safe_stem}-{identity}.webp"
             destination = OUTPUT_DIR / destination_name
             optimized_url = f"{OUTPUT_PREFIX}{destination_name}"
 
