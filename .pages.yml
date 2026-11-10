@@ -3,6 +3,7 @@ media:
     label: 商品图片
     input: public/archive/items
     output: /archive/items
+    rename: safe
     extensions:
       - jpg
       - jpeg
