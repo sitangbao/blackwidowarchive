@@ -17,24 +17,24 @@ for (const file of files) {
   const raw = await fs.readFile(fullPath, "utf8");
   let item;
   try { item = JSON.parse(raw); } catch { skipped.push(file); continue; }
-  if (item.category !== "卡片类" || !/^UD\\s*/i.test(String(item.name ?? ""))) continue;
+  if (item.category !== "卡片类" || !/^UD\s*/i.test(String(item.name ?? ""))) continue;
 
   const original = String(item.name);
-  let name = original.replace(/^UD\\s*/i, "UD");
+  let name = original.replace(/^UD\s*/i, "UD");
   const type = cardTypes.find((candidate) => name.includes(candidate));
   if (!type) continue;
 
   const index = name.indexOf(type);
   const prefix = name.slice(0, index).trimEnd();
   let suffix = name.slice(index + type.length);
-  suffix = suffix.replace(/^\\s+/, "");
-  suffix = suffix.replace(/\\s*#\\s*/, " #");
+  suffix = suffix.replace(/^\s+/, "");
+  suffix = suffix.replace(/\s*#\s*/, " #");
   name = prefix + " " + type + suffix;
-  name = name.replace(/\\s*#\\s*/, " #");
+  name = name.replace(/\s*#\s*/, " #");
 
   if (name !== original) {
     item.name = name;
-    await fs.writeFile(fullPath, JSON.stringify(item, null, 2) + "\\n", "utf8");
+    await fs.writeFile(fullPath, JSON.stringify(item, null, 2) + "\n", "utf8");
     changed.push({ file, from: original, to: name });
   }
 }
