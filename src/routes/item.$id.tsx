@@ -75,7 +75,11 @@ function ItemPage() {
   const cur = item.images[idx];
   const displayBrand = item.brand ?? (item.series?.trim().toLowerCase() === "funko" ? "FUNKO" : null);
   const displaySeries = item.series?.trim().toLowerCase() === "funko" ? null : item.category === "卡片类" ? (item.card_series ?? item.series) : item.series;
-  const seriesLinkEnabled = item.category === "卡片类" ? item.card_series_link_enabled === true : item.series_link_enabled === true;
+  const seriesLinkEnabled = item.category === "卡片类"
+    ? item.card_series_link_enabled === true
+    : item.category === "手办类"
+      ? item.series_link_enabled === true
+      : Boolean(displaySeries);
   const rows: [string, string | null | undefined][] = [
     ["地区", item.region],
     ...(displayBrand ? [["品牌", displayBrand] as [string, string]] : []),
@@ -145,7 +149,7 @@ function ItemPage() {
           <dl className="mt-5 rounded bg-card text-sm">
             {rows.map(([k, v]) => (
               <div key={k} className="grid grid-cols-[7.5rem_1fr] gap-3 px-4 py-2.5">
-                <dt className="text-muted-foreground">{k}</dt><dd className="whitespace-pre-wrap break-words">{k === "品牌" && v ? <a href={`/?category=${encodeURIComponent(item.category)}&brand=${encodeURIComponent(v)}#collection`} className="inline-flex items-center gap-1 text-primary no-underline transition-colors hover:text-foreground">{v}<span aria-hidden="true" className="text-xs opacity-70">→</span></a> : k === "系列" && v && displayBrand && seriesLinkEnabled ? <a href={`/?category=${encodeURIComponent(item.category)}&brand=${encodeURIComponent(displayBrand)}&series=${encodeURIComponent(v)}#collection`} className="inline-flex items-center gap-1 text-primary no-underline transition-colors hover:text-foreground">{v}<span aria-hidden="true" className="text-xs opacity-70">→</span></a> : (v || "—")}</dd>
+                <dt className="text-muted-foreground">{k}</dt><dd className="whitespace-pre-wrap break-words">{k === "品牌" && v ? <a href={`/?category=${encodeURIComponent(item.category)}&brand=${encodeURIComponent(v)}#collection`} className="inline-flex items-center gap-1 text-primary no-underline transition-colors hover:text-foreground">{v}<span aria-hidden="true" className="text-xs opacity-70">→</span></a> : k === "系列" && v && seriesLinkEnabled && ((item.category !== "卡片类" && item.category !== "手办类") || displayBrand) ? <a href={`/?category=${encodeURIComponent(item.category)}${displayBrand ? `&brand=${encodeURIComponent(displayBrand)}` : ""}&series=${encodeURIComponent(v)}#collection`} className="inline-flex items-center gap-1 text-primary no-underline transition-colors hover:text-foreground">{v}<span aria-hidden="true" className="text-xs opacity-70">→</span></a> : (v || "—")}</dd>
               </div>
             ))}
           </dl>
