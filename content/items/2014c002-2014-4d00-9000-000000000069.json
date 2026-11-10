@@ -10,5 +10,8 @@
   "brand_preset": "upper_deck",
   "card_number": "69",
   "person_count": "multi",
-  "characters": "黑寡妇｜尼克弗瑞"
+  "characters": "黑寡妇｜尼克弗瑞",
+  "images": [
+    "/archive/items/69.jpg"
+  ]
 }
