@@ -1,0 +1,23 @@
+name: Normalize Existing UD Card Names
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "scripts/normalize-ud-card-names.mjs"
+      - ".github/workflows/normalize-ud-card-names.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  normalize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Normalize UD card names in source JSON
+        run: node scripts/normalize-ud-card-names.mjs
