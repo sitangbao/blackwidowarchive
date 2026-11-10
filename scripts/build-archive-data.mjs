@@ -37,6 +37,16 @@ const CARD_SERIES = {
 };
 
 const resolveCardSeries = (item) => CARD_SERIES[item.card_series_preset] ?? item.card_series ?? null;
+
+// Compact the UD card name: keep one space before the card number,
+// but remove the spaces between "UD", the Chinese series, and card type.
+const normalizeCardName = (item) => {
+  const name = String(item.name ?? "");
+  if (item.category !== "卡片类" || !/^UD\\s+/.test(name)) return name;
+  let normalized = name.replace(/^UD\\s+/, "UD");
+  normalized = normalized.replace(/\\s+(?=(?:普卡|衣料卡|双人衣料卡|三人衣料卡|镭射卡|银折|红折|蓝折|签字卡|概念卡|透明卡|贴纸卡|拼图卡|金属卡|角色卡|场景卡)\\s+#)/, "");
+  return normalized;
+};
 async function main() {
   const listingResponse = await fetch(apiUrl, { headers });
   let files = [];
@@ -66,7 +76,7 @@ async function main() {
     items.push({
       ...item,
       id: String(item.id),
-      name: String(item.name),
+      name: normalizeCardName(item),
       region: item.region ?? "",
       series: String(item.series ?? "").trim().toLowerCase() === "funko" ? null : item.series_preset === "iron_man_2" ? "钢铁侠2" : item.series_preset === "avengers_1" ? "复仇者联盟1" : item.series_preset === "winter_soldier" ? "美国队长2:冬日战士" : item.series_preset === "age_of_ultron" ? "复仇者联盟2:奥创纪元" : item.series_preset === "civil_war" ? "美国队长3:内战" : item.series_preset === "infinity_war" ? "复仇者联盟3:无限战争" : item.series_preset === "endgame" ? "复仇者联盟4:终局之战" : item.series_preset === "black_widow" ? "黑寡妇" : (item.series ?? null),
       card_series: resolveCardSeries(item),
