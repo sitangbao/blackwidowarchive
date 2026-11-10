@@ -42,9 +42,9 @@ const resolveCardSeries = (item) => CARD_SERIES[item.card_series_preset] ?? item
 // but remove the spaces between "UD", the Chinese series, and card type.
 const normalizeCardName = (item) => {
   const name = String(item.name ?? "");
-  if (item.category !== "卡片类" || !/^UD\\s+/.test(name)) return name;
-  let normalized = name.replace(/^UD\\s+/, "UD");
-  normalized = normalized.replace(/\\s+(?=(?:普卡|衣料卡|双人衣料卡|三人衣料卡|镭射卡|银折|红折|蓝折|签字卡|概念卡|透明卡|贴纸卡|拼图卡|金属卡|角色卡|场景卡)\\s+#)/, "");
+  if (item.category !== "卡片类" || !/^UD\s+/.test(name)) return name;
+  let normalized = name.replace(/^UD\s+/, "UD");
+  normalized = normalized.replace(/\s+(?=(?:普卡|衣料卡|双人衣料卡|三人衣料卡|镭射卡|银折|红折|蓝折|签字卡|概念卡|透明卡|贴纸卡|拼图卡|金属卡|角色卡|场景卡)\s+#)/, "");
   return normalized;
 };
 async function main() {
