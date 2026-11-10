@@ -9,5 +9,8 @@
   "item_type": "Concept Card",
   "brand_preset": "upper_deck",
   "card_number": "CS-9",
-  "person_count": "single"
+  "person_count": "single",
+  "images": [
+    "/archive/items/cs-9.jpg"
+  ]
 }
