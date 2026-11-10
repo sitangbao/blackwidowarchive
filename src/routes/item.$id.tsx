@@ -85,7 +85,7 @@ function ItemPage() {
     ...(item.set_name?.trim() ? [["Set", item.set_name] as [string, string]] : []),
     ["类别", item.category],
     ...( (item.category === "卡片类" || item.category === "手办类") && item.item_type?.trim()
-      ? [["第二层", item.item_type] as [string, string]] : []),
+      ? [["卡片类型", item.item_type] as [string, string]] : []),
     
     ...(item.size?.trim() ? [["尺寸", item.size] as [string, string]] : []),
     ...(item.box_number?.trim() ? [["盒号", item.box_number] as [string, string]] : []),
