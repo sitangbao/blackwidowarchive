@@ -9,5 +9,8 @@
   "item_type": "Red Foil",
   "brand_preset": "upper_deck",
   "card_number": "92",
-  "person_count": "single"
+  "person_count": "single",
+  "images": [
+    "/archive/items/92-2.jpg"
+  ]
 }
