@@ -9,5 +9,9 @@
   "item_type": "Avengers' Database",
   "brand_preset": "upper_deck",
   "card_number": "AD-B",
-  "person_count": "single"
+  "person_count": "single",
+  "images": [
+    "/archive/items/ad-b.jpg",
+    "/archive/items/file-1.jpg"
+  ]
 }
