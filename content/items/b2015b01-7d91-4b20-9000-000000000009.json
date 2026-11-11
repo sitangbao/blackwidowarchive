@@ -9,5 +9,8 @@
   "item_type": "Blue Foil",
   "brand_preset": "upper_deck",
   "card_number": "9",
-  "person_count": "single"
+  "person_count": "single",
+  "images": [
+    "/archive/items/9-1.jpg"
+  ]
 }
