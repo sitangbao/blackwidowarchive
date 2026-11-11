@@ -10,5 +10,8 @@
   "brand_preset": "upper_deck",
   "card_number": "22",
   "person_count": "multi",
-  "characters": "群像"
+  "characters": "群像",
+  "images": [
+    "/archive/items/22-1.jpg"
+  ]
 }
