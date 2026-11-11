@@ -9,5 +9,8 @@
   "item_type": "Avengers Connection - Theatrical",
   "brand_preset": "upper_deck",
   "card_number": "ACT-5",
-  "person_count": "single"
+  "person_count": "single",
+  "images": [
+    "/archive/items/act-8.jpg"
+  ]
 }
