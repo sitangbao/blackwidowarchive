@@ -9,5 +9,8 @@
   "item_type": "Behind the Lens",
   "brand_preset": "upper_deck",
   "card_number": "BTL-14",
-  "person_count": "single"
+  "person_count": "single",
+  "images": [
+    "/archive/items/img5161.jpeg"
+  ]
 }
