@@ -9,5 +9,8 @@
   "item_type": "Silver Foil",
   "brand_preset": "upper_deck",
   "card_number": "41",
-  "person_count": "single"
+  "person_count": "single",
+  "images": [
+    "/archive/items/img5178-1.jpeg"
+  ]
 }
