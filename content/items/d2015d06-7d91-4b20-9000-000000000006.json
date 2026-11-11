@@ -9,5 +9,8 @@
   "item_type": "Character Shots",
   "brand_preset": "upper_deck",
   "card_number": "CS-5",
-  "person_count": "single"
+  "person_count": "single",
+  "images": [
+    "/archive/items/cs5.jpg"
+  ]
 }
