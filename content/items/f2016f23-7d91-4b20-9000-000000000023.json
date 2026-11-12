@@ -10,5 +10,8 @@
   "brand_preset": "upper_deck",
   "card_number": "27",
   "person_count": "multi",
-  "characters": "群像"
+  "characters": "群像",
+  "images": [
+    "/archive/items/civil-war-blue-foil-27.jpg"
+  ]
 }
