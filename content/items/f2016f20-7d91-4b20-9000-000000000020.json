@@ -9,5 +9,8 @@
   "item_type": "Known Heroes Relic",
   "brand_preset": "upper_deck",
   "card_number": "KH-BL",
-  "person_count": "single"
+  "person_count": "single",
+  "images": [
+    "/archive/items/美队3 known heroes衣料卡 #KH-BL.jpg"
+  ]
 }
