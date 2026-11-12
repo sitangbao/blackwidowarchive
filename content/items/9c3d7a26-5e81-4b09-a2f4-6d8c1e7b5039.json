@@ -9,5 +9,8 @@
   "item_type": "Heroic Lines Card",
   "brand_preset": "upper_deck",
   "card_number": "HL-4",
-  "person_count": "single"
+  "person_count": "single",
+  "images": [
+    "/archive/items/hero lines英雄台词 #HL-4.jpg"
+  ]
 }

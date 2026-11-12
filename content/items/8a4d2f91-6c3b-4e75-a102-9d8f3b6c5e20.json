@@ -9,5 +9,8 @@
   "item_type": "Team Iron Man Bio Card",
   "brand_preset": "upper_deck",
   "card_number": "IMB-5",
-  "person_count": "single"
+  "person_count": "single",
+  "images": [
+    "/archive/items/人物特卡#IMB-5.jpg"
+  ]
 }

@@ -9,5 +9,8 @@
   "item_type": "Team Building Concept Art Card",
   "brand_preset": "upper_deck",
   "card_number": "BT-10",
-  "person_count": "single"
+  "person_count": "single",
+  "images": [
+    "/archive/items/团队建设#BT-10.jpg"
+  ]
 }
