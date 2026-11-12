@@ -1,5 +1,9 @@
 name: Optimize Product Images
 
+concurrency:
+  group: optimize-product-images-${{ github.ref }}
+  cancel-in-progress: false
+
 on:
   push:
     branches:
