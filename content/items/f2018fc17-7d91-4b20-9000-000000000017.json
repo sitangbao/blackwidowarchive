@@ -6,11 +6,10 @@
   "series_link_enabled": false,
   "card_series_link_enabled": true,
   "category": "卡片类",
-  "item_type": "Film Cel",
+  "item_type": "Film Cels",
   "brand_preset": "upper_deck",
   "card_number": "FC17",
   "card_title": "Meeting Proxima Midnight",
-  "set_name": "Film Cels",
   "person_count": "single",
   "images": [
     "/archive/optimized/FC17-76b58298fa61.webp"
