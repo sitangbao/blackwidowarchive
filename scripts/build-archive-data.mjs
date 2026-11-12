@@ -134,21 +134,6 @@ async function main() {
     const seriesB = String(b.card_series ?? b.series ?? "");
     const seriesCompare = seriesA.localeCompare(seriesB, "zh-Hans", { numeric: true });
     if (seriesCompare) return seriesCompare;
-    // Trial ordering for 2014 Captain America: The Winter Soldier only:
-    // group matching card numbers together, then Base -> Silver Foil -> Red Foil.
-    if (seriesA.includes("2014") && /Winter Soldier/i.test(seriesA)) {
-      const numberCompare = getCardNumber(a).localeCompare(getCardNumber(b), "en", { numeric: true });
-      if (numberCompare) return numberCompare;
-      const trialRank = (item) => {
-        const type = getCardType(item).toLowerCase();
-        const name = String(item.name ?? "").toLowerCase();
-        if (type.includes("base") || type.includes("普卡") || name.includes("普卡")) return 0;
-        if (type.includes("silver") || type.includes("银折") || name.includes("银折")) return 1;
-        if (type.includes("red") || type.includes("红折") || name.includes("红折")) return 2;
-        return 3;
-      };
-      return trialRank(a) - trialRank(b);
-    }
     // Walmart Civil War cards use a fixed six-group display order:
     // red base, blue base, red sparkle, blue sparkle, red electric shock, blue electric shock.
     const walmartGroupRank = (item) => {
