@@ -21,6 +21,8 @@ for (const file of files) {
 
   const original = String(item.name);
   let name = original.replace(/^UD\s*/i, "UD");
+  // Standardize limited-edition counts: (99编) -> 99编.
+  name = name.replace(/\((\d+编)\)/g, "$1");
   const type = cardTypes.find((candidate) => name.includes(candidate));
   if (!type) continue;
 
