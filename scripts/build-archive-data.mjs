@@ -42,11 +42,16 @@ const resolveCardSeries = (item) => CARD_SERIES[item.card_series_preset] ?? item
 // and one space between the card type and its number.
 const normalizeCardName = (item) => {
   const name = String(item.name ?? "");
-  if (item.category !== "卡片类" || !/^UD\s*/.test(name)) return name;
-  let normalized = name.replace(/^UD\s*/, "UD");
-  const cardTypes = "双人衣料卡|三人衣料卡|普卡|衣料卡|镭射卡|银折|红折|蓝折|签字卡|概念卡|透明卡|贴纸卡|拼图卡|金属卡|角色卡|场景卡";
-  normalized = normalized.replace(/[（(](\\d+编)[）)]/g, "$1");
-  normalized = normalized.replace(new RegExp(`(${cardTypes})\\s*#`), "$1 #");
+  if (item.category !== "卡片类") return name;
+
+  let normalized = name;
+  if (/^UD\\s*/.test(normalized)) normalized = normalized.replace(/^UD\\s*/, "UD");
+  normalized = normalized.replace(/[（(]\\s*(\\d+编)\\s*[）)]/g, "$1");
+
+  if (/^UD/.test(normalized)) {
+    const cardTypes = "双人衣料卡|三人衣料卡|普卡|衣料卡|镭射卡|银折|红折|蓝折|签字卡|概念卡|透明卡|贴纸卡|拼图卡|金属卡|角色卡|场景卡|金折";
+    normalized = normalized.replace(new RegExp(`(${cardTypes})\\\\s*#`), "$1 #");
+  }
   return normalized;
 };
 async function main() {
