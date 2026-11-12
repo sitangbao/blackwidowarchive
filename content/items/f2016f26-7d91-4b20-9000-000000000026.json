@@ -10,5 +10,8 @@
   "brand_preset": "upper_deck",
   "card_number": "37",
   "person_count": "multi",
-  "characters": "黑寡妇｜黑豹"
+  "characters": "黑寡妇｜黑豹",
+  "images": [
+    "/archive/items/civil-war-blue-foil-37.jpg"
+  ]
 }
