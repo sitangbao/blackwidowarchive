@@ -134,6 +134,29 @@ async function main() {
     const seriesB = String(b.card_series ?? b.series ?? "");
     const seriesCompare = seriesA.localeCompare(seriesB, "zh-Hans", { numeric: true });
     if (seriesCompare) return seriesCompare;
+    // Walmart Civil War cards use a fixed six-group display order:
+    // red base, blue base, red sparkle, blue sparkle, red electric shock, blue electric shock.
+    const walmartGroupRank = (item) => {
+      const name = String(item.name ?? "");
+      if (!name.includes("美队3")) return null;
+      if (name.includes("红底普卡")) return 0;
+      if (name.includes("蓝底普卡")) return 1;
+      if (name.includes("红底星星折")) return 2;
+      if (name.includes("蓝底星星折")) return 3;
+      if (name.includes("红底闪电折")) return 4;
+      if (name.includes("蓝底闪电折")) return 5;
+      return null;
+    };
+    const walmartRankA = walmartGroupRank(a);
+    const walmartRankB = walmartGroupRank(b);
+    if (walmartRankA !== null && walmartRankB !== null && walmartRankA !== walmartRankB) {
+      return walmartRankA - walmartRankB;
+    }
+    if (walmartRankA !== null && walmartRankB === null) return -1;
+    if (walmartRankA === null && walmartRankB !== null) return 1;
+    if (walmartRankA !== null && walmartRankB !== null) {
+      return getCardNumber(a).localeCompare(getCardNumber(b), "en", { numeric: true });
+    }
     const typeA = getCardType(a);
     const typeB = getCardType(b);
     const rankA = cardTypeOrder.get(typeA) ?? 4;
