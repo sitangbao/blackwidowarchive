@@ -157,6 +157,24 @@ async function main() {
     if (walmartRankA !== null && walmartRankB !== null) {
       return getCardNumber(a).localeCompare(getCardNumber(b), "en", { numeric: true });
     }
+    const walmartVariantRank = (item) => {
+      const name = String(item.name ?? "");
+      if (name.includes("红底普卡")) return 0;
+      if (name.includes("蓝底普卡")) return 1;
+      if (name.includes("红底星星折")) return 2;
+      if (name.includes("蓝底星星折")) return 3;
+      if (name.includes("红底闪电折")) return 4;
+      if (name.includes("蓝底闪电折")) return 5;
+      return null;
+    };
+    const walmartA = walmartVariantRank(a);
+    const walmartB = walmartVariantRank(b);
+    if (walmartA !== null || walmartB !== null) {
+      if (walmartA === null) return 1;
+      if (walmartB === null) return -1;
+      if (walmartA !== walmartB) return walmartA - walmartB;
+      return getCardNumber(a).localeCompare(getCardNumber(b), "en", { numeric: true });
+    }
     const typeA = getCardType(a);
     const typeB = getCardType(b);
     const rankA = cardTypeOrder.get(typeA) ?? 4;
