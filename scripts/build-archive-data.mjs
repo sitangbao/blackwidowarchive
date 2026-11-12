@@ -143,6 +143,16 @@ async function main() {
       const otherTypeCompare = typeA.localeCompare(typeB, "zh-Hans", { numeric: true });
       if (otherTypeCompare) return otherTypeCompare;
     }
+    // Keep Walmart red-background and blue-background variants in separate blocks
+    // within the same card type, with red first, then blue.
+    const getBackgroundRank = (item) => {
+      const name = String(item.name ?? "");
+      if (name.includes("红底")) return 0;
+      if (name.includes("蓝底")) return 1;
+      return 2;
+    };
+    const backgroundCompare = getBackgroundRank(a) - getBackgroundRank(b);
+    if (backgroundCompare) return backgroundCompare;
     return getCardNumber(a).localeCompare(getCardNumber(b), "en", { numeric: true });
   });
   cardPositions.forEach((position, index) => { items[position] = cards[index]; });
