@@ -9,5 +9,8 @@
   "item_type": "Base Set",
   "brand_preset": "upper_deck",
   "card_number": "CW25",
-  "person_count": "single"
+  "person_count": "single",
+  "images": [
+    "/archive/items/UD美队3 红底普卡 #cw25.jpg"
+  ]
 }
