@@ -50,7 +50,7 @@ const normalizeCardName = (item) => {
 
   if (/^UD/.test(normalized)) {
     const cardTypes = "双人衣料卡|三人衣料卡|普卡|衣料卡|镭射卡|银折|红折|蓝折|签字卡|概念卡|透明卡|贴纸卡|拼图卡|金属卡|角色卡|场景卡|金折";
-    normalized = normalized.replace(new RegExp(`(${cardTypes})\\\\s*#`), "$1 #");
+    normalized = normalized.replace(new RegExp(`(${cardTypes})\\s*#`), "$1 #");
   }
   return normalized;
 };
