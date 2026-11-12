@@ -1,0 +1,18 @@
+{
+  "id": "f2018rp05-7d91-4b20-9000-000000000005",
+  "name": "UD复联3 人物特卡 #RP5",
+  "region": "美谷",
+  "card_series": "2018 UPPER DECK AVENGERS : INFINITY WAR",
+  "series_link_enabled": false,
+  "card_series_link_enabled": true,
+  "category": "卡片类",
+  "item_type": "Remarkable People",
+  "brand_preset": "upper_deck",
+  "card_number": "RP5",
+  "card_title": "Black Widow",
+  "set_name": "Remarkable People",
+  "person_count": "single",
+  "images": [
+    "/archive/items/人物特卡 #RP5.jpg"
+  ]
+}
