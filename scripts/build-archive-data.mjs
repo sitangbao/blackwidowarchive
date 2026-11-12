@@ -65,7 +65,8 @@ async function main() {
 
   const items = [];
   for (const file of files) {
-    const item = await getJson(file.download_url);
+    // Cache-bust GitHub's raw file CDN so builds always read the latest committed item JSON.
+    const item = await getJson(`${file.download_url}?v=${file.sha}`);
     if (!item || typeof item !== "object" || !item.id || !item.name) {
       throw new Error(`Invalid item JSON: ${file.name}`);
     }
