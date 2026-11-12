@@ -9,5 +9,8 @@
   "item_type": "Blue Background Variation",
   "brand_preset": "upper_deck",
   "card_number": "CW34",
-  "person_count": "single"
+  "person_count": "single",
+  "images": [
+    "/archive/items/UD美队3 蓝底普卡 #cw34.jpg"
+  ]
 }
