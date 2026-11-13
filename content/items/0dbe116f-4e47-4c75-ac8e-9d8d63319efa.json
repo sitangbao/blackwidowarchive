@@ -1,0 +1,16 @@
+{
+  "id": "0dbe116f-4e47-4c75-ac8e-9d8d63319efa",
+  "name": "UD漫威黑寡妇 姐妹情谊特卡 #SH-4",
+  "region": "美谷",
+  "card_series": "2021 Marvel Black Widow",
+  "card_series_link_enabled": true,
+  "category": "卡片类",
+  "item_type": "Sisterhood",
+  "brand_preset": "upper_deck",
+  "card_number": "SH-4",
+  "card_title": "Sisters",
+  "person_count": "single",
+  "images": [
+    "/archive/items/%23SH-4.jpg"
+  ]
+}
