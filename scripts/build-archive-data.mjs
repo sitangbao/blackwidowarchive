@@ -134,6 +134,14 @@ async function main() {
     const seriesB = String(b.card_series ?? b.series ?? "");
     const seriesCompare = seriesA.localeCompare(seriesB, "zh-Hans", { numeric: true });
     if (seriesCompare) return seriesCompare;
+    // In the 2024 Marvel Studios Series 2: Cinematic checklist, keep parallel
+    // versions of the same card number together instead of separating by subset.
+    const isCinematicSeries = (value) => value.trim().toLocaleLowerCase() === "2024 marvel studios series 2 cinematic";
+    if (isCinematicSeries(seriesA) && isCinematicSeries(seriesB)) {
+      const numberCompare = getCardNumber(a).localeCompare(getCardNumber(b), "en", { numeric: true });
+      if (numberCompare) return numberCompare;
+      return String(a.name ?? "").localeCompare(String(b.name ?? ""), "zh-Hans", { numeric: true });
+    }
     // Walmart Civil War cards use a fixed six-group display order:
     // red base, blue base, red sparkle, blue sparkle, red electric shock, blue electric shock.
     const walmartGroupRank = (item) => {
