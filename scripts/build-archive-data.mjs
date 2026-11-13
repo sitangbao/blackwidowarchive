@@ -91,7 +91,7 @@ async function main() {
       set_name: item.set_name ?? null,
       category: item.category ?? "",
       item_type: item.item_type ?? null,
-      brand: item.brand_preset === "funko" ? "FUNKO" : item.brand_preset === "upper_deck" ? "UPPER DECK (UD)" : item.brand_preset === "kakawow" ? "KAKAWOW" : item.brand_preset === "topps" ? "TOPPS" : item.brand_preset === "finding_card" ? "FINDING CARD" : item.brand_preset === "hot_toys" ? "HOT TOYS" : item.brand_preset === "marvel_legends" ? "MARVEL LEGENDS" : item.brand_preset === "cosbaby" ? "COSBABY" : item.brand_preset === "lego" ? "LEGO" : item.brand_preset === "pop_mart" ? "POP MART" : item.brand_preset === "bandai" ? "BANDAI" : item.brand_preset === "titan_hero_series" ? "TITAN HERO SERIES" : (item.brand ?? (String(item.series ?? "").trim().toLowerCase() === "funko" ? "FUNKO" : null)),
+      brand: item.brand_preset === "funko" ? "FUNKO" : item.brand_preset === "upper_deck" ? "UPPER DECK (UD)" : item.brand_preset === "kakawow" ? "KAKAWOW" : item.brand_preset === "topps" ? "TOPPS" : item.brand_preset === "finding_card" ? "FINDING CARD" : item.brand_preset === "panini" ? "PANINI" : item.brand_preset === "hot_toys" ? "HOT TOYS" : item.brand_preset === "marvel_legends" ? "MARVEL LEGENDS" : item.brand_preset === "cosbaby" ? "COSBABY" : item.brand_preset === "lego" ? "LEGO" : item.brand_preset === "pop_mart" ? "POP MART" : item.brand_preset === "bandai" ? "BANDAI" : item.brand_preset === "titan_hero_series" ? "TITAN HERO SERIES" : (item.brand ?? (String(item.series ?? "").trim().toLowerCase() === "funko" ? "FUNKO" : null)),
       size: item.size ?? null,
       item_number: item.item_number ?? null,
       card_number: item.card_number ?? null,

@@ -149,6 +149,8 @@ content:
               label: TOPPS
             - name: finding_card
               label: FINDING CARD
+            - name: panini
+              label: PANINI
             - name: hot_toys
               label: HOT TOYS
             - name: marvel_legends
