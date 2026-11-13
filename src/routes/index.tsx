@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { Hourglass } from "@/components/Hourglass";
 import { ItemImage } from "@/components/ItemImage";
-import { CATEGORIES, REGIONS, PERSON_COUNTS, CATEGORY_OPTIONS, brandsFor, countByCategory, filterItems, loadArchiveItems, readCollectionState, writeCollectionState, seriesIdFor, type Filters, type CollectionState } from "@/lib/archive";
+import { CATEGORIES, REGIONS, PERSON_COUNTS, CATEGORY_OPTIONS, brandsFor, countByCategory, filterItems, loadArchiveItems, readCollectionState, writeCollectionState, seriesIdFor, formatCardSeriesName, type Filters, type CollectionState } from "@/lib/archive";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [{ title: "BLACK WIDOW ARCHIVE — Natasha Romanoff 周边收藏图鉴" }, { name: "description", content: "Marvel Natasha Romanoff / Black Widow 官方周边收藏图鉴。" }] }),
@@ -51,7 +51,7 @@ function Index() {
       </div>
       <div className="mb-4 rounded border bg-background/95 px-3 py-3 backdrop-blur sm:rounded">
         <input value={f.q} onChange={e => update("q", e.target.value)} placeholder="搜索名称 / 系列 / 关键词 / 盒号 / 商品编号 / 卡片编号" className={selectCls} />
-        {f.series && <div className="mt-2 flex items-center justify-between gap-2 rounded border border-primary/30 bg-primary/5 px-3 py-2"><p className="min-w-0 text-xs text-foreground">系列筛选：<span className="text-primary">{seriesFilterLabel}</span></p><button type="button" onClick={() => update("series", "")} className="shrink-0 text-xs text-muted-foreground underline">清除</button></div>}
+        {f.series && <div className="mt-2 flex items-center justify-between gap-2 rounded border border-primary/30 bg-primary/5 px-3 py-2"><p className="min-w-0 text-xs text-foreground">系列筛选：<span className="text-primary">{f.category === "卡片类" ? formatCardSeriesName(seriesFilterLabel) : seriesFilterLabel}</span></p><button type="button" onClick={() => update("series", "")} className="shrink-0 text-xs text-muted-foreground underline">清除</button></div>}
         <div className="mt-2 grid grid-cols-2 gap-2">
           <select value={f.region} onChange={e => update("region", e.target.value)} className={selectCls}><option value="">全部地区</option>{REGIONS.map(x => <option key={x}>{x}</option>)}</select>
           <select value={f.category} onChange={e => update("category", e.target.value)} className={selectCls}><option value="">全部类别</option>{CATEGORIES.map(c => <option key={c} value={c}>{c}{c === "卡片类" ? " (CARDS)" : c === "手办类" ? " (FIGURES)" : ""}</option>)}</select>
@@ -62,7 +62,7 @@ function Index() {
           <p className="mb-2 text-[11px] tracking-wider text-muted-foreground">类型</p>
           <div className="flex flex-wrap gap-2">
             <button type="button" onClick={() => update("item_type", "")} className={`rounded-full border px-3 py-1.5 text-xs transition ${!f.item_type ? "border-primary bg-primary/15 text-primary" : "border-border bg-card text-muted-foreground hover:border-primary/60"}`}>全部类型</button>
-            {CATEGORY_OPTIONS[f.category].map(x => <button type="button" key={x} onClick={() => update("item_type", x)} className={`rounded-full border px-3 py-1.5 text-xs transition ${f.item_type === x ? "border-primary bg-primary/15 text-primary" : "border-border bg-card text-muted-foreground hover:border-primary/60"}`}>{x}</button>)}
+            {CATEGORY_OPTIONS[f.category].map(x => <button type="button" key={x} onClick={() => update("item_type", x)} className={`rounded-full border px-3 py-1.5 text-xs transition ${f.item_type === x ? "border-primary bg-primary/15 text-primary" : "border-border bg-card text-muted-foreground hover:border-primary/60"}`}>{f.category === "卡片类" ? formatCardSeriesName(x) : x}</button>)}
           </div>
         </div>}
         {(f.category || f.brand) && brandOptions.length > 0 && <div className="mt-3">

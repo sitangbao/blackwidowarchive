@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { ItemImage } from "@/components/ItemImage";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { personLabel, readCollectionState, writeCollectionState, uploadFiles, loadArchiveItems, type Item, type CollectionState } from "@/lib/archive";
+import { personLabel, formatCardSeriesName, readCollectionState, writeCollectionState, uploadFiles, loadArchiveItems, type Item, type CollectionState } from "@/lib/archive";
 
 export const Route = createFileRoute("/item/$id")({
   head: () => ({
@@ -147,7 +147,7 @@ function ItemPage() {
           <dl className="mt-5 rounded bg-card text-sm">
             {rows.map(([k, v]) => (
               <div key={k} className="grid grid-cols-[7.5rem_1fr] gap-3 px-4 py-2.5">
-                <dt className="text-muted-foreground">{k}</dt><dd className="whitespace-pre-wrap break-words">{k === "品牌" && v ? <a href={`/?category=${encodeURIComponent(item.category)}&brand=${encodeURIComponent(v)}#collection`} className="inline-flex items-center gap-1 text-primary no-underline transition-colors hover:text-foreground">{v}<span aria-hidden="true" className="text-xs opacity-70">→</span></a> : k === "系列" && v && seriesLinkEnabled && ((item.category !== "卡片类" && item.category !== "手办类") || displayBrand) ? <a href={`/?category=${encodeURIComponent(item.category)}${displayBrand ? `&brand=${encodeURIComponent(displayBrand)}` : ""}&series=${encodeURIComponent(v)}#collection`} className="inline-flex items-center gap-1 text-primary no-underline transition-colors hover:text-foreground">{v}<span aria-hidden="true" className="text-xs opacity-70">→</span></a> : (v || "—")}</dd>
+                <dt className="text-muted-foreground">{k}</dt><dd className="whitespace-pre-wrap break-words">{k === "品牌" && v ? <a href={`/?category=${encodeURIComponent(item.category)}&brand=${encodeURIComponent(v)}#collection`} className="inline-flex items-center gap-1 text-primary no-underline transition-colors hover:text-foreground">{v}<span aria-hidden="true" className="text-xs opacity-70">→</span></a> : k === "系列" && v && seriesLinkEnabled && ((item.category !== "卡片类" && item.category !== "手办类") || displayBrand) ? <a href={`/?category=${encodeURIComponent(item.category)}${displayBrand ? `&brand=${encodeURIComponent(displayBrand)}` : ""}&series=${encodeURIComponent(v)}#collection`} className="inline-flex items-center gap-1 text-primary no-underline transition-colors hover:text-foreground">{item.category === "卡片类" ? formatCardSeriesName(v) : v}<span aria-hidden="true" className="text-xs opacity-70">→</span></a> : (v ? (k === "系列" && item.category === "卡片类" ? formatCardSeriesName(v) : v) : "—")}</dd>
               </div>
             ))}
           </dl>

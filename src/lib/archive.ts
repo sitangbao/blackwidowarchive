@@ -45,6 +45,10 @@ export type Item = {
 
 export type Filters = { q: string; region: string; category: string; brand: string; item_type: string; series: string; status: string; person: string };
 
+export function formatCardSeriesName(value: string) {
+  return value.replace(/[A-Za-z]+/g, word => word.charAt(0).toLocaleUpperCase() + word.slice(1).toLocaleLowerCase());
+}
+
 export function seriesIdFor(value: string) {
   return value.trim().replace(/\s+/g, " ").toLocaleLowerCase();
 }
