@@ -62,7 +62,7 @@ function Index() {
           <p className="mb-2 text-[11px] tracking-wider text-muted-foreground">类型</p>
           <div className="flex flex-wrap gap-2">
             <button type="button" onClick={() => update("item_type", "")} className={`rounded-full border px-3 py-1.5 text-xs transition ${!f.item_type ? "border-primary bg-primary/15 text-primary" : "border-border bg-card text-muted-foreground hover:border-primary/60"}`}>全部类型</button>
-            {CATEGORY_OPTIONS[f.category].map(x => <button type="button" key={x} onClick={() => update("item_type", x)} className={`rounded-full border px-3 py-1.5 text-xs transition ${f.item_type === x ? "border-primary bg-primary/15 text-primary" : "border-border bg-card text-muted-foreground hover:border-primary/60"}`}>{f.category === "卡片类" ? formatCardSeriesName(x) : x}</button>)}
+            {CATEGORY_OPTIONS[f.category].map(x => <button type="button" key={x} onClick={() => update("item_type", x)} className={`rounded-full border px-3 py-1.5 text-xs transition ${f.item_type === x ? "border-primary bg-primary/15 text-primary" : "border-border bg-card text-muted-foreground hover:border-primary/60"}`}>{x}</button>)}
           </div>
         </div>}
         {(f.category || f.brand) && brandOptions.length > 0 && <div className="mt-3">
@@ -76,7 +76,7 @@ function Index() {
           <p className="mb-2 text-[11px] tracking-wider text-muted-foreground">系列</p>
           <div className="flex flex-wrap gap-2">
             <button type="button" onClick={() => update("series", "")} className={`rounded-full border px-3 py-1.5 text-xs transition ${!f.series ? "border-primary bg-primary/15 text-primary" : "border-border bg-card text-muted-foreground hover:border-primary/60"}`}>全部系列</button>
-            {availableSeries.map(x => <button type="button" key={x} onClick={() => update("series", x)} className={`rounded-full border px-3 py-1.5 text-xs transition ${f.series === x ? "border-primary bg-primary/15 text-primary" : "border-border bg-card text-muted-foreground hover:border-primary/60"}`}>{x}</button>)}
+            {availableSeries.map(x => <button type="button" key={x} onClick={() => update("series", x)} className={`rounded-full border px-3 py-1.5 text-xs transition ${f.series === x ? "border-primary bg-primary/15 text-primary" : "border-border bg-card text-muted-foreground hover:border-primary/60"}`}>{f.category === "卡片类" ? formatCardSeriesName(x) : x}</button>)}
           </div>
         </div>}
         {(f.category || f.brand || f.item_type || f.series || f.region || f.status || f.person || f.q) && <button type="button" onClick={() => setF({ q:"", region:"", category:"", brand:"", item_type:"", series:"", status:"", person:"" })} className="mt-3 text-xs text-muted-foreground underline">清除筛选</button>}
