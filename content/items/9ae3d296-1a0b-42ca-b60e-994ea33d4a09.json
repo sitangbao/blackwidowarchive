@@ -9,8 +9,9 @@
   "brand_preset": "upper_deck",
   "card_number": "SH-2",
   "card_title": "Yelena",
-  "person_count": "single",
+  "person_count": "multi",
   "images": [
     "/archive/items/%23SH-2.jpg"
-  ]
+  ],
+  "characters": "娜塔莎｜叶莲娜"
 }
