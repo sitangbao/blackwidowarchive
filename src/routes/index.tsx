@@ -15,7 +15,30 @@ function Index() {
   const initialSeries = typeof window !== "undefined" ? ((() => { const p = new URLSearchParams(window.location.search); const id = p.get("seriesId"); return id ? id : (p.get("series") ?? ""); })()) : "";
   const initialBrand = typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get("brand") ?? "") : "";
   const initialCategory = typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get("category") ?? "") : "";
-  const [f, setF] = useState<Filters>({ q: "", region: "", category: initialCategory, brand: initialBrand, item_type: "", series: initialSeries, status: "", person: "" });
+  const [f, setF] = useState<Filters>(() => {
+    if (typeof window !== "undefined") {
+      const saved = sessionStorage.getItem("bwa-collection-filters");
+      if (saved) {
+        sessionStorage.removeItem("bwa-collection-filters");
+        try {
+          const parsed = JSON.parse(saved) as Partial<Filters>;
+          return {
+            q: parsed.q ?? "",
+            region: parsed.region ?? "",
+            category: parsed.category ?? initialCategory,
+            brand: parsed.brand ?? initialBrand,
+            item_type: parsed.item_type ?? "",
+            series: parsed.series ?? initialSeries,
+            status: parsed.status ?? "",
+            person: parsed.person ?? "",
+          };
+        } catch {
+          sessionStorage.removeItem("bwa-collection-filters");
+        }
+      }
+    }
+    return { q: "", region: "", category: initialCategory, brand: initialBrand, item_type: "", series: initialSeries, status: "", person: "" };
+  });
   const [personal, setPersonal] = useState<CollectionState>(() => readCollectionState());
   useEffect(() => {
     if (isLoading) return;
@@ -84,7 +107,10 @@ function Index() {
       <div className="flex items-center justify-between py-4"><p className="archive-label">{isLoading ? "LOADING" : `${shown.length} COLLECTIBLES`}</p><Link to="/collection" className="text-xs text-primary underline">MY COLLECTION →</Link></div>
       {isError ? <div className="my-8 rounded border border-destructive/40 bg-card p-5 text-center"><p className="text-sm text-foreground">暂时无法读取周边资料，请稍后重试。</p><button type="button" onClick={() => refetch()} className="mt-3 rounded border border-primary px-4 py-2 text-xs text-primary">重新加载</button></div> : !isLoading && shown.length === 0 ? <p className="py-16 text-center text-sm text-muted-foreground">没有符合条件的周边。</p> : null}
       <div className="grid grid-cols-3 gap-2 sm:gap-4">{shown.map(it => <div key={it.id} className="overflow-visible rounded border border-border/60 bg-card transition hover:border-primary">
-        <Link to="/item/$id" params={{ id: it.id }} className="block" onClick={(event) => { if (event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) sessionStorage.setItem("bwa-collection-scroll-y", String(window.scrollY)); }}>
+        <Link to="/item/$id" params={{ id: it.id }} className="block" onClick={(event) => { if (event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) {
+            sessionStorage.setItem("bwa-collection-scroll-y", String(window.scrollY));
+            sessionStorage.setItem("bwa-collection-filters", JSON.stringify(f));
+          } }}>
           <div className="flex aspect-square items-center justify-center overflow-hidden rounded-t bg-card"><ItemImage url={it.images[0]} alt={it.name} category={it.category} className="h-[82%] w-[82%] rounded-t"/></div>
           <div className="px-2 pt-1.5 pb-2.5 sm:px-3"><p className="line-clamp-2 min-h-[2.5em] text-[12px] leading-snug sm:text-[15px]">{it.name}</p><div className="mt-1.5 flex flex-wrap items-center gap-1"><span className="rounded-full border border-border/70 bg-background/60 px-1.5 py-0.5 text-[9px] leading-none text-muted-foreground sm:text-[11px]">{it.category}</span><span className="rounded-full border border-border/70 bg-background/60 px-1.5 py-0.5 text-[8px] leading-none text-muted-foreground sm:text-[10px]">{it.region}</span></div></div>
         </Link>
