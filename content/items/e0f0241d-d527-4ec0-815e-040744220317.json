@@ -9,8 +9,9 @@
   "brand_preset": "upper_deck",
   "card_number": "SH-3",
   "card_title": "Conversation",
-  "person_count": "single",
+  "person_count": "multi",
   "images": [
     "/archive/items/%23SH-3.jpg"
-  ]
+  ],
+  "characters": "娜塔莎｜叶莲娜"
 }
