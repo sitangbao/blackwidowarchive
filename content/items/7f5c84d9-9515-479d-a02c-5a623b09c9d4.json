@@ -9,8 +9,9 @@
   "brand_preset": "upper_deck",
   "card_number": "SH-8",
   "card_title": "Melina",
-  "person_count": "single",
+  "person_count": "multi",
   "images": [
     "/archive/items/%23SH-8.jpg"
-  ]
+  ],
+  "characters": "娜塔莎｜叶莲娜"
 }
