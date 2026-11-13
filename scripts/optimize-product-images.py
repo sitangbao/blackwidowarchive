@@ -4,6 +4,7 @@ import hashlib
 import re
 import json
 from pathlib import Path
+from urllib.parse import unquote
 
 from PIL import Image, ImageOps
 
@@ -58,7 +59,7 @@ def main() -> None:
                 updated.append(image_url)
                 continue
 
-            relative_path = image_url[len(SOURCE_PREFIX):]
+            relative_path = unquote(image_url[len(SOURCE_PREFIX):])
             source = ROOT / "public" / "archive" / "items" / relative_path
             if not source.is_file() or source.suffix.lower() not in SUPPORTED:
                 updated.append(image_url)
