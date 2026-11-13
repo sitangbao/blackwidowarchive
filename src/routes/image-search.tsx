@@ -113,7 +113,7 @@ function ImageSearch() {
     <div className="mt-7 rounded border bg-card p-4 sm:p-6">
       <label className="flex min-h-52 cursor-pointer flex-col items-center justify-center rounded border border-dashed border-primary/50 bg-background/60 p-4 text-center transition hover:bg-primary/5">
         {preview ? <img src={preview} alt="待识别图片预览" className="max-h-64 max-w-full rounded object-contain"/> : <><div className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary"><ImagePlus size={26}/></div><p className="text-sm font-medium">选择商品照片</p><p className="mt-1 text-xs text-muted-foreground">也可以使用手机相机拍摄</p></>}
-        <input type="file" accept="image/*" capture="environment" className="sr-only" onChange={event => { setFile(event.target.files?.[0] ?? null); setMatches(null); setMessage(""); }}/>
+        <input type="file" accept="image/*" className="sr-only" onChange={event => { setFile(event.target.files?.[0] ?? null); setMatches(null); setMessage(""); }}/>
       </label>
       <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
         <p className="text-[11px] text-muted-foreground">支持 JPG、PNG、HEIC（取决于浏览器解码能力）</p>
