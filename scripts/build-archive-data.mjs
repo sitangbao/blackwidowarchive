@@ -108,6 +108,17 @@ async function main() {
   // Keep non-card items in their existing alphabetical positions, while sorting
   // card items by card series, card type, then card number.
   items.sort((a, b) => a.name.localeCompare(b.name, "zh-Hans"));
+  // Sort PANINI sticker entries by series and natural item number while keeping
+  // their overall positions in the archive grid.
+  const stickerPositions = items.flatMap((item, index) =>
+    item.category === "贴纸" && (item.brand_preset === "panini" || item.brand === "PANINI") ? [index] : []
+  );
+  const stickers = stickerPositions.map((index) => items[index]).sort((a, b) => {
+    const seriesCompare = String(a.series ?? "").localeCompare(String(b.series ?? ""), "zh-Hans", { numeric: true });
+    if (seriesCompare) return seriesCompare;
+    return String(a.item_number ?? "").localeCompare(String(b.item_number ?? ""), "en", { numeric: true });
+  });
+  stickerPositions.forEach((position, index) => { items[position] = stickers[index]; });
   const cardPositions = items.flatMap((item, index) => item.category === "卡片类" ? [index] : []);
   const cardTypeOrder = new Map([
     ["Base Card", 0], ["Base Card-Roll Call", 0], ["Base", 0], ["普卡", 0],
