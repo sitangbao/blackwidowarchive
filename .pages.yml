@@ -66,6 +66,7 @@ content:
             - 美谷
             - 韩谷
             - 国谷
+            - 巴西谷
       - name: series_preset
         label: 系列快捷选项
         type: select
@@ -151,6 +152,8 @@ content:
               label: FINDING CARD
             - name: panini
               label: PANINI
+            - name: abril
+              label: ABRIL
             - name: hot_toys
               label: HOT TOYS
             - name: marvel_legends
