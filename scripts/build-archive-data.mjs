@@ -108,10 +108,10 @@ async function main() {
   // Keep non-card items in their existing alphabetical positions, while sorting
   // card items by card series, card type, then card number.
   items.sort((a, b) => a.name.localeCompare(b.name, "zh-Hans"));
-  // Sort PANINI sticker entries by series and natural item number while keeping
+  // Sort PANINI and ABRIL sticker entries by series and natural item number while keeping
   // their overall positions in the archive grid.
   const stickerPositions = items.flatMap((item, index) =>
-    item.category === "贴纸" && (item.brand_preset === "panini" || item.brand === "PANINI") ? [index] : []
+    item.category === "贴纸" && (item.brand_preset === "panini" || item.brand === "PANINI" || item.brand_preset === "abril" || item.brand === "ABRIL") ? [index] : []
   );
   const stickers = stickerPositions.map((index) => items[index]).sort((a, b) => {
     const seriesCompare = String(a.series ?? "").localeCompare(String(b.series ?? ""), "zh-Hans", { numeric: true });
