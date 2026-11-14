@@ -67,6 +67,7 @@ content:
             - 韩谷
             - 国谷
             - 巴西谷
+            - 意谷
       - name: series_preset
         label: 系列快捷选项
         type: select
@@ -154,6 +155,8 @@ content:
               label: PANINI
             - name: abril
               label: ABRIL
+            - name: preziosi
+              label: PREZIOSI
             - name: hot_toys
               label: HOT TOYS
             - name: marvel_legends
