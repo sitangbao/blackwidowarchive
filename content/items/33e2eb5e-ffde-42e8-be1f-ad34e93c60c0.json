@@ -2,8 +2,6 @@
   "id": "33e2eb5e-ffde-42e8-be1f-ad34e93c60c0",
   "name": "PANINI复联2 #A5",
   "region": "意谷",
-  "card_series": "2015 Avengers 2: Age of Ultron",
-  "card_series_link_enabled": true,
   "category": "贴纸",
   "item_type": "Figured",
   "brand_preset": "panini",
@@ -11,6 +9,8 @@
   "card_title": "Sticker A5",
   "person_count": "single",
   "images": [
-    "/archive/optimized/aou-A5-ad4e471319fc.webp"
-  ]
+    "/archive/items/aou%23A5.JPG"
+  ],
+  "series": "2015 Avengers 2: Age of Ultron",
+  "series_link_enabled": true
 }

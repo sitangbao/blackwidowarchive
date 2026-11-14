@@ -2,8 +2,6 @@
   "id": "c69a7e6f-c629-49df-9920-5e45b2c0bbe7",
   "name": "PANINI复联2 #31",
   "region": "意谷",
-  "card_series": "2015 Avengers 2: Age of Ultron",
-  "card_series_link_enabled": true,
   "category": "贴纸",
   "item_type": "Foil",
   "brand_preset": "panini",
@@ -11,6 +9,8 @@
   "card_title": "Sticker 31",
   "person_count": "single",
   "images": [
-    "/archive/optimized/aou-31-da267daa5594.webp"
-  ]
+    "/archive/items/aou%2331.JPG"
+  ],
+  "series": "2015 Avengers 2: Age of Ultron",
+  "series_link_enabled": true
 }
