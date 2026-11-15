@@ -145,6 +145,29 @@ async function main() {
     const seriesB = String(b.card_series ?? b.series ?? "");
     const seriesCompare = seriesA.localeCompare(seriesB, "zh-Hans", { numeric: true });
     if (seriesCompare) return seriesCompare;
+    // UPPER DECK 2014 Captain America: The Winter Soldier (美队2):
+    // group by card number first, then keep parallels together in this order:
+    // base, silver, red, blue.
+    const isUdWinterSoldier = (item) => {
+      const series = String(item.card_series ?? item.series ?? "");
+      const isUpperDeck = item.brand_preset === "upper_deck" || item.brand === "UPPER DECK (UD)";
+      return isUpperDeck && /2014.*captain america.*winter soldier/i.test(series);
+    };
+    if (isUdWinterSoldier(a) && isUdWinterSoldier(b)) {
+      const numberCompare = getCardNumber(a).localeCompare(getCardNumber(b), "en", { numeric: true });
+      if (numberCompare) return numberCompare;
+      const parallelRank = (item) => {
+        const name = String(item.name ?? "");
+        if (/普卡|Base Card/i.test(name)) return 0;
+        if (/银折|Silver Foil/i.test(name)) return 1;
+        if (/红折|Red Foil/i.test(name)) return 2;
+        if (/蓝折|Blue Foil/i.test(name)) return 3;
+        return 4;
+      };
+      const parallelCompare = parallelRank(a) - parallelRank(b);
+      if (parallelCompare) return parallelCompare;
+      return String(a.name ?? "").localeCompare(String(b.name ?? ""), "zh-Hans", { numeric: true });
+    }
     // In the 2024 Marvel Studios Series 2: Cinematic checklist, keep parallel
     // versions of the same card number together instead of separating by subset.
     const isCinematicSeries = (value) => value.trim().toLocaleLowerCase() === "2024 marvel studios series 2 cinematic";
