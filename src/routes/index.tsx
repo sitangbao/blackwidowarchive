@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { Hourglass } from "@/components/Hourglass";
 import { ItemImage } from "@/components/ItemImage";
+import { toast } from "sonner";
 import { CATEGORIES, REGIONS, PERSON_COUNTS, CATEGORY_OPTIONS, brandsFor, countByCategory, filterItems, loadArchiveItems, readCollectionState, writeCollectionState, seriesIdFor, formatCardSeriesName, type Filters, type CollectionState } from "@/lib/archive";
 
 export const Route = createFileRoute("/")({
@@ -40,6 +41,31 @@ function Index() {
     return { q: "", region: "", category: initialCategory, brand: initialBrand, item_type: "", series: initialSeries, status: "", person: "" };
   });
   const [personal, setPersonal] = useState<CollectionState>(() => readCollectionState());
+  const [batchMode, setBatchMode] = useState(false);
+  const [selected, setSelected] = useState<Record<string, number>>({});
+  const selectedCount = Object.keys(selected).length;
+  const allShownSelected = shown.length > 0 && shown.every(item => Object.hasOwn(selected, item.id));
+  const toggleBatchItem = (id: string) => setSelected(old => {
+    if (Object.hasOwn(old, id)) { const next = { ...old }; delete next[id]; return next; }
+    return { ...old, [id]: personal[id]?.status === "owned" ? Math.max(1, personal[id].quantity) : 1 };
+  });
+  const changeBatchQuantity = (id: string, quantity: number) => setSelected(old => ({ ...old, [id]: Math.max(1, Math.floor(quantity) || 1) }));
+  const toggleAllShown = () => setSelected(old => {
+    if (allShownSelected) { const next = { ...old }; shown.forEach(item => delete next[item.id]); return next; }
+    const next = { ...old };
+    shown.forEach(item => { if (!Object.hasOwn(next, item.id)) next[item.id] = personal[item.id]?.status === "owned" ? Math.max(1, personal[item.id].quantity) : 1; });
+    return next;
+  });
+  const saveBatchCollection = () => {
+    if (!selectedCount) return;
+    const next = { ...personal };
+    Object.entries(selected).forEach(([id, quantity]) => { next[id] = { status: "owned", quantity: Math.max(1, Math.floor(quantity) || 1) }; });
+    setPersonal(next);
+    writeCollectionState(next);
+    toast.success(`已将 ${selectedCount} 款商品加入我的收藏`);
+    setSelected({});
+    setBatchMode(false);
+  };
   useEffect(() => {
     if (isLoading) return;
     const saved = sessionStorage.getItem("bwa-collection-scroll-y");
@@ -105,17 +131,22 @@ function Index() {
         </div>}
         {(f.category || f.brand || f.item_type || f.series || f.region || f.status || f.person || f.q) && <button type="button" onClick={() => setF({ q:"", region:"", category:"", brand:"", item_type:"", series:"", status:"", person:"" })} className="mt-3 text-xs text-muted-foreground underline">清除筛选</button>}
       </div>
-      <div className="flex items-center justify-between py-4"><p className="archive-label">{isLoading ? "LOADING" : `${shown.length} COLLECTIBLES`}</p><Link to="/collection" className="text-xs text-primary underline">MY COLLECTION →</Link></div>
+      <div className="flex items-center justify-between gap-2 py-4"><p className="archive-label">{isLoading ? "LOADING" : `${shown.length} COLLECTIBLES`}</p><div className="flex items-center gap-3"><button type="button" onClick={() => { setBatchMode(value => !value); setSelected({}); }} className={`text-xs underline ${batchMode ? "text-primary" : "text-muted-foreground"}`}>{batchMode ? "退出批量选择" : "批量选择"}</button><Link to="/collection" className="text-xs text-primary underline">MY COLLECTION →</Link></div></div>
+      {batchMode && <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded border border-primary/40 bg-primary/5 px-3 py-2.5"><p className="text-xs text-foreground">已选择 <span className="font-semibold text-primary">{selectedCount}</span> 款商品</p><button type="button" onClick={toggleAllShown} className="text-xs text-primary underline">{allShownSelected ? "取消全选当前结果" : "全选当前筛选结果"}</button></div>}
       {isError ? <div className="my-8 rounded border border-destructive/40 bg-card p-5 text-center"><p className="text-sm text-foreground">暂时无法读取周边资料，请稍后重试。</p><button type="button" onClick={() => refetch()} className="mt-3 rounded border border-primary px-4 py-2 text-xs text-primary">重新加载</button></div> : !isLoading && shown.length === 0 ? <p className="py-16 text-center text-sm text-muted-foreground">没有符合条件的周边。</p> : null}
-      <div className="grid grid-cols-3 gap-2 sm:gap-4">{shown.map(it => <div key={it.id} className="overflow-visible rounded border border-border/60 bg-card transition hover:border-primary">
-        <Link to="/item/$id" params={{ id: it.id }} className="block" onClick={(event) => { if (event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) {
-            sessionStorage.setItem("bwa-collection-scroll-y", String(window.scrollY));
-            sessionStorage.setItem("bwa-collection-filters", JSON.stringify(f));
-          } }}>
-          <div className="flex aspect-square items-center justify-center overflow-hidden rounded-t bg-card"><ItemImage url={it.images[0]} alt={it.name} category={it.category} className="h-[82%] w-[82%] rounded-t"/></div>
-          <div className="px-2 pt-1.5 pb-2.5 sm:px-3"><p className="line-clamp-2 min-h-[2.5em] text-[12px] leading-snug sm:text-[15px]">{it.name}</p><div className="mt-1.5 flex flex-wrap items-center gap-1"><span className="rounded-full border border-border/70 bg-background/60 px-1.5 py-0.5 text-[9px] leading-none text-muted-foreground sm:text-[11px]">{it.category}</span><span className="rounded-full border border-border/70 bg-background/60 px-1.5 py-0.5 text-[8px] leading-none text-muted-foreground sm:text-[10px]">{it.region}</span></div></div>
-        </Link>
-      </div>)}</div>
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">{shown.map(it => {
+        const isSelected = Object.hasOwn(selected, it.id);
+        const cardContent = <>
+          <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-t bg-card"><ItemImage url={it.images[0]} alt={it.name} category={it.category} className="h-[82%] w-[82%] rounded-t"/>{batchMode && <span className={`absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full border text-xs shadow ${isSelected ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background/90 text-muted-foreground"}`}>{isSelected ? "✓" : ""}</span>}</div>
+          <div className="px-2 pt-1.5 pb-2.5 sm:px-3"><p className="line-clamp-2 min-h-[2.5em] text-[12px] leading-snug sm:text-[15px]">{it.name}</p><div className="mt-1.5 flex flex-wrap items-center gap-1"><span className="rounded-full border border-border/70 bg-background/60 px-1.5 py-0.5 text-[9px] leading-none text-muted-foreground sm:text-[11px]">{it.category}</span><span className="rounded-full border border-border/70 bg-background/60 px-1.5 py-0.5 text-[8px] leading-none text-muted-foreground sm:text-[10px]">{it.region}</span></div>
+          {batchMode && isSelected && <div className="mt-2 flex items-center justify-between gap-1 rounded border border-primary/30 bg-primary/5 p-1" onClick={event => event.stopPropagation()}><button type="button" aria-label={`减少${it.name}数量`} onClick={() => changeBatchQuantity(it.id, selected[it.id] - 1)} disabled={selected[it.id] <= 1} className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-base disabled:opacity-30">−</button><input aria-label={`${it.name}拥有数量`} type="number" min="1" step="1" inputMode="numeric" value={selected[it.id]} onChange={event => changeBatchQuantity(it.id, Number(event.target.value))} className="w-8 min-w-0 border-0 bg-transparent text-center text-xs outline-none"/><button type="button" aria-label={`增加${it.name}数量`} onClick={() => changeBatchQuantity(it.id, selected[it.id] + 1)} className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-base">＋</button></div>}
+          </div>
+        </>;
+        return <div key={it.id} className={`overflow-visible rounded border bg-card transition hover:border-primary ${isSelected ? "border-primary ring-1 ring-primary/30" : "border-border/60"}`}>
+          {batchMode ? <button type="button" aria-pressed={isSelected} onClick={() => toggleBatchItem(it.id)} className="block w-full text-left">{cardContent}</button> : <Link to="/item/$id" params={{ id: it.id }} className="block" onClick={(event) => { if (event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) { sessionStorage.setItem("bwa-collection-scroll-y", String(window.scrollY)); sessionStorage.setItem("bwa-collection-filters", JSON.stringify(f)); } }}>{cardContent}</Link>}
+        </div>;
+      })}</div>
+      {batchMode && selectedCount > 0 && <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-40 mx-auto max-w-3xl px-3"><div className="flex items-center justify-between gap-3 rounded-lg border border-primary/40 bg-card/95 p-3 shadow-xl backdrop-blur"><div className="min-w-0"><p className="text-sm font-medium">已选择 {selectedCount} 款</p><p className="text-[10px] text-muted-foreground">可在商品卡片上调整拥有数量</p></div><button type="button" onClick={saveBatchCollection} className="shrink-0 rounded bg-primary px-4 py-2.5 text-xs font-medium text-primary-foreground">加入我的收藏</button></div></div>}
     </section>
   </>;
 }
