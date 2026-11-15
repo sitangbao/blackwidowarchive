@@ -148,12 +148,17 @@ async function main() {
     // UPPER DECK 2014 Captain America: The Winter Soldier (美队2):
     // group by card number first, then keep parallels together in this order:
     // base, silver, red, blue.
-    const isUdWinterSoldier = (item) => {
+    const isUdNumberFirstSeries = (item) => {
       const series = String(item.card_series ?? item.series ?? "");
       const isUpperDeck = item.brand_preset === "upper_deck" || item.brand === "UPPER DECK (UD)";
-      return isUpperDeck && /2014.*captain america.*winter soldier/i.test(series);
+      const isTargetSeries =
+        /2014.*captain america.*winter soldier/i.test(series) ||
+        /2015.*avengers.*age of ultron/i.test(series) ||
+        /2016.*captain america.*civil war/i.test(series) ||
+        /2019.*mcu.*10th anniversary/i.test(series);
+      return isUpperDeck && isTargetSeries;
     };
-    if (isUdWinterSoldier(a) && isUdWinterSoldier(b)) {
+    if (isUdNumberFirstSeries(a) && isUdNumberFirstSeries(b)) {
       const numberCompare = getCardNumber(a).localeCompare(getCardNumber(b), "en", { numeric: true });
       if (numberCompare) return numberCompare;
       const parallelRank = (item) => {
