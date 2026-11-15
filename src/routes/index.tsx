@@ -43,6 +43,20 @@ function Index() {
   const [personal, setPersonal] = useState<CollectionState>(() => readCollectionState());
   const [batchMode, setBatchMode] = useState(false);
   const [selected, setSelected] = useState<Record<string, number>>({});
+  useEffect(() => {
+    if (isLoading) return;
+    const saved = sessionStorage.getItem("bwa-collection-scroll-y");
+    if (saved === null) return;
+    sessionStorage.removeItem("bwa-collection-scroll-y");
+    const y = Number(saved);
+    if (!Number.isFinite(y)) return;
+    requestAnimationFrame(() => requestAnimationFrame(() => window.scrollTo(0, y)));
+  }, [isLoading]);
+  const counts = useMemo(() => countByCategory(items), [items]);
+  const brands = useMemo(() => (f.category ? brandsFor(items, f.category) : [...new Set(items.map(i => i.brand).filter((x): x is string => !!x))].sort()), [items, f.category]);
+  // Stickers have a curated brand layer as well as brands discovered from existing items.
+  const brandOptions = f.category === "贴纸" ? [...new Set([...brands, "ABRIL", "PANINI", "PREZIOSI"])].sort() : brands;
+  const shown = useMemo(() => filterItems(items, { ...f, status: "" }).filter(it => !f.status || (personal[it.id]?.status ?? "") === f.status), [items, f, personal]);
   const selectedCount = Object.keys(selected).length;
   const allShownSelected = shown.length > 0 && shown.every(item => Object.hasOwn(selected, item.id));
   const toggleBatchItem = (id: string) => setSelected(old => {
@@ -66,20 +80,6 @@ function Index() {
     setSelected({});
     setBatchMode(false);
   };
-  useEffect(() => {
-    if (isLoading) return;
-    const saved = sessionStorage.getItem("bwa-collection-scroll-y");
-    if (saved === null) return;
-    sessionStorage.removeItem("bwa-collection-scroll-y");
-    const y = Number(saved);
-    if (!Number.isFinite(y)) return;
-    requestAnimationFrame(() => requestAnimationFrame(() => window.scrollTo(0, y)));
-  }, [isLoading]);
-  const counts = useMemo(() => countByCategory(items), [items]);
-  const brands = useMemo(() => (f.category ? brandsFor(items, f.category) : [...new Set(items.map(i => i.brand).filter((x): x is string => !!x))].sort()), [items, f.category]);
-  // Stickers have a curated brand layer as well as brands discovered from existing items.
-  const brandOptions = f.category === "贴纸" ? [...new Set([...brands, "ABRIL", "PANINI", "PREZIOSI"])].sort() : brands;
-  const shown = useMemo(() => filterItems(items, { ...f, status: "" }).filter(it => !f.status || (personal[it.id]?.status ?? "") === f.status), [items, f, personal]);
   const categoryLabel = f.category || "周边收藏总数";
   const seriesFilterLabel = items.find(it => seriesIdFor((f.category === "卡片类" ? (it.card_series ?? it.series) : it.series) ?? "") === f.series)?.[f.category === "卡片类" ? "card_series" : "series"] ?? f.series;
   const availableSeries = [...new Set(items.filter(i => i.category === f.category && i.brand === f.brand).map(i => f.category === "卡片类" ? (i.card_series ?? i.series) : i.series).filter((x): x is string => !!x))].sort();
