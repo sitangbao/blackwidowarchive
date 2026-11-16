@@ -154,6 +154,7 @@ async function main() {
       if (numberCompare) return numberCompare;
       const allureParallelOrder = new Map([
         ["Base Card", 0],
+        ["Base High Series", 0],
         ["Black Rainbow", 1],
         ["Magenta", 2],
         ["Orange Slice Die-Cut", 3],
