@@ -170,6 +170,31 @@ async function main() {
       const rankB = allureParallelOrder.get(String(b.item_type ?? "").trim()) ?? 99;
       if (rankA !== rankB) return rankA - rankB;
     }
+    // 2022 Marvel Allure #46: preserve the collector's explicitly supplied parallel order.
+    const isAllure2022NumberFortySix = (item) =>
+      String(item.card_series ?? item.series ?? "").trim().toLowerCase() === "2022 marvel allure" &&
+      getCardNumber(item) === "46";
+    if (isAllure2022NumberFortySix(a) && isAllure2022NumberFortySix(b)) {
+      const allureParallelOrder = new Map([
+        ["Base Card", 0],
+        ["Black Rainbow", 1],
+        ["Magenta", 2],
+        ["Orange Slice Die-Cut", 3],
+        ["Portal", 4],
+        ["Red Prism", 5],
+        ["Steel", 6],
+        ["Sunrise", 7],
+        ["Yellow Taxi", 8],
+        ["Storm", 9],
+        ["Green Quartz", 10],
+        ["White Diamond", 11],
+        ["Blue Line", 12],
+        ["Purple Rainbow Die-Cut", 13],
+      ]);
+      const rankA = allureParallelOrder.get(String(a.item_type ?? "").trim()) ?? 99;
+      const rankB = allureParallelOrder.get(String(b.item_type ?? "").trim()) ?? 99;
+      if (rankA !== rankB) return rankA - rankB;
+    }
     // UPPER DECK 2014 Captain America: The Winter Soldier (美队2):
     // group by card number first, then keep parallels together in this order:
     // base, silver, red, blue.
