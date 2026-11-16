@@ -169,6 +169,20 @@ async function main() {
         ["Blue Line", 12],
         ["Pink", 13],
         ["Purple Rainbow Die-Cut", 13],
+        ["Infinity Stones - Mind Stone", 14],
+        ["Infinity Stones - Power Stone", 15],
+        ["Infinity Stones - Reality Stone", 16],
+        ["Infinity Stones - Soul Stone", 17],
+        ["Infinity Stones - Space Stone", 18],
+        ["Infinity Stones - Time Stone", 19],
+        ["Infinity Stones Gold Parallel - Mind Stone", 20],
+        ["Infinity Stones Gold Parallel - Power Stone", 21],
+        ["Infinity Stones Gold Parallel - Reality Stone", 22],
+        ["Infinity Stones Gold Parallel - Soul Stone", 23],
+        ["Infinity Stones Gold Parallel - Space Stone", 24],
+        ["Infinity Stones Gold Parallel - Time Stone", 25],
+        ["Infinity Stones White Parallel - Soul Stone", 26],
+        ["Infinity Stones White Parallel - Space Stone", 27],
       ]);
       const rankA = allureParallelOrder.get(String(a.item_type ?? "").trim()) ?? 99;
       const rankB = allureParallelOrder.get(String(b.item_type ?? "").trim()) ?? 99;
