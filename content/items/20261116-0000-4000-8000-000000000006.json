@@ -1,0 +1,17 @@
+{
+  "id": "20261116-0000-4000-8000-000000000006",
+  "name": "UD小黑钻 红棱镜 #4",
+  "region": "美谷",
+  "card_series": "2022 Marvel Allure",
+  "card_series_link_enabled": true,
+  "category": "卡片类",
+  "item_type": "Red Prism",
+  "brand_preset": "upper_deck",
+  "card_number": "4",
+  "status": "not_owned",
+  "person_count": "single",
+  "character_preset": "natasha_romanoff",
+  "images": [
+    "/archive/items/Red%20prism%E7%BA%A2%E6%A3%B1%E9%95%9C%E6%8A%98%E5%B0%84%20%234.jpg"
+  ]
+}
