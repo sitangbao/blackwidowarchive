@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { Hourglass } from "@/components/Hourglass";
 import { ItemImage } from "@/components/ItemImage";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { CATEGORIES, REGIONS, PERSON_COUNTS, CATEGORY_OPTIONS, brandsFor, countByCategory, filterItems, loadArchiveItems, readCollectionState, writeCollectionState, seriesIdFor, formatCardSeriesName, type Filters, type CollectionState } from "@/lib/archive";
 
@@ -42,6 +43,8 @@ function Index() {
   });
   const [personal, setPersonal] = useState<CollectionState>(() => readCollectionState());
   const [batchMode, setBatchMode] = useState(false);
+  const [atlasOpen, setAtlasOpen] = useState(false);
+  const [atlasZoomItem, setAtlasZoomItem] = useState<(typeof items)[number] | null>(null);
   const [selected, setSelected] = useState<Record<string, number>>({});
   useEffect(() => {
     if (isLoading) return;
@@ -57,6 +60,25 @@ function Index() {
   // Stickers have a curated brand layer as well as brands discovered from existing items.
   const brandOptions = f.category === "贴纸" ? [...new Set([...brands, "ABRIL", "PANINI", "PREZIOSI"])].sort() : brands;
   const shown = useMemo(() => filterItems(items, { ...f, status: "" }).filter(it => !f.status || (personal[it.id]?.status ?? "") === f.status), [items, f, personal]);
+  const selectedSeriesItems = useMemo(() => {
+    if (f.category !== "卡片类" || f.brand !== "UPPER DECK (UD)" || !f.series ||
+      !f.series.toLocaleLowerCase().includes("2022 marvel allure")) return [];
+    return items.filter(item => item.category === "卡片类" &&
+      item.brand === "UPPER DECK (UD)" &&
+      seriesIdFor(item.card_series ?? item.series ?? "") === seriesIdFor(f.series));
+  }, [items, f.category, f.brand, f.series]);
+  const atlasCards = useMemo(() => {
+    const byNumber = new Map<string, (typeof selectedSeriesItems)[number]>();
+    for (const item of selectedSeriesItems) {
+      const number = String(item.card_number ?? item.name.match(/#\\s*([A-Z]*-?\\d+)/i)?.[1] ?? "").trim();
+      if (!number) continue;
+      const current = byNumber.get(number);
+      const isBase = /^(Base Card|Base High Series|Base)$/i.test(String(item.item_type ?? "")) || /普卡/.test(item.name);
+      const currentIsBase = current && (/^(Base Card|Base High Series|Base)$/i.test(String(current.item_type ?? "")) || /普卡/.test(current.name));
+      if (!current || (isBase && !currentIsBase)) byNumber.set(number, item);
+    }
+    return [...byNumber.entries()].sort(([a], [b]) => a.localeCompare(b, "en", { numeric: true }));
+  }, [selectedSeriesItems]);
   const selectedCount = Object.keys(selected).length;
   const allShownSelected = shown.length > 0 && shown.every(item => Object.hasOwn(selected, item.id));
   const toggleBatchItem = (id: string) => setSelected(old => {
@@ -132,6 +154,10 @@ function Index() {
         {(f.category || f.brand || f.item_type || f.series || f.region || f.status || f.person || f.q) && <button type="button" onClick={() => setF({ q:"", region:"", category:"", brand:"", item_type:"", series:"", status:"", person:"" })} className="mt-3 text-xs text-muted-foreground underline">清除筛选</button>}
       </div>
       <div className="flex items-center justify-between gap-2 py-4"><p className="archive-label">{isLoading ? "LOADING" : `${shown.length} COLLECTIBLES`}</p><div className="flex items-center gap-3"><button type="button" onClick={() => { setBatchMode(value => !value); setSelected({}); }} className={`text-xs underline ${batchMode ? "text-primary" : "text-muted-foreground"}`}>{batchMode ? "退出批量选择" : "批量选择"}</button><Link to="/collection" className="text-xs text-primary underline">MY COLLECTION →</Link></div></div>
+      {atlasCards.length > 0 && <button type="button" onClick={() => setAtlasOpen(true)} className="mb-4 flex w-full items-center justify-between gap-3 rounded border border-primary/35 bg-primary/5 px-4 py-3 text-left transition hover:border-primary hover:bg-primary/10">
+        <span><span className="block text-sm font-medium text-foreground">完整图鉴</span><span className="mt-0.5 block text-[11px] text-muted-foreground">查看 2022 Marvel Allure 所有卡面总览</span></span>
+        <span className="shrink-0 text-xs tracking-wider text-primary">OPEN ATLAS ↗</span>
+      </button>}
       {batchMode && <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded border border-primary/40 bg-primary/5 px-3 py-2.5"><p className="text-xs text-foreground">已选择 <span className="font-semibold text-primary">{selectedCount}</span> 款商品</p><button type="button" onClick={toggleAllShown} className="text-xs text-primary underline">{allShownSelected ? "取消全选当前结果" : "全选当前筛选结果"}</button></div>}
       {isError ? <div className="my-8 rounded border border-destructive/40 bg-card p-5 text-center"><p className="text-sm text-foreground">暂时无法读取周边资料，请稍后重试。</p><button type="button" onClick={() => refetch()} className="mt-3 rounded border border-primary px-4 py-2 text-xs text-primary">重新加载</button></div> : !isLoading && shown.length === 0 ? <p className="py-16 text-center text-sm text-muted-foreground">没有符合条件的周边。</p> : null}
       <div className="grid grid-cols-3 gap-2 sm:gap-4">{shown.map(it => {
@@ -147,6 +173,28 @@ function Index() {
         </div>;
       })}</div>
       {batchMode && selectedCount > 0 && <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-40 mx-auto max-w-3xl px-3"><div className="flex items-center justify-between gap-3 rounded-lg border border-primary/40 bg-card/95 p-3 shadow-xl backdrop-blur"><div className="min-w-0"><p className="text-sm font-medium">已选择 {selectedCount} 款</p><p className="text-[10px] text-muted-foreground">可在商品卡片上调整拥有数量</p></div><button type="button" onClick={saveBatchCollection} className="shrink-0 rounded bg-primary px-4 py-2.5 text-xs font-medium text-primary-foreground">加入我的收藏</button></div></div>}
+      <Dialog open={atlasOpen} onOpenChange={setAtlasOpen}>
+        <DialogContent className="max-h-[92vh] max-w-5xl overflow-y-auto p-3 sm:p-5">
+          <DialogHeader>
+            <DialogTitle className="font-display text-xl tracking-wider">2022 MARVEL ALLURE — COMPLETE CARD ATLAS</DialogTitle>
+            <p className="text-xs text-muted-foreground">按卡号整理 · 每个卡号展示一张代表卡面 · 共 {atlasCards.length} 张</p>
+          </DialogHeader>
+          <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 sm:gap-3">
+            {atlasCards.map(([number, item]) => <button type="button" key={number} onClick={() => setAtlasZoomItem(item)} className="min-w-0 rounded border border-border/70 bg-card p-1.5 text-left transition hover:border-primary">
+              <div className="flex aspect-[3/4] items-center justify-center overflow-hidden rounded bg-background"><img src={item.images[0]} alt={item.name} loading="lazy" className="h-full w-full object-contain" /></div>
+              <span className="mt-1.5 block text-center text-xs text-muted-foreground">#{number}</span>
+            </button>)}
+          </div>
+          <p className="pt-1 text-center text-[10px] text-muted-foreground">点选任一卡面可放大查看。完整平行版本仍保留在原商品列表中。</p>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={!!atlasZoomItem} onOpenChange={open => { if (!open) setAtlasZoomItem(null); }}>
+        <DialogContent className="max-h-[92vh] max-w-3xl p-2">
+          <DialogHeader className="sr-only"><DialogTitle>{atlasZoomItem?.name ?? "卡面放大"}</DialogTitle></DialogHeader>
+          {atlasZoomItem?.images[0] && <img src={atlasZoomItem.images[0]} alt={atlasZoomItem.name} className="max-h-[85vh] w-full object-contain" />}
+          {atlasZoomItem && <p className="px-2 pb-1 text-center text-xs text-muted-foreground">{atlasZoomItem.name}</p>}
+        </DialogContent>
+      </Dialog>
     </section>
   </>;
 }
