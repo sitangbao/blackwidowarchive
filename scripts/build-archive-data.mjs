@@ -145,11 +145,13 @@ async function main() {
     const seriesB = String(b.card_series ?? b.series ?? "");
     const seriesCompare = seriesA.localeCompare(seriesB, "zh-Hans", { numeric: true });
     if (seriesCompare) return seriesCompare;
-    // 2022 Marvel Allure #4: preserve the collector's explicitly supplied parallel order.
-    const isAllure2022NumberFour = (item) =>
-      String(item.card_series ?? item.series ?? "").trim().toLowerCase() === "2022 marvel allure" &&
-      getCardNumber(item) === "4";
-    if (isAllure2022NumberFour(a) && isAllure2022NumberFour(b)) {
+    // 2022 Marvel Allure: group by card number first, then preserve the collector's
+    // supplied parallel order so every version of the same card image stays together.
+    const isAllure2022 = (item) =>
+      String(item.card_series ?? item.series ?? "").trim().toLowerCase() === "2022 marvel allure";
+    if (isAllure2022(a) && isAllure2022(b)) {
+      const numberCompare = getCardNumber(a).localeCompare(getCardNumber(b), "en", { numeric: true });
+      if (numberCompare) return numberCompare;
       const allureParallelOrder = new Map([
         ["Base Card", 0],
         ["Black Rainbow", 1],
@@ -165,35 +167,12 @@ async function main() {
         ["White Diamond", 11],
         ["Blue Line", 12],
         ["Pink", 13],
-      ]);
-      const rankA = allureParallelOrder.get(String(a.item_type ?? "").trim()) ?? 99;
-      const rankB = allureParallelOrder.get(String(b.item_type ?? "").trim()) ?? 99;
-      if (rankA !== rankB) return rankA - rankB;
-    }
-    // 2022 Marvel Allure #46: preserve the collector's explicitly supplied parallel order.
-    const isAllure2022NumberFortySix = (item) =>
-      String(item.card_series ?? item.series ?? "").trim().toLowerCase() === "2022 marvel allure" &&
-      getCardNumber(item) === "46";
-    if (isAllure2022NumberFortySix(a) && isAllure2022NumberFortySix(b)) {
-      const allureParallelOrder = new Map([
-        ["Base Card", 0],
-        ["Black Rainbow", 1],
-        ["Magenta", 2],
-        ["Orange Slice Die-Cut", 3],
-        ["Portal", 4],
-        ["Red Prism", 5],
-        ["Steel", 6],
-        ["Sunrise", 7],
-        ["Yellow Taxi", 8],
-        ["Storm", 9],
-        ["Green Quartz", 10],
-        ["White Diamond", 11],
-        ["Blue Line", 12],
         ["Purple Rainbow Die-Cut", 13],
       ]);
       const rankA = allureParallelOrder.get(String(a.item_type ?? "").trim()) ?? 99;
       const rankB = allureParallelOrder.get(String(b.item_type ?? "").trim()) ?? 99;
       if (rankA !== rankB) return rankA - rankB;
+      return String(a.name ?? "").localeCompare(String(b.name ?? ""), "zh-Hans", { numeric: true });
     }
     // UPPER DECK 2014 Captain America: The Winter Soldier (美队2):
     // group by card number first, then keep parallels together in this order:
