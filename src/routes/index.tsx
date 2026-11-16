@@ -5,7 +5,7 @@ import { Hourglass } from "@/components/Hourglass";
 import { ItemImage } from "@/components/ItemImage";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { CATEGORIES, REGIONS, PERSON_COUNTS, CATEGORY_OPTIONS, brandsFor, countByCategory, filterItems, loadArchiveItems, readCollectionState, writeCollectionState, seriesIdFor, formatCardSeriesName, type Filters, type CollectionState } from "@/lib/archive";
+import { CATEGORIES, REGIONS, PERSON_COUNTS, CATEGORY_OPTIONS, brandsFor, countByCategory, filterItems, loadArchiveItems, readCollectionState, writeCollectionState, seriesIdFor, formatCardSeriesName, type Filters, type CollectionState, type AtlasEntry, loadAtlasEntries, useSignedUrls } from "@/lib/archive";
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [{ title: "BLACK WIDOW ARCHIVE — Natasha Romanoff 周边收藏图鉴" }, { name: "description", content: "Marvel Natasha Romanoff / Black Widow 官方周边收藏图鉴。" }] }),
@@ -14,6 +14,7 @@ export const Route = createFileRoute("/")({
 const selectCls = "h-10 w-full min-w-0 rounded border bg-card px-2 text-xs sm:text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary";
 function Index() {
   const { data: items = [], isLoading, isError, refetch } = useQuery({ queryKey: ["items"], queryFn: loadArchiveItems });
+  const { data: atlasEntries = [] } = useQuery({ queryKey: ["atlas-entries"], queryFn: loadAtlasEntries, staleTime: 60_000 });
   const initialSeries = typeof window !== "undefined" ? ((() => { const p = new URLSearchParams(window.location.search); const id = p.get("seriesId"); return id ? id : (p.get("series") ?? ""); })()) : "";
   const initialBrand = typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get("brand") ?? "") : "";
   const initialCategory = typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get("category") ?? "") : "";
@@ -45,6 +46,9 @@ function Index() {
   const [batchMode, setBatchMode] = useState(false);
   const [atlasOpen, setAtlasOpen] = useState(false);
   const [atlasZoomItem, setAtlasZoomItem] = useState<(typeof items)[number] | null>(null);
+  const [atlasZoomSrc, setAtlasZoomSrc] = useState<string | null>(null);
+  const [atlasZoomTitle, setAtlasZoomTitle] = useState("");
+  const [atlasPage, setAtlasPage] = useState(0);
   const [selected, setSelected] = useState<Record<string, number>>({});
   useEffect(() => {
     if (isLoading) return;
@@ -79,6 +83,9 @@ function Index() {
     }
     return [...byNumber.entries()].sort(([a], [b]) => a.localeCompare(b, "en", { numeric: true }));
   }, [selectedSeriesItems]);
+  const activeAtlas: AtlasEntry | undefined = f.category === "卡片类" ? atlasEntries.find(entry => entry.images.length > 0 && seriesIdFor(entry.name) === seriesIdFor(f.series)) : undefined;
+  const atlasImageUrls = useSignedUrls("item-images", activeAtlas?.images ?? []);
+  useEffect(() => { setAtlasPage(0); }, [activeAtlas?.id]);
   const selectedCount = Object.keys(selected).length;
   const allShownSelected = shown.length > 0 && shown.every(item => Object.hasOwn(selected, item.id));
   const toggleBatchItem = (id: string) => setSelected(old => {
@@ -154,8 +161,8 @@ function Index() {
         {(f.category || f.brand || f.item_type || f.series || f.region || f.status || f.person || f.q) && <button type="button" onClick={() => setF({ q:"", region:"", category:"", brand:"", item_type:"", series:"", status:"", person:"" })} className="mt-3 text-xs text-muted-foreground underline">清除筛选</button>}
       </div>
       <div className="flex items-center justify-between gap-2 py-4"><p className="archive-label">{isLoading ? "LOADING" : `${shown.length} COLLECTIBLES`}</p><div className="flex items-center gap-3"><button type="button" onClick={() => { setBatchMode(value => !value); setSelected({}); }} className={`text-xs underline ${batchMode ? "text-primary" : "text-muted-foreground"}`}>{batchMode ? "退出批量选择" : "批量选择"}</button><Link to="/collection" className="text-xs text-primary underline">MY COLLECTION →</Link></div></div>
-      {atlasCards.length > 0 && <button type="button" onClick={() => setAtlasOpen(true)} className="mb-4 flex w-full items-center justify-between gap-3 rounded border border-primary/35 bg-primary/5 px-4 py-3 text-left transition hover:border-primary hover:bg-primary/10">
-        <span><span className="block text-sm font-medium text-foreground">完整图鉴</span><span className="mt-0.5 block text-[11px] text-muted-foreground">查看 2022 Marvel Allure 所有卡面总览</span></span>
+      {(activeAtlas || atlasCards.length > 0) && <button type="button" onClick={() => setAtlasOpen(true)} className="mb-4 flex w-full items-center justify-between gap-3 rounded border border-primary/35 bg-primary/5 px-4 py-3 text-left transition hover:border-primary hover:bg-primary/10">
+        <span><span className="block text-sm font-medium text-foreground">完整图鉴</span><span className="mt-0.5 block text-[11px] text-muted-foreground">查看 {activeAtlas?.name ?? "2022 Marvel Allure"} 自制图鉴</span></span>
         <span className="shrink-0 text-xs tracking-wider text-primary">OPEN ATLAS ↗</span>
       </button>}
       {batchMode && <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded border border-primary/40 bg-primary/5 px-3 py-2.5"><p className="text-xs text-foreground">已选择 <span className="font-semibold text-primary">{selectedCount}</span> 款商品</p><button type="button" onClick={toggleAllShown} className="text-xs text-primary underline">{allShownSelected ? "取消全选当前结果" : "全选当前筛选结果"}</button></div>}
@@ -176,23 +183,35 @@ function Index() {
       <Dialog open={atlasOpen} onOpenChange={setAtlasOpen}>
         <DialogContent className="max-h-[92vh] max-w-5xl overflow-y-auto p-3 sm:p-5">
           <DialogHeader>
-            <DialogTitle className="font-display text-xl tracking-wider">2022 MARVEL ALLURE — COMPLETE CARD ATLAS</DialogTitle>
-            <p className="text-xs text-muted-foreground">按卡号整理 · 每个卡号展示一张代表卡面 · 共 {atlasCards.length} 张</p>
+            <DialogTitle className="font-display text-xl tracking-wider">{activeAtlas?.name ?? "2022 MARVEL ALLURE — COMPLETE CARD ATLAS"}</DialogTitle>
+            <p className="text-xs text-muted-foreground">{activeAtlas ? `自制图鉴 · 第 ${atlasPage + 1} / ${activeAtlas.images.length} 页` : `按卡号整理 · 每个卡号展示一张代表卡面 · 共 ${atlasCards.length} 张`}</p>
           </DialogHeader>
-          <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 sm:gap-3">
-            {atlasCards.map(([number, item]) => <button type="button" key={number} onClick={() => setAtlasZoomItem(item)} className="min-w-0 rounded border border-border/70 bg-card p-1.5 text-left transition hover:border-primary">
-              <div className="flex aspect-[3/4] items-center justify-center overflow-hidden rounded bg-background"><img src={item.images[0]} alt={item.name} loading="lazy" className="h-full w-full object-contain" /></div>
-              <span className="mt-1.5 block text-center text-xs text-muted-foreground">#{number}</span>
-            </button>)}
-          </div>
-          <p className="pt-1 text-center text-[10px] text-muted-foreground">点选任一卡面可放大查看。完整平行版本仍保留在原商品列表中。</p>
+          {activeAtlas ? <div className="space-y-3">
+            <button type="button" disabled={!atlasImageUrls[activeAtlas.images[atlasPage]]} onClick={() => { setAtlasZoomSrc(atlasImageUrls[activeAtlas.images[atlasPage]] ?? null); setAtlasZoomTitle(`${activeAtlas.name} · 第 ${atlasPage + 1} 页`); }} className="flex max-h-[68vh] w-full items-center justify-center overflow-hidden rounded bg-background disabled:opacity-60">
+              <img src={atlasImageUrls[activeAtlas.images[atlasPage]]} alt={`${activeAtlas.name} 第 ${atlasPage + 1} 页`} className="max-h-[68vh] w-full object-contain" />
+            </button>
+            {activeAtlas.images.length > 1 && <div className="flex items-center justify-between gap-3">
+              <button type="button" disabled={atlasPage === 0} onClick={() => setAtlasPage(p => Math.max(0, p - 1))} className={ghost}>← 上一页</button>
+              <span className="text-xs tabular-nums text-muted-foreground">{atlasPage + 1} / {activeAtlas.images.length}</span>
+              <button type="button" disabled={atlasPage >= activeAtlas.images.length - 1} onClick={() => setAtlasPage(p => Math.min(activeAtlas.images.length - 1, p + 1))} className={ghost}>下一页 →</button>
+            </div>}
+            <p className="text-center text-[10px] text-muted-foreground">点击图片可放大查看</p>
+          </div> : <>
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-5 sm:gap-3">
+              {atlasCards.map(([number, item]) => <button type="button" key={number} onClick={() => setAtlasZoomItem(item)} className="min-w-0 rounded border border-border/70 bg-card p-1.5 text-left transition hover:border-primary">
+                <div className="flex aspect-[3/4] items-center justify-center overflow-hidden rounded bg-background"><img src={item.images[0]} alt={item.name} loading="lazy" className="h-full w-full object-contain" /></div>
+                <span className="mt-1.5 block text-center text-xs text-muted-foreground">#{number}</span>
+              </button>)}
+            </div>
+            <p className="pt-1 text-center text-[10px] text-muted-foreground">点选任一卡面可放大查看。完整平行版本仍保留在原商品列表中。</p>
+          </>}
         </DialogContent>
       </Dialog>
-      <Dialog open={!!atlasZoomItem} onOpenChange={open => { if (!open) setAtlasZoomItem(null); }}>
+      <Dialog open={!!atlasZoomItem || !!atlasZoomSrc} onOpenChange={open => { if (!open) { setAtlasZoomItem(null); setAtlasZoomSrc(null); } }}>
         <DialogContent className="max-h-[92vh] max-w-3xl p-2">
-          <DialogHeader className="sr-only"><DialogTitle>{atlasZoomItem?.name ?? "卡面放大"}</DialogTitle></DialogHeader>
-          {atlasZoomItem?.images[0] && <img src={atlasZoomItem.images[0]} alt={atlasZoomItem.name} className="max-h-[85vh] w-full object-contain" />}
-          {atlasZoomItem && <p className="px-2 pb-1 text-center text-xs text-muted-foreground">{atlasZoomItem.name}</p>}
+          <DialogHeader className="sr-only"><DialogTitle>{atlasZoomItem?.name ?? atlasZoomTitle ?? "卡面放大"}</DialogTitle></DialogHeader>
+          {atlasZoomSrc ? <img src={atlasZoomSrc} alt={atlasZoomTitle} className="max-h-[85vh] w-full object-contain" /> : atlasZoomItem?.images[0] && <img src={atlasZoomItem.images[0]} alt={atlasZoomItem.name} className="max-h-[85vh] w-full object-contain" />}
+          {(atlasZoomItem || atlasZoomTitle) && <p className="px-2 pb-1 text-center text-xs text-muted-foreground">{atlasZoomItem?.name ?? atlasZoomTitle}</p>}
         </DialogContent>
       </Dialog>
     </section>
