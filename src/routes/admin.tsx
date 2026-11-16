@@ -84,7 +84,7 @@ function Login() {
   );
 }
 
-type Tab = "stats" | "items" | "atlases" | "subs" | "reports";
+type Tab = "stats" | "items" | "subs" | "reports";
 
 function Dashboard() {
   const [tab, setTab] = useState<Tab>("stats");
@@ -93,7 +93,7 @@ function Dashboard() {
   const subs = useQuery({ queryKey: ["subs"], queryFn: async () => (await supabase.from("submissions").select("*").order("created_at", { ascending: false })).data ?? [] });
   const reports = useQuery({ queryKey: ["reports"], queryFn: async () => (await supabase.from("reports").select("*").order("created_at", { ascending: false })).data ?? [] });
   const refresh = () => qc.invalidateQueries();
-  const tabs: [Tab, string][] = [["stats", "统计"], ["items", "商品"], ["atlases", "图鉴管理"], ["subs", `投稿（${subs.data?.filter((s) => s.status === "pending").length ?? 0}）`], ["reports", `报告（${reports.data?.filter((s) => s.status === "pending").length ?? 0}）`]];
+  const tabs: [Tab, string][] = [["stats", "统计"], ["items", "商品"], ["subs", `投稿（${subs.data?.filter((s) => s.status === "pending").length ?? 0}）`], ["reports", `报告（${reports.data?.filter((s) => s.status === "pending").length ?? 0}）`]];
 
   return (
     <section className="mx-auto max-w-6xl px-3 py-8 sm:px-6">
@@ -109,7 +109,6 @@ function Dashboard() {
       <div className="mt-6">
         {tab === "stats" && <Stats items={items.data ?? []} subs={subs.data ?? []} reports={reports.data ?? []} />}
         {tab === "items" && <ItemsAdmin items={items.data ?? []} onChange={refresh} />}
-        {tab === "atlases" && <AtlasAdmin />}
         {tab === "subs" && <Inbox table="submissions" rows={subs.data ?? []} onChange={refresh} />}
         {tab === "reports" && <Inbox table="reports" rows={reports.data ?? []} onChange={refresh} />}
       </div>
@@ -281,162 +280,6 @@ function ItemEditor({ item, onClose }: { item: Item | null; onClose: () => void 
         </div>
       </DialogContent>
     </Dialog>
-  );
-}
-
-
-type ManagedAtlas = { id: string; name: string; images: string[]; updated_at: string };
-const ATLAS_INDEX_PATH = "atlases/index.json";
-
-async function readManagedAtlases(): Promise<ManagedAtlas[]> {
-  const { data, error } = await supabase.storage.from("item-images").download(ATLAS_INDEX_PATH);
-  if (error) {
-    if (/not found|object not found|404/i.test(error.message)) return [];
-    throw error;
-  }
-  if (!data) return [];
-  const parsed: unknown = JSON.parse(await data.text());
-  return Array.isArray(parsed) ? parsed as ManagedAtlas[] : [];
-}
-
-async function writeManagedAtlases(atlases: ManagedAtlas[]) {
-  const body = new Blob([JSON.stringify(atlases, null, 2)], { type: "application/json" });
-  const { error } = await supabase.storage.from("item-images").upload(ATLAS_INDEX_PATH, body, {
-    upsert: true,
-    contentType: "application/json",
-    cacheControl: "0",
-  });
-  if (error) throw error;
-}
-
-function AtlasAdmin() {
-  const qc = useQueryClient();
-  const { data: atlases = [], isLoading, error } = useQuery({
-    queryKey: ["managed-atlases"],
-    queryFn: readManagedAtlases,
-  });
-  const [editing, setEditing] = useState<ManagedAtlas | null>(null);
-  const [name, setName] = useState("");
-  const [images, setImages] = useState<string[]>([]);
-  const [removed, setRemoved] = useState<string[]>([]);
-  const [busy, setBusy] = useState(false);
-  const urls = useSignedUrls("item-images", images);
-  const listUrls = useSignedUrls("item-images", atlases.flatMap(atlas => atlas.images));
-
-  const startNew = () => {
-    setEditing({ id: crypto.randomUUID(), name: "", images: [], updated_at: "new" });
-    setName("");
-    setImages([]);
-    setRemoved([]);
-  };
-  const startEdit = (atlas: ManagedAtlas) => {
-    setEditing(atlas);
-    setName(atlas.name);
-    setImages([...atlas.images]);
-    setRemoved([]);
-  };
-  const addImages = async (files: File[]) => {
-    if (!files.length) return;
-    setBusy(true);
-    try {
-      const paths = await uploadFiles("item-images", files, `atlases/${editing?.id ?? crypto.randomUUID()}/`);
-      setImages(old => [...old, ...paths]);
-      toast.success(`已上传 ${paths.length} 张图片`);
-    } catch (e) {
-      toast.error((e as Error).message || "图片上传失败");
-    } finally {
-      setBusy(false);
-    }
-  };
-  const save = async () => {
-    if (!editing || !name.trim()) { toast.error("请填写图鉴名称"); return; }
-    if (!images.length) { toast.error("请至少上传一张图鉴图片"); return; }
-    setBusy(true);
-    const record: ManagedAtlas = { ...editing, name: name.trim(), images, updated_at: new Date().toISOString() };
-    const next = editing.updated_at === "new"
-      ? [record, ...atlases]
-      : atlases.some(a => a.id === editing.id) ? atlases.map(a => a.id === editing.id ? record : a) : [record, ...atlases];
-    try {
-      await writeManagedAtlases(next);
-      if (removed.length) await supabase.storage.from("item-images").remove(removed);
-      toast.success("图鉴已保存");
-      setEditing(null);
-      await qc.invalidateQueries({ queryKey: ["managed-atlases"] });
-      await qc.invalidateQueries({ queryKey: ["atlas-entries"] });
-    } catch (e) {
-      toast.error((e as Error).message || "保存失败");
-    } finally {
-      setBusy(false);
-    }
-  };
-  const removeAtlas = async (atlas: ManagedAtlas) => {
-    if (!window.confirm(`确定删除「${atlas.name}」及其所有图鉴图片吗？`)) return;
-    setBusy(true);
-    try {
-      await writeManagedAtlases(atlases.filter(a => a.id !== atlas.id));
-      if (atlas.images.length) await supabase.storage.from("item-images").remove(atlas.images);
-      toast.success("图鉴已删除");
-      await qc.invalidateQueries({ queryKey: ["managed-atlases"] });
-      await qc.invalidateQueries({ queryKey: ["atlas-entries"] });
-    } catch (e) {
-      toast.error((e as Error).message || "删除失败");
-    } finally {
-      setBusy(false);
-    }
-  };
-  const moveImage = (index: number, direction: -1 | 1) => {
-    setImages(old => {
-      const next = [...old];
-      const target = index + direction;
-      if (target < 0 || target >= next.length) return old;
-      [next[index], next[target]] = [next[target], next[index]];
-      return next;
-    });
-  };
-
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between gap-3">
-        <div><p className="archive-label">CURATED ATLASES</p><p className="mt-1 text-xs text-muted-foreground">管理前台「完整图鉴」中展示的自制图鉴图片。</p></div>
-        <button type="button" onClick={startNew} className={btn}>+ 新增图鉴</button>
-      </div>
-      {isLoading && <p className="py-8 text-center text-sm text-muted-foreground">正在读取图鉴…</p>}
-      {error && <p className="rounded border border-destructive/40 p-3 text-sm text-destructive">读取失败：{(error as Error).message}</p>}
-      {!isLoading && !atlases.length && <p className="rounded border border-dashed p-8 text-center text-sm text-muted-foreground">还没有自制图鉴。点击「新增图鉴」开始上传。</p>}
-      <div className="space-y-2">
-        {atlases.map(atlas => <div key={atlas.id} className="flex items-center gap-3 rounded border bg-card p-3">
-          <div className="h-16 w-12 shrink-0 overflow-hidden rounded bg-background">{atlas.images[0] && <img src={listUrls[atlas.images[0]]} alt="" className="h-full w-full object-contain" />}</div>
-          <div className="min-w-0 flex-1"><p className="truncate text-sm font-medium">{atlas.name}</p><p className="text-xs text-muted-foreground">{atlas.images.length} 页 · 更新于 {new Date(atlas.updated_at).toLocaleDateString()}</p></div>
-          <button type="button" onClick={() => startEdit(atlas)} className={ghost}>编辑</button>
-          <button type="button" onClick={() => removeAtlas(atlas)} disabled={busy} className="rounded border border-destructive px-3 py-1.5 text-xs text-destructive disabled:opacity-50">删除</button>
-        </div>)}
-      </div>
-      {editing && <Dialog open onOpenChange={open => !open && !busy && setEditing(null)}>
-        <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
-          <DialogHeader><DialogTitle>{atlases.some(a => a.id === editing.id) ? "编辑图鉴" : "新增图鉴"}</DialogTitle></DialogHeader>
-          <L t="图鉴名称 *"><input value={name} onChange={e => setName(e.target.value)} placeholder="例如：2022 Marvel Allure" className={input} /></L>
-          <div>
-            <p className="archive-label mb-2">图鉴图片（按这里的顺序展示）</p>
-            <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-              {images.map((path, i) => <div key={path} className="space-y-1 rounded border bg-card p-1">
-                <div className="flex aspect-[3/4] items-center justify-center overflow-hidden rounded bg-background">{urls[path] && <img src={urls[path]} alt={`第 ${i + 1} 页`} className="h-full w-full object-contain" />}</div>
-                <p className="text-center text-[10px] text-muted-foreground">第 {i + 1} 页</p>
-                <div className="flex gap-1">
-                  <button type="button" disabled={i === 0} onClick={() => moveImage(i, -1)} className="flex-1 rounded border py-1 text-xs disabled:opacity-30">←</button>
-                  <button type="button" disabled={i === images.length - 1} onClick={() => moveImage(i, 1)} className="flex-1 rounded border py-1 text-xs disabled:opacity-30">→</button>
-                  <button type="button" onClick={() => { setRemoved(old => [...old, path]); setImages(old => old.filter(x => x !== path)); }} className="flex-1 rounded border py-1 text-xs text-destructive">删除</button>
-                </div>
-              </div>)}
-              <label className="flex aspect-[3/4] cursor-pointer flex-col items-center justify-center gap-1 rounded border border-dashed text-xs text-muted-foreground">＋ 上传图片
-                <input type="file" accept="image/*" multiple hidden disabled={busy} onChange={e => { const files = [...(e.target.files ?? [])]; e.currentTarget.value = ""; void addImages(files); }} />
-              </label>
-            </div>
-          </div>
-          <p className="text-xs text-muted-foreground">支持多页图片；前台会按此顺序显示，并可点击放大查看。建议使用清晰的 JPG、PNG 或 WebP 图片。</p>
-          <div className="flex justify-end gap-2"><button type="button" onClick={() => setEditing(null)} disabled={busy} className={ghost}>取消</button><button type="button" onClick={save} disabled={busy} className={btn}>{busy ? "处理中…" : "保存图鉴"}</button></div>
-        </DialogContent>
-      </Dialog>}
-    </div>
   );
 }
 
