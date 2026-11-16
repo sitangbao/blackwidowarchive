@@ -70,7 +70,7 @@ function Index() {
   const atlasCards = useMemo(() => {
     const byNumber = new Map<string, (typeof selectedSeriesItems)[number]>();
     for (const item of selectedSeriesItems) {
-      const number = String(item.card_number ?? item.name.match(/#\\s*([A-Z]*-?\\d+)/i)?.[1] ?? "").trim();
+      const number = String(item.card_number ?? item.name.match(/#\s*([A-Z]*-?\\d+)/i)?.[1] ?? "").trim();
       if (!number) continue;
       const current = byNumber.get(number);
       const isBase = /^(Base Card|Base High Series|Base)$/i.test(String(item.item_type ?? "")) || /普卡/.test(item.name);
