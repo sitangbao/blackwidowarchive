@@ -120,6 +120,33 @@ export async function uploadFiles(bucket: string, files: File[], prefix = "") {
   return paths;
 }
 
+
+export type AtlasEntry = {
+  id: string;
+  name: string;
+  images: string[];
+  updated_at: string;
+};
+
+/** Load curator-uploaded atlas pages from the shared image bucket. */
+export async function loadAtlasEntries(): Promise<AtlasEntry[]> {
+  const { data, error } = await supabase.storage.from("item-images").download("atlases/index.json");
+  if (error) {
+    if (/not found|object not found|404/i.test(error.message)) return [];
+    throw error;
+  }
+  if (!data) return [];
+  const parsed: unknown = JSON.parse(await data.text());
+  if (!Array.isArray(parsed)) return [];
+  return parsed.filter((entry): entry is AtlasEntry =>
+    !!entry && typeof entry === "object" &&
+    typeof (entry as AtlasEntry).id === "string" &&
+    typeof (entry as AtlasEntry).name === "string" &&
+    Array.isArray((entry as AtlasEntry).images) &&
+    (entry as AtlasEntry).images.every((path) => typeof path === "string")
+  );
+}
+
 export const COLLECTION_STORAGE_KEY = "bwa-my-collection-v1";
 export type CollectionStatus = "owned" | "not_owned" | "wishlist";
 export type CollectionEntry = { status: CollectionStatus; quantity: number };
