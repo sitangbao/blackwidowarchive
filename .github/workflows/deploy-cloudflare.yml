@@ -30,6 +30,8 @@ jobs:
 
       - name: Build Cloudflare Worker
         run: bun run build
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
 
       - name: Deploy to Cloudflare
         run: bunx wrangler deploy
