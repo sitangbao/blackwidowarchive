@@ -81,9 +81,15 @@ function Index() {
     setBatchMode(false);
   };
   const categoryLabel = f.category || "周边收藏总数";
-  const seriesFilterLabel = items.find(it => seriesIdFor((f.category === "卡片类" ? (it.card_series ?? it.series) : it.series) ?? "") === f.series)?.[f.category === "卡片类" ? "card_series" : "series"] ?? f.series;
-  const availableSeries = [...new Set(items.filter(i => i.category === f.category && i.brand === f.brand).map(i => f.category === "卡片类" ? (i.card_series ?? i.series) : i.series).filter((x): x is string => !!x))].sort();
-  const update = (key: keyof Filters, value: string) => setF(old => ({ ...old, [key]: value, ...(key === "category" ? { brand: "", item_type: "", series: "" } : {}), ...(key === "brand" ? { series: "" } : {}) }));
+  const getSeries = (item: typeof items[number]) => f.category === "卡片类" || !f.category ? (item.card_series ?? item.series) : item.series;
+  const seriesFilterLabel = items.map(getSeries).find(value => value && (seriesIdFor(value) === f.series || value === f.series)) ?? f.series;
+  const availableSeries = [...new Set(items.filter(i => (!f.category || i.category === f.category) && i.brand === f.brand).map(i => f.category === "卡片类" || !f.category ? (i.card_series ?? i.series) : i.series).filter((x): x is string => !!x))].sort();
+  const update = (key: keyof Filters, value: string) => setF(old => ({
+    ...old,
+    [key]: value,
+    ...(key === "category" ? { item_type: "", series: "" } : {}),
+    ...(key === "brand" ? { category: "", item_type: "", series: "" } : {}),
+  }));
   return <>
     <section className="relative overflow-hidden border-b">
       <div className="hero-glow absolute inset-0" /><Hourglass className="pointer-events-none absolute right-[-5%] top-1/2 h-[115%] -translate-y-1/2 text-primary/10 sm:right-[8%]" />
@@ -97,7 +103,7 @@ function Index() {
       <div className="pt-10 pb-5"><p className="archive-label">THE COLLECTION</p><h2 className="mt-1 text-xl font-medium tracking-widest">周边收藏图鉴</h2></div>
       <div className="mb-5 rounded border bg-card/70 p-4">
         <p className="archive-label">COLLECTION OVERVIEW</p>
-        <div className="mt-2 flex items-end justify-between gap-3"><div><p className="text-xs text-muted-foreground">{categoryLabel}</p><p className="font-display text-5xl leading-none text-primary">{isLoading || isError ? "—" : (f.category ? counts[f.category] ?? 0 : items.length)}</p></div><p className="archive-label">TOTAL COLLECTIBLES</p></div>
+        <div className="mt-2 flex items-end justify-between gap-3"><div><p className="text-xs text-muted-foreground">{f.category ? categoryLabel : f.brand ? `${f.brand} 商品总数` : categoryLabel}</p><p className="font-display text-5xl leading-none text-primary">{isLoading || isError ? "—" : (f.category ? counts[f.category] ?? 0 : f.brand ? items.filter(item => item.brand === f.brand).length : items.length)}</p></div><p className="archive-label">TOTAL COLLECTIBLES</p></div>
       </div>
       <div className="mb-4 rounded border bg-background/95 px-3 py-3 backdrop-blur sm:rounded">
         <input value={f.q} onChange={e => update("q", e.target.value)} placeholder="搜索名称 / 系列 / 关键词 / 盒号 / 商品编号 / 卡片编号" className={selectCls} />
