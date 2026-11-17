@@ -108,10 +108,20 @@ async function main() {
 
   // Add Funko POP! box numbers to display names. Rock Candy and Button Pin are
   // separate Funko product lines and intentionally remain unchanged.
-  const isFunkoPop = (item) =>
-    item.brand_preset === "funko" &&
-    item.category === "手办类" &&
-    !/rock\s*candy|button\s*pin/i.test(String(item.name ?? ""));
+  const isFunkoPop = (item) => {
+    const brand = String(item.brand_preset ?? item.brand ?? "").trim().toLowerCase();
+    const legacySeries = String(item.series ?? "").trim().toLowerCase();
+    const category = String(item.category ?? "").trim();
+    const productLine = [
+      item.name, item.item_type, item.series, item.series_preset,
+      item.product_spec, item.keywords, item.notes,
+    ].filter(Boolean).join(" ");
+    const isFunko = brand === "funko" || brand === "funko pop" ||
+      legacySeries === "funko" || item.brand_preset === "funko";
+    const isFigure = category === "手办类" || category === "手办";
+    const isExcludedLine = /rock\s*candy|button\s*pin/i.test(productLine);
+    return isFunko && isFigure && !isExcludedLine;
+  };
   for (const item of items) {
     if (!isFunkoPop(item)) continue;
     const boxNumber = String(item.box_number ?? "").trim();
