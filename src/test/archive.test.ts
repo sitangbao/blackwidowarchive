@@ -6,6 +6,8 @@ const items: Item[] = [
   base,
   { ...base, id: "2", name: "B", brand: "Upper Deck（UD）", person_count: "multi" },
   { ...base, id: "3", name: "C", category: "吧唧", brand: "Movic", status: "wishlist" },
+  { ...base, id: "4", name: "Funko POP! #50", category: "手办类", brand: "FUNKO", series: "Pop! Marvel" },
+  { ...base, id: "5", name: "Funko Button Pin", category: "其他", brand: "FUNKO", series: "Button Pin" },
 ];
 const empty = { q: "", region: "", category: "", brand: "", item_type: "", series: "", status: "", person: "" };
 
@@ -13,5 +15,7 @@ describe("collection filters", () => {
   it("counts items per category", () => expect(countByCategory(items)).toEqual({ 卡片类: 2, 吧唧: 1 }));
   it("brands come only from items in the chosen category", () => expect(brandsFor(items, "卡片类")).toEqual(["Topps", "Upper Deck（UD）"]));
   it("person count filter selects multi-person items", () => expect(filterItems(items, { ...empty, person: "multi" }).map((i) => i.id)).toEqual(["2"]));
+  it("brand filter can show the brand across all categories", () => expect(filterItems(items, { ...empty, brand: "FUNKO" }).map((i) => i.id)).toEqual(["4", "5"]));
+  it("category can narrow an already selected brand", () => expect(filterItems(items, { ...empty, category: "手办类", brand: "FUNKO" }).map((i) => i.id)).toEqual(["4"]));
   it("brand filter applies within category", () => expect(filterItems(items, { ...empty, category: "卡片类", brand: "Topps" }).map((i) => i.id)).toEqual(["1"]));
 });
