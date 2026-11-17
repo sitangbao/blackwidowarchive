@@ -12,7 +12,7 @@ const items: Item[] = [
 const empty = { q: "", region: "", category: "", brand: "", item_type: "", series: "", status: "", person: "" };
 
 describe("collection filters", () => {
-  it("counts items per category", () => expect(countByCategory(items)).toEqual({ 卡片类: 2, 吧唧: 1 }));
+  it("counts items per category", () => expect(countByCategory(items)).toEqual({ 卡片类: 2, 吧唧: 1, 手办类: 1, 其他: 1 }));
   it("brands come only from items in the chosen category", () => expect(brandsFor(items, "卡片类")).toEqual(["Topps", "Upper Deck（UD）"]));
   it("person count filter selects multi-person items", () => expect(filterItems(items, { ...empty, person: "multi" }).map((i) => i.id)).toEqual(["2"]));
   it("brand filter can show the brand across all categories", () => expect(filterItems(items, { ...empty, brand: "FUNKO" }).map((i) => i.id)).toEqual(["4", "5"]));
