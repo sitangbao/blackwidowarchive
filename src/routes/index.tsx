@@ -87,8 +87,8 @@ function Index() {
   const update = (key: keyof Filters, value: string) => setF(old => ({
     ...old,
     [key]: value,
-    ...(key === "category" ? { item_type: "", series: "" } : {}),
-    ...(key === "brand" ? { category: "", item_type: "", series: "" } : {}),
+    ...(key === "category" ? { brand: "", item_type: "", series: "" } : {}),
+    ...(key === "brand" ? { item_type: "", series: "" } : {}),
   }));
   return <>
     <section className="relative overflow-hidden border-b">
@@ -121,19 +121,21 @@ function Index() {
             {CATEGORY_OPTIONS[f.category].map(x => <button type="button" key={x} onClick={() => update("item_type", x)} className={`rounded-full border px-3 py-1.5 text-xs transition ${f.item_type === x ? "border-primary bg-primary/15 text-primary" : "border-border bg-card text-muted-foreground hover:border-primary/60"}`}>{x}</button>)}
           </div>
         </div>}
-        {(f.category || f.brand) && brandOptions.length > 0 && <div className="mt-3">
-          <p className="mb-2 text-[11px] tracking-wider text-muted-foreground">品牌</p>
-          <div className="flex flex-wrap gap-2">
-            <button type="button" onClick={() => update("brand", "")} className={`rounded-full border px-3 py-1.5 text-xs transition ${!f.brand ? "border-primary bg-primary/15 text-primary" : "border-border bg-card text-muted-foreground hover:border-primary/60"}`}>全部品牌</button>
-            {brandOptions.map(x => <button type="button" key={x} onClick={() => update("brand", x)} className={`rounded-full border px-3 py-1.5 text-xs transition ${f.brand === x ? "border-primary bg-primary/15 text-primary" : "border-border bg-card text-muted-foreground hover:border-primary/60"}`}>{x}</button>)}
-          </div>
-        </div>}
-        {f.brand && availableSeries.length > 0 && <div className="mt-3">
-          <p className="mb-2 text-[11px] tracking-wider text-muted-foreground">系列</p>
-          <div className="flex flex-wrap gap-2">
-            <button type="button" onClick={() => update("series", "")} className={`rounded-full border px-3 py-1.5 text-xs transition ${!f.series ? "border-primary bg-primary/15 text-primary" : "border-border bg-card text-muted-foreground hover:border-primary/60"}`}>全部系列</button>
-            {availableSeries.map(x => <button type="button" key={x} onClick={() => update("series", x)} className={`rounded-full border px-3 py-1.5 text-xs transition ${f.series === x ? "border-primary bg-primary/15 text-primary" : "border-border bg-card text-muted-foreground hover:border-primary/60"}`}>{f.category === "卡片类" ? formatCardSeriesName(x) : x}</button>)}
-          </div>
+        {(f.category || f.brand) && brandOptions.length > 0 && <div className="mt-3 grid grid-cols-2 gap-2">
+          <label className="min-w-0">
+            <span className="mb-1.5 block text-[11px] tracking-wider text-muted-foreground">品牌</span>
+            <select value={f.brand} onChange={e => update("brand", e.target.value)} className={selectCls}>
+              <option value="">全部品牌</option>
+              {brandOptions.map(x => <option key={x} value={x}>{x}</option>)}
+            </select>
+          </label>
+          {f.brand && availableSeries.length > 0 && <label className="min-w-0">
+            <span className="mb-1.5 block text-[11px] tracking-wider text-muted-foreground">系列</span>
+            <select value={f.series} onChange={e => update("series", e.target.value)} className={selectCls}>
+              <option value="">全部系列</option>
+              {availableSeries.map(x => <option key={x} value={x}>{f.category === "卡片类" ? formatCardSeriesName(x) : x}</option>)}
+            </select>
+          </label>}
         </div>}
         {(f.category || f.brand || f.item_type || f.series || f.region || f.status || f.person || f.q) && <button type="button" onClick={() => setF({ q:"", region:"", category:"", brand:"", item_type:"", series:"", status:"", person:"" })} className="mt-3 text-xs text-muted-foreground underline">清除筛选</button>}
       </div>
