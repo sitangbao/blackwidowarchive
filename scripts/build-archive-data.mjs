@@ -130,14 +130,107 @@ async function main() {
     }
   }
 
-  // Keep other products in their existing alphabetical positions.
-  items.sort((a, b) => a.name.localeCompare(b.name, "zh-Hans", { numeric: true }));
-  // Funko POP! items occupy their existing grid positions, but are ordered by box number.
+  // Restore the archive's established order: alphabetical baseline, then
+  // curated ordering for Funko POP!, sticker brands, and card collections.
+  items.sort((a, b) => a.name.localeCompare(b.name, "zh-Hans"));
+
   const funkoPositions = items.flatMap((item, index) => isFunkoPop(item) ? [index] : []);
-  const funkoItems = funkoPositions.map((index) => items[index]).sort((a, b) =>
+  const funkoItems = funkoPositions.map(index => items[index]).sort((a, b) =>
     String(a.box_number ?? "").localeCompare(String(b.box_number ?? ""), "en", { numeric: true })
   );
   funkoPositions.forEach((position, index) => { items[position] = funkoItems[index]; });
+
+  // Keep PANINI, ABRIL, and PREZIOSI stickers grouped by series and item number.
+  const stickerPositions = items.flatMap((item, index) =>
+    item.category === "贴纸" && ["panini", "abril", "preziosi"].some(brand =>
+      item.brand_preset === brand || String(item.brand ?? "").toLowerCase() === brand.toUpperCase().toLowerCase()
+    ) ? [index] : []
+  );
+  const stickers = stickerPositions.map(index => items[index]).sort((a, b) => {
+    const seriesCompare = String(a.series ?? "").localeCompare(String(b.series ?? ""), "zh-Hans", { numeric: true });
+    if (seriesCompare) return seriesCompare;
+    return String(a.item_number ?? "").localeCompare(String(b.item_number ?? ""), "en", { numeric: true });
+  });
+  stickerPositions.forEach((position, index) => { items[position] = stickers[index]; });
+
+  const cardPositions = items.flatMap((item, index) => item.category === "卡片类" ? [index] : []);
+  const cardTypeOrder = new Map([
+    ["Base Card", 0], ["Base Card-Roll Call", 0], ["Base High Series", 0], ["Base", 0], ["普卡", 0],
+    ["Silver Foil", 1], ["银折", 1], ["Red Foil", 2], ["红折", 2], ["Blue Foil", 3], ["蓝折", 3],
+  ]);
+  const getCardType = item => {
+    if (item.item_type) return String(item.item_type).trim();
+    const name = String(item.name ?? "");
+    if (/普卡|Base Card/i.test(name)) return "Base Card";
+    if (/银折|Silver Foil/i.test(name)) return "Silver Foil";
+    if (/红折|Red Foil/i.test(name)) return "Red Foil";
+    if (/蓝折|Blue Foil/i.test(name)) return "Blue Foil";
+    return "";
+  };
+  const getCardNumber = item => {
+    const stored = String(item.card_number ?? "").trim();
+    return stored || (String(item.name ?? "").match(/#\\s*([A-Z]*-?\\d+)/i)?.[1] ?? "");
+  };
+  const cards = cardPositions.map(index => items[index]).sort((a, b) => {
+    const seriesA = String(a.card_series ?? a.series ?? "");
+    const seriesB = String(b.card_series ?? b.series ?? "");
+    const seriesCompare = seriesA.localeCompare(seriesB, "zh-Hans", { numeric: true });
+    if (seriesCompare) return seriesCompare;
+    const numberCompare = () => getCardNumber(a).localeCompare(getCardNumber(b), "en", { numeric: true });
+    const seriesLower = seriesA.trim().toLowerCase();
+    const isAllure = seriesLower === "2022 marvel allure";
+    if (isAllure) {
+      const n = numberCompare();
+      if (n) return n;
+      const order = ["Base Card", "Base High Series", "Black Rainbow", "Magenta", "Orange Slice Die-Cut", "Portal", "Red Prism", "Steel", "Sunrise", "Yellow Taxi", "Storm", "Green Quartz", "White Diamond", "Blue Line", "Pink", "Purple Rainbow Die-Cut", "Infinity Stones - Mind Stone", "Infinity Stones - Power Stone", "Infinity Stones - Reality Stone", "Infinity Stones - Soul Stone", "Infinity Stones - Space Stone", "Infinity Stones - Time Stone", "Infinity Stones Gold Parallel - Mind Stone", "Infinity Stones Gold Parallel - Power Stone", "Infinity Stones Gold Parallel - Reality Stone", "Infinity Stones Gold Parallel - Soul Stone", "Infinity Stones Gold Parallel - Space Stone", "Infinity Stones Gold Parallel - Time Stone", "Infinity Stones White Parallel - Soul Stone", "Infinity Stones White Parallel - Space Stone"];
+      const ra = order.indexOf(String(a.item_type ?? "").trim()), rb = order.indexOf(String(b.item_type ?? "").trim());
+      return (ra < 0 ? 99 : ra) - (rb < 0 ? 99 : rb) || String(a.name ?? "").localeCompare(String(b.name ?? ""), "zh-Hans", { numeric: true });
+    }
+    const upperDeck = a.brand_preset === "upper_deck" || a.brand === "UPPER DECK (UD)";
+    const numberFirst = upperDeck && [
+      /2014.*captain america.*winter soldier/i,
+      /2015.*avengers.*age of ultron/i,
+      /2016.*captain america.*civil war/i,
+      /2019.*mcu.*10th anniversary/i,
+    ].some(re => re.test(seriesA));
+    if (numberFirst) {
+      const n = numberCompare();
+      if (n) return n;
+      const rank = item => /普卡|Base Card/i.test(String(item.name ?? "")) ? 0 : /银折|Silver Foil/i.test(String(item.name ?? "")) ? 1 : /红折|Red Foil/i.test(String(item.name ?? "")) ? 2 : /蓝折|Blue Foil/i.test(String(item.name ?? "")) ? 3 : 4;
+      return rank(a) - rank(b) || String(a.name ?? "").localeCompare(String(b.name ?? ""), "zh-Hans", { numeric: true });
+    }
+    if (seriesLower === "2024 marvel studios series 2 cinematic") {
+      const n = numberCompare();
+      if (n) return n;
+      return String(a.name ?? "").localeCompare(String(b.name ?? ""), "zh-Hans", { numeric: true });
+    }
+    const walmartRank = item => {
+      const name = String(item.name ?? "");
+      if (name.includes("红底普卡")) return 0;
+      if (name.includes("蓝底普卡")) return 1;
+      if (name.includes("红底星星折")) return 2;
+      if (name.includes("蓝底星星折")) return 3;
+      if (name.includes("红底闪电折")) return 4;
+      if (name.includes("蓝底闪电折")) return 5;
+      return null;
+    };
+    const wa = walmartRank(a), wb = walmartRank(b);
+    if (wa !== null || wb !== null) {
+      if (wa === null) return 1;
+      if (wb === null) return -1;
+      return wa - wb || numberCompare();
+    }
+    const ta = getCardType(a), tb = getCardType(b);
+    const ra = cardTypeOrder.get(ta) ?? 4, rb = cardTypeOrder.get(tb) ?? 4;
+    if (ra !== rb) return ra - rb;
+    if (ra === 4 && ta !== tb) {
+      const typeCompare = ta.localeCompare(tb, "zh-Hans", { numeric: true });
+      if (typeCompare) return typeCompare;
+    }
+    const backgroundRank = item => String(item.name ?? "").includes("红底") ? 0 : String(item.name ?? "").includes("蓝底") ? 1 : 2;
+    return backgroundRank(a) - backgroundRank(b) || numberCompare();
+  });
+  cardPositions.forEach((position, index) => { items[position] = cards[index]; });
   await mkdir("public/archive-data", { recursive: true });
   await writeFile("public/archive-data/items.json", JSON.stringify(items, null, 2) + "\n", "utf8");
   console.log(`Generated public/archive-data/items.json with ${items.length} item(s).`);
