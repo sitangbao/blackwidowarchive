@@ -197,6 +197,25 @@ async function main() {
       /2016.*captain america.*civil war/i,
       /2019.*mcu.*10th anniversary/i,
     ].some(re => re.test(seriesA));
+    const isTenAnniversary = upperDeck && /2019.*mcu.*10th anniversary/i.test(seriesA);
+    if (isTenAnniversary) {
+      const tenYearRank = item => {
+        const label = [item.item_type, item.name, item.card_title].filter(Boolean).join(" ").toLowerCase();
+        if (/罗马特卡|罗马数字|roman(?:\s*numeral)?(?:\s*card)?/.test(label)) return 1;
+        if (/人物卡|人物|character card|characters?/.test(label)) return 2;
+        if (/拍摄花絮|幕后|behind[ -]?the[ -]?scenes|bts/.test(label)) return 3;
+        if (/胶片特卡|胶片|film(?:\s*strip)?(?:\s*card)?/.test(label)) return 4;
+        return 0;
+      };
+      const rankA = tenYearRank(a), rankB = tenYearRank(b);
+      if (rankA !== rankB) return rankA - rankB;
+      // Group regular cards by their shared artwork/title, then sort each artwork group by card number.
+      const artworkKey = item => String(item.card_title ?? "").trim().toLowerCase() ||
+        String(item.name ?? "").replace(/(?:普卡|银折|红折|蓝折|金折|\bbase card\b|\bfoil\b).*$/i, "").trim().toLowerCase();
+      const artworkCompare = artworkKey(a).localeCompare(artworkKey(b), "zh-Hans", { numeric: true });
+      if (artworkCompare) return artworkCompare;
+      return numberCompare() || String(a.name ?? "").localeCompare(String(b.name ?? ""), "zh-Hans", { numeric: true });
+    }
     if (numberFirst) {
       const seriesSpecialRank = item => {
         const label = [item.item_type, item.name, item.card_title].filter(Boolean).join(" ").toLowerCase();
