@@ -221,6 +221,21 @@ async function main() {
       return tenYearRank(a) - tenYearRank(b) ||
         String(a.name ?? "").localeCompare(String(b.name ?? ""), "zh-Hans", { numeric: true });
     }
+    const isEndgame = upperDeck && /2020.*avengers.*endgame/i.test(seriesA);
+    if (isEndgame) {
+      const endgameRank = item => {
+        const label = [item.item_type, item.name, item.card_title].filter(Boolean).join(" ").toLowerCase();
+        if (/胶片特卡|胶片|film(?:\\s*strip)?(?:\\s*card)?|film cel/.test(label)) return 0;
+        if (/沙盒特卡|沙盒|shadow ?box/.test(label)) return 1;
+        if (/钢板特卡|钢板|steel(?: ?card)?/.test(label)) return 2;
+        if (/大头肖像|大头|big ?head|portrait/.test(label)) return 3;
+        if (/战衣特卡|战衣|costume(?: ?card)?|suit/.test(label)) return 4;
+        if (/钻石木盒|木盒|diamond ?wood(?:en)? ?box/.test(label)) return 5;
+        return 99;
+      };
+      return endgameRank(a) - endgameRank(b) || numberCompare() ||
+        String(a.name ?? "").localeCompare(String(b.name ?? ""), "zh-Hans", { numeric: true });
+    }
     if (numberFirst) {
       const isCivilWar = /2016.*captain america.*civil war/i.test(seriesA);
       // Walmart Civil War cards must be sorted before the generic number-first rule below.
