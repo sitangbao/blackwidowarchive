@@ -198,6 +198,14 @@ async function main() {
       /2019.*mcu.*10th anniversary/i,
     ].some(re => re.test(seriesA));
     if (numberFirst) {
+      const seriesSpecialRank = item => {
+        const label = [item.item_type, item.name, item.card_title].filter(Boolean).join(" ").toLowerCase();
+        if (/幕后|behind[ -]?the[ -]?scenes|bts/.test(label)) return 1;
+        if (/人物卡|人物|character card|characters?/.test(label)) return 2;
+        return 0;
+      };
+      const specialRankA = seriesSpecialRank(a), specialRankB = seriesSpecialRank(b);
+      if (specialRankA !== specialRankB) return specialRankA - specialRankB;
       const n = numberCompare();
       if (n) return n;
       const rank = item => /普卡|Base Card/i.test(String(item.name ?? "")) ? 0 : /银折|Silver Foil/i.test(String(item.name ?? "")) ? 1 : /红折|Red Foil/i.test(String(item.name ?? "")) ? 2 : /蓝折|Blue Foil/i.test(String(item.name ?? "")) ? 3 : 4;
