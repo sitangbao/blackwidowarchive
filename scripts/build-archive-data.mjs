@@ -200,11 +200,12 @@ async function main() {
     const isTenAnniversary = upperDeck && /2019.*mcu.*10th anniversary/i.test(seriesA);
     if (isTenAnniversary) {
       const tenYearRank = item => {
+        const type = String(item.item_type ?? "").trim().toLowerCase();
         const label = [item.item_type, item.name, item.card_title].filter(Boolean).join(" ").toLowerCase();
-        if (/罗马特卡|罗马数字|roman(?:\s*numeral)?(?:\s*card)?/.test(label)) return 1;
-        if (/人物卡|人物|character card|characters?/.test(label)) return 2;
-        if (/拍摄花絮|幕后|behind[ -]?the[ -]?scenes|bts/.test(label)) return 3;
-        if (/胶片特卡|胶片|film(?:\s*strip)?(?:\s*card)?/.test(label)) return 4;
+        if (/罗马特卡|罗马数字|roman(?:\s*numerals?)?/.test(label)) return 1;
+        if (/人物卡|人物特卡|character card|characters?|the marvel cinematic universe/.test(label)) return 2;
+        if (/拍摄花絮|幕后|behind[ -]?the[ -]?scenes|bts|story of the mcu/.test(label)) return 3;
+        if (/胶片特卡|胶片|film(?:\s*strip)?(?:\s*card)?|film cel/.test(label) || type === "film cel") return 4;
         return 0;
       };
       const rankA = tenYearRank(a), rankB = tenYearRank(b);
