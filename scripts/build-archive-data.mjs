@@ -223,11 +223,12 @@ async function main() {
       if (isCivilWar) {
         const walmartRank = item => {
           const label = [item.item_type, item.name, item.card_title].filter(Boolean).join(" ").toLowerCase();
+          // Type-first order: red/blue base, red/blue star foil, red/blue lightning foil.
           if (/红底普卡|red[ -]?background[ -]?base|red[ -]?base/.test(label)) return 0;
-          if (/红底星星折|red[ -]?background.*star|red.*star[ -]?foil/.test(label)) return 1;
-          if (/红底闪电折|red[ -]?background.*lightning|red.*lightning[ -]?foil/.test(label)) return 2;
-          if (/蓝底普卡|blue[ -]?background[ -]?base|blue[ -]?base/.test(label)) return 3;
-          if (/蓝底星星折|blue[ -]?background.*star|blue.*star[ -]?foil/.test(label)) return 4;
+          if (/蓝底普卡|blue[ -]?background[ -]?base|blue[ -]?base/.test(label)) return 1;
+          if (/红底星星折|red[ -]?background.*star|red.*star[ -]?foil/.test(label)) return 2;
+          if (/蓝底星星折|blue[ -]?background.*star|blue.*star[ -]?foil/.test(label)) return 3;
+          if (/红底闪电折|red[ -]?background.*lightning|red.*lightning[ -]?foil/.test(label)) return 4;
           if (/蓝底闪电折|blue[ -]?background.*lightning|blue.*lightning[ -]?foil/.test(label)) return 5;
           if (/角色简介|character bio|character profile/.test(label)) return 6;
           if (/电影剧照|movie still|film still/.test(label)) return 7;
@@ -237,7 +238,7 @@ async function main() {
         if (wa !== null || wb !== null) {
           if (wa === null) return 1;
           if (wb === null) return -1;
-          // Restore the original Walmart order: parallel type first, then card number.
+          // Default Walmart order: requested type order, then card number.
           // Special inserts stay after all parallels: bios first, then movie stills.
           return wa - wb || numberCompare();
         }
