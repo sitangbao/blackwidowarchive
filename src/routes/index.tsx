@@ -70,13 +70,12 @@ function Index() {
       const label = `${item.item_type ?? ""} ${item.name ?? ""}`.toLowerCase();
       const series = seriesKey(item);
       if (/2016.*captain america.*civil war/i.test(series)) {
-        // Walmart parallels: red/blue base, red/blue star foil, red/blue lightning foil.
-        if (/红底普卡|red[ -]?background[ -]?base|red[ -]?base/.test(label)) return 0;
-        if (/蓝底普卡|blue[ -]?background[ -]?base|blue[ -]?base/.test(label)) return 1;
-        if (/红底星星折|red[ -]?background.*star|red.*star[ -]?foil/.test(label)) return 2;
-        if (/蓝底星星折|blue[ -]?background.*star|blue.*star[ -]?foil/.test(label)) return 3;
-        if (/红底闪电折|red[ -]?background.*lightning|red.*lightning[ -]?foil/.test(label)) return 4;
-        if (/蓝底闪电折|blue[ -]?background.*lightning|blue.*lightning[ -]?foil/.test(label)) return 5;
+        // Walmart parallels: base -> star foil -> lightning foil; red before blue in each type.
+        const color = /红|red/.test(label) ? 0 : /蓝|blue/.test(label) ? 1 : null;
+        if (color !== null) {
+          const kind = /星星|star/.test(label) ? 1 : /闪电|lightning|bolt/.test(label) ? 2 : /普卡|base/.test(label) ? 0 : null;
+          if (kind !== null) return kind * 2 + color;
+        }
       }
       if (/base card|base set|base high series|普卡/.test(label)) return 0;
       if (/silver foil|银折/.test(label)) return 1;
