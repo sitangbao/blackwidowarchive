@@ -242,6 +242,24 @@ async function main() {
           return wa - wb || numberCompare();
         }
       }
+      const isAgeOfUltron = /2015.*avengers.*age of ultron/i.test(seriesA);
+      if (isAgeOfUltron) {
+        // Age of Ultron order: base, silver, blue, patterned foil (10编),
+        // Behind the Scenes, Character Cards, then all remaining special inserts.
+        const ageOfUltronRank = item => {
+          const label = [item.item_type, item.name, item.card_title].filter(Boolean).join(" ").toLowerCase();
+          if (/幕后|behind[ -]?the[ -]?scenes|bts/.test(label)) return 4;
+          if (/人物卡|人物特卡|人物|character card|characters?/.test(label)) return 5;
+          if (/闪标|patterned foil/.test(label)) return 3;
+          if (/蓝折|blue foil/.test(label)) return 2;
+          if (/银折|silver foil/.test(label)) return 1;
+          if (/普卡|base card|base set/.test(label)) return 0;
+          return 6;
+        };
+        return ageOfUltronRank(a) - ageOfUltronRank(b) ||
+          numberCompare() ||
+          String(a.name ?? "").localeCompare(String(b.name ?? ""), "zh-Hans", { numeric: true });
+      }
       const seriesSpecialRank = item => {
         const label = [item.item_type, item.name, item.card_title].filter(Boolean).join(" ").toLowerCase();
         if (/幕后|behind[ -]?the[ -]?scenes|bts/.test(label)) return 1;
