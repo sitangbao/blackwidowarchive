@@ -1,0 +1,18 @@
+{
+  "id": "b1aa0155-2012-4d00-9000-000000000155",
+  "name": "UD复联1 普卡 #155",
+  "region": "美谷",
+  "card_series": "2012 AVENGERS ASSEMBLE",
+  "series_link_enabled": false,
+  "card_series_link_enabled": true,
+  "category": "卡片类",
+  "item_type": "Base Card",
+  "brand_preset": "upper_deck",
+  "card_number": "155",
+  "card_title": "Avengers",
+  "person_count": "multi",
+  "characters": "黑寡妇｜鹰眼",
+  "images": [
+    "/archive/items/avengers%20%23155.jpg"
+  ]
+}
