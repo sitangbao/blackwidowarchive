@@ -77,6 +77,10 @@ function Index() {
           if (kind !== null) return kind * 2 + color;
         }
       }
+      if (/2019.*mcu.*10th anniversary/i.test(series)) {
+        if (/color wheel|rainbow foil|彩虹折/.test(label)) return 1;
+        if (/base set|base card|普卡/.test(label)) return 0;
+      }
       if (/base card|base set|base high series|普卡/.test(label)) return 0;
       if (/silver foil|银折/.test(label)) return 1;
       if (/blue foil|蓝折/.test(label)) return 2;
