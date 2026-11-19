@@ -43,6 +43,10 @@ function Index() {
   const [personal, setPersonal] = useState<CollectionState>(() => readCollectionState());
   const [batchMode, setBatchMode] = useState(false);
   const [selected, setSelected] = useState<Record<string, number>>({});
+  const [cardSortMode, setCardSortMode] = useState<"artwork" | "type">(() => {
+    if (typeof window === "undefined") return "artwork";
+    return localStorage.getItem("bwa-card-sort-mode-v1") === "type" ? "type" : "artwork";
+  });
   useEffect(() => {
     if (isLoading) return;
     const saved = sessionStorage.getItem("bwa-collection-scroll-y");
@@ -57,6 +61,25 @@ function Index() {
   // Stickers have a curated brand layer as well as brands discovered from existing items.
   const brandOptions = f.category === "贴纸" ? [...new Set([...brands, "ABRIL", "PANINI", "PREZIOSI"])].sort() : brands;
   const shown = useMemo(() => filterItems(items, { ...f, status: "" }).filter(it => !f.status || (personal[it.id]?.status ?? "") === f.status), [items, f, personal]);
+  const sortedShown = useMemo(() => {
+    if (f.category !== "卡片类") return shown;
+    const collator = new Intl.Collator("zh-Hans", { numeric: true, sensitivity: "base" });
+    const seriesKey = (item: typeof items[number]) => String(item.card_series ?? item.series ?? "");
+    const cardNumber = (item: typeof items[number]) => String(item.card_number ?? item.name.match(/#([A-Za-z0-9-]+)/)?.[1] ?? "");
+    const cardType = (item: typeof items[number]) => String(item.item_type ?? "未分类");
+    return shown.map((item, index) => ({ item, index })).sort((a, b) => {
+      const seriesCompare = collator.compare(seriesKey(a.item), seriesKey(b.item));
+      if (seriesCompare) return seriesCompare;
+      const numberCompare = () => collator.compare(cardNumber(a.item), cardNumber(b.item));
+      const typeCompare = () => collator.compare(cardType(a.item), cardType(b.item));
+      if (cardSortMode === "artwork") return numberCompare() || typeCompare() || a.index - b.index;
+      return typeCompare() || numberCompare() || a.index - b.index;
+    }).map(entry => entry.item);
+  }, [shown, f.category, cardSortMode, items]);
+  const changeCardSortMode = (mode: "artwork" | "type") => {
+    setCardSortMode(mode);
+    localStorage.setItem("bwa-card-sort-mode-v1", mode);
+  };
   const selectedCount = Object.keys(selected).length;
   const allShownSelected = shown.length > 0 && shown.every(item => Object.hasOwn(selected, item.id));
   const toggleBatchItem = (id: string) => setSelected(old => {
@@ -139,11 +162,18 @@ function Index() {
         </div>}
         {(f.category || f.brand || f.item_type || f.series || f.region || f.status || f.person || f.q) && <button type="button" onClick={() => setF({ q:"", region:"", category:"", brand:"", item_type:"", series:"", status:"", person:"" })} className="mt-3 text-xs text-muted-foreground underline">清除筛选</button>}
       </div>
-      <div className="flex items-center justify-between gap-2 py-4"><p className="archive-label">{isLoading ? "LOADING" : `${shown.length} COLLECTIBLES`}</p><div className="flex items-center gap-3"><button type="button" onClick={() => { setBatchMode(value => !value); setSelected({}); }} className={`text-xs underline ${batchMode ? "text-primary" : "text-muted-foreground"}`}>{batchMode ? "退出批量选择" : "批量选择"}</button><Link to="/collection" className="text-xs text-primary underline">MY COLLECTION →</Link></div></div>
+      <div className="flex items-center justify-between gap-2 py-4"><p className="archive-label">{isLoading ? "LOADING" : `${sortedShown.length} COLLECTIBLES`}</p><div className="flex items-center gap-3"><button type="button" onClick={() => { setBatchMode(value => !value); setSelected({}); }} className={`text-xs underline ${batchMode ? "text-primary" : "text-muted-foreground"}`}>{batchMode ? "退出批量选择" : "批量选择"}</button><Link to="/collection" className="text-xs text-primary underline">MY COLLECTION →</Link></div></div>
 
+      {f.category === "卡片类" && <div className="mb-3 flex items-center justify-between gap-3 rounded border bg-card/70 px-3 py-2.5">
+        <span className="text-xs text-muted-foreground">排列方式</span>
+        <div className="flex rounded border p-0.5">
+          <button type="button" aria-pressed={cardSortMode === "artwork"} onClick={() => changeCardSortMode("artwork")} className={`rounded px-3 py-1.5 text-xs transition ${cardSortMode === "artwork" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>同编号柄图</button>
+          <button type="button" aria-pressed={cardSortMode === "type"} onClick={() => changeCardSortMode("type")} className={`rounded px-3 py-1.5 text-xs transition ${cardSortMode === "type" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>卡片类型</button>
+        </div>
+      </div>}
       {batchMode && <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded border border-primary/40 bg-primary/5 px-3 py-2.5"><p className="text-xs text-foreground">已选择 <span className="font-semibold text-primary">{selectedCount}</span> 款商品</p><button type="button" onClick={toggleAllShown} className="text-xs text-primary underline">{allShownSelected ? "取消全选当前结果" : "全选当前筛选结果"}</button></div>}
       {isError ? <div className="my-8 rounded border border-destructive/40 bg-card p-5 text-center"><p className="text-sm text-foreground">暂时无法读取周边资料，请稍后重试。</p><button type="button" onClick={() => refetch()} className="mt-3 rounded border border-primary px-4 py-2 text-xs text-primary">重新加载</button></div> : !isLoading && shown.length === 0 ? <p className="py-16 text-center text-sm text-muted-foreground">没有符合条件的周边。</p> : null}
-      <div className="grid grid-cols-3 gap-2 sm:gap-4">{shown.map(it => {
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">{sortedShown.map(it => {
         const isSelected = Object.hasOwn(selected, it.id);
         const cardContent = <>
           <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-t bg-card"><ItemImage url={it.images[0]} alt={it.name} category={it.category} className="h-[82%] w-[82%] rounded-t"/>{batchMode && <span className={`absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full border text-xs shadow ${isSelected ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background/90 text-muted-foreground"}`}>{isSelected ? "✓" : ""}</span>}</div>
