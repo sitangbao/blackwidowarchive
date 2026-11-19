@@ -9,9 +9,10 @@
   "brand_preset": "upper_deck",
   "card_number": "28",
   "card_title": "Fun or Foolish?",
-  "person_count": "single",
+  "person_count": "multi",
   "images": [
     "/archive/optimized/IMG_4702-d685d10b5175.webp"
   ],
-  "item_type": "Base Card"
+  "item_type": "Base Card",
+  "characters": "黑寡妇｜钢铁侠"
 }
