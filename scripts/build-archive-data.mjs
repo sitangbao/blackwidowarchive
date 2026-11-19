@@ -227,21 +227,27 @@ async function main() {
       if (n) return n;
       return String(a.name ?? "").localeCompare(String(b.name ?? ""), "zh-Hans", { numeric: true });
     }
-    const walmartRank = item => {
-      const name = String(item.name ?? "");
-      if (name.includes("红底普卡")) return 0;
-      if (name.includes("蓝底普卡")) return 1;
-      if (name.includes("红底星星折")) return 2;
-      if (name.includes("蓝底星星折")) return 3;
-      if (name.includes("红底闪电折")) return 4;
-      if (name.includes("蓝底闪电折")) return 5;
-      return null;
-    };
-    const wa = walmartRank(a), wb = walmartRank(b);
-    if (wa !== null || wb !== null) {
-      if (wa === null) return 1;
-      if (wb === null) return -1;
-      return wa - wb || numberCompare();
+    const isCivilWarSeries = /2016.*captain america.*civil war/i.test(seriesA);
+    if (isCivilWarSeries) {
+      const walmartRank = item => {
+        const name = String(item.name ?? "");
+        if (/红底普卡/.test(name)) return 0;
+        if (/红底星星折/.test(name)) return 1;
+        if (/红底闪电折/.test(name)) return 2;
+        if (/蓝底普卡/.test(name)) return 3;
+        if (/蓝底星星折/.test(name)) return 4;
+        if (/蓝底闪电折/.test(name)) return 5;
+        const label = [item.item_type, item.name, item.card_title].filter(Boolean).join(" ");
+        if (/角色简介|character bio|character profile/i.test(label)) return 6;
+        if (/电影剧照|movie still|film still/i.test(label)) return 7;
+        return null;
+      };
+      const wa = walmartRank(a), wb = walmartRank(b);
+      if (wa !== null || wb !== null) {
+        if (wa === null) return 1;
+        if (wb === null) return -1;
+        return wa - wb || numberCompare();
+      }
     }
     const ta = getCardType(a), tb = getCardType(b);
     const ra = cardTypeOrder.get(ta) ?? 4, rb = cardTypeOrder.get(tb) ?? 4;
