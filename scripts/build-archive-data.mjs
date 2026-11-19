@@ -208,7 +208,18 @@ async function main() {
       if (specialRankA !== specialRankB) return specialRankA - specialRankB;
       const n = numberCompare();
       if (n) return n;
-      const rank = item => /普卡|Base Card/i.test(String(item.name ?? "")) ? 0 : /银折|Silver Foil/i.test(String(item.name ?? "")) ? 1 : /红折|Red Foil/i.test(String(item.name ?? "")) ? 2 : /蓝折|Blue Foil/i.test(String(item.name ?? "")) ? 3 : 4;
+      const isCivilWar = /2016.*captain america.*civil war/i.test(seriesA);
+      const rank = item => {
+        const label = [item.item_type, item.name, item.card_title].filter(Boolean).join(" ");
+        if (/普卡|Base Card/i.test(label)) return 0;
+        if (isCivilWar) {
+          if (/蓝折|Blue Foil/i.test(label)) return 1;
+          if (/红折|Red Foil/i.test(label)) return 2;
+          if (/金折|Gold Foil|Gold Parallel/i.test(label)) return 3;
+          return 4;
+        }
+        return /银折|Silver Foil/i.test(label) ? 1 : /红折|Red Foil/i.test(label) ? 2 : /蓝折|Blue Foil/i.test(label) ? 3 : 4;
+      };
       return rank(a) - rank(b) || String(a.name ?? "").localeCompare(String(b.name ?? ""), "zh-Hans", { numeric: true });
     }
     if (seriesLower === "2024 marvel studios series 2 cinematic") {
