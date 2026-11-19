@@ -66,15 +66,40 @@ function Index() {
     const collator = new Intl.Collator("zh-Hans", { numeric: true, sensitivity: "base" });
     const seriesKey = (item: typeof items[number]) => String(item.card_series ?? item.series ?? "");
     const cardNumber = (item: typeof items[number]) => String(item.card_number ?? item.name.match(/#([A-Za-z0-9-]+)/)?.[1] ?? "");
-    const cardType = (item: typeof items[number]) => String(item.item_type ?? "未分类");
-    return shown.map((item, index) => ({ item, index })).sort((a, b) => {
-      const seriesCompare = collator.compare(seriesKey(a.item), seriesKey(b.item));
-      if (seriesCompare) return seriesCompare;
-      const numberCompare = () => collator.compare(cardNumber(a.item), cardNumber(b.item));
-      const typeCompare = () => collator.compare(cardType(a.item), cardType(b.item));
-      if (cardSortMode === "artwork") return numberCompare() || typeCompare() || a.index - b.index;
-      return typeCompare() || numberCompare() || a.index - b.index;
-    }).map(entry => entry.item);
+    const typeOrder = (item: typeof items[number]) => {
+      const label = `${item.item_type ?? ""} ${item.name ?? ""}`.toLowerCase();
+      if (/base card|base set|base high series|普卡/.test(label)) return 0;
+      if (/silver foil|银折/.test(label)) return 1;
+      if (/blue foil|蓝折/.test(label)) return 2;
+      if (/red foil|红折/.test(label)) return 3;
+      if (/gold foil|金折/.test(label)) return 4;
+      if (/green foil|绿折/.test(label)) return 5;
+      if (/purple foil|紫折/.test(label)) return 6;
+      return 99;
+    };
+    // Only reorder ordinary base/foil parallels. Special inserts retain their exact slots and order.
+    const isRegularParallel = (item: typeof items[number]) => typeOrder(item) < 99;
+    const result = [...shown];
+    const seriesGroups = new Map<string, number[]>();
+    shown.forEach((item, index) => {
+      const key = seriesKey(item);
+      const indices = seriesGroups.get(key) ?? [];
+      indices.push(index);
+      seriesGroups.set(key, indices);
+    });
+    for (const indices of seriesGroups.values()) {
+      const slots = indices.filter(index => isRegularParallel(shown[index]));
+      if (slots.length < 2) continue;
+      const regularCards = slots.map(index => shown[index]).sort((a, b) => {
+        const numberCompare = () => collator.compare(cardNumber(a), cardNumber(b));
+        const typeCompare = () => typeOrder(a) - typeOrder(b) || collator.compare(String(a.item_type ?? ""), String(b.item_type ?? ""));
+        return cardSortMode === "artwork"
+          ? numberCompare() || typeCompare()
+          : typeCompare() || numberCompare();
+      });
+      slots.forEach((slot, index) => { result[slot] = regularCards[index]; });
+    }
+    return result;
   }, [shown, f.category, cardSortMode, items]);
   const changeCardSortMode = (mode: "artwork" | "type") => {
     setCardSortMode(mode);
