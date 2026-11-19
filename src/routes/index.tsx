@@ -100,7 +100,34 @@ function Index() {
       indices.push(index);
       seriesGroups.set(key, indices);
     });
+    const tenYearRank = (item: typeof items[number]) => {
+      const label = `${item.item_type ?? ""} ${item.name ?? ""} ${item.card_title ?? ""}`.toLowerCase();
+      if (/base set|base card|普卡/.test(label)) return 0;
+      if (/color wheel|rainbow foil|彩虹折/.test(label)) return 1;
+      if (/罗马特卡|罗马数字|roman(?:\\s*numerals?)?/.test(label)) return 2;
+      if (/人物卡|人物特卡|character card|characters?|the marvel cinematic universe/.test(label)) return 3;
+      if (/拍摄花絮|幕后|behind[ -]?the[ -]?scenes|bts|story of the mcu/.test(label)) return 4;
+      if (/胶片特卡|胶片|film(?:\\s*strip)?(?:\\s*card)?|film cel/.test(label)) return 5;
+      return 99;
+    };
     for (const indices of seriesGroups.values()) {
+      const group = indices.map(index => shown[index]);
+      if (/2019.*mcu.*10th anniversary/i.test(seriesKey(group[0]))) {
+        const ordered = [...group].sort((a, b) => {
+          const rankA = tenYearRank(a), rankB = tenYearRank(b);
+          const numberCompare = () => collator.compare(cardNumber(a), cardNumber(b));
+          if (cardSortMode === "artwork") {
+            const regularA = rankA <= 1, regularB = rankB <= 1;
+            if (regularA !== regularB) return regularA ? -1 : 1;
+            if (regularA) return numberCompare() || rankA - rankB;
+          }
+          return rankA - rankB || numberCompare() ||
+            collator.compare(String(a.name ?? ""), String(b.name ?? ""));
+        });
+        indices.forEach((slot, index) => { result[slot] = ordered[index]; });
+        continue;
+      }
+      // Other series: only reorder ordinary base/foil parallels. Special inserts keep their slots.
       const slots = indices.filter(index => isRegularParallel(shown[index]));
       if (slots.length < 2) continue;
       const regularCards = slots.map(index => shown[index]).sort((a, b) => {
