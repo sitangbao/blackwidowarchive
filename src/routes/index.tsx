@@ -70,8 +70,8 @@ function Index() {
       const label = `${item.item_type ?? ""} ${item.name ?? ""}`.toLowerCase();
       if (/base card|base set|base high series|普卡/.test(label)) return 0;
       if (/silver foil|银折/.test(label)) return 1;
-      if (/red foil|红折/.test(label)) return 2;
-      if (/blue foil|蓝折/.test(label)) return 3;
+      if (/blue foil|蓝折/.test(label)) return 2;
+      if (/red foil|红折/.test(label)) return 3;
       if (/gold foil|金折/.test(label)) return 4;
       if (/green foil|绿折/.test(label)) return 5;
       if (/purple foil|紫折/.test(label)) return 6;
