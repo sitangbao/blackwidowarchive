@@ -236,20 +236,9 @@ async function main() {
         if (wa !== null || wb !== null) {
           if (wa === null) return 1;
           if (wb === null) return -1;
-          // Group Walmart parallels by the actual image asset first; within each artwork
-          // group, apply the requested red/blue parallel sequence and then card number.
+          // Restore the original Walmart order: parallel type first, then card number.
           // Special inserts stay after all parallels: bios first, then movie stills.
-          if (wa >= 6 || wb >= 6) return wa - wb || numberCompare();
-          const artworkKey = item => {
-            const title = String(item.card_title ?? "").trim().toLowerCase();
-            if (title) return title;
-            const imageList = Array.isArray(item.images) ? item.images : item.images ? [item.images] : [];
-            const image = String(imageList[0] ?? "").trim().toLowerCase();
-            if (image) return image;
-            return String(item.name ?? "").replace(/(?:红底|蓝底)?(?:普卡|星星折|闪电折).*$/i, "").trim().toLowerCase();
-          };
-          const artworkCompare = artworkKey(a).localeCompare(artworkKey(b), "zh-Hans", { numeric: true });
-          return artworkCompare || wa - wb || numberCompare();
+          return wa - wb || numberCompare();
         }
       }
       const seriesSpecialRank = item => {
