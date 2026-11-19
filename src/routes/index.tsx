@@ -175,9 +175,23 @@ function Index() {
         customRank = series2Rank;
       }
       if (customRank) {
+        // Ten-Year parallels stay together by artwork first; special inserts follow in the chosen type order.
+        const isTenYear = /2019.*mcu.*10th anniversary/i.test(series);
+        const compareTenYear = (a: typeof items[number], b: typeof items[number]) => {
+          const rankA = customRank!(a), rankB = customRank!(b);
+          const numberCompare = collator.compare(cardNumber(a), cardNumber(b));
+          if (cardSortMode === "artwork") {
+            const regularA = rankA <= 1, regularB = rankB <= 1;
+            if (regularA !== regularB) return regularA ? -1 : 1;
+            if (regularA) return numberCompare || rankA - rankB;
+          }
+          return rankA - rankB || numberCompare || collator.compare(String(a.name ?? ""), String(b.name ?? ""));
+        };
         // Keep memorabilia at the end; all other cards obey the selected artwork/type mode.
-        const regular = group.filter(item => !isMemorabilia(item)).sort((a, b) => compareByMode(a, b, customRank!));
-        const memorabilia = group.filter(isMemorabilia).sort((a, b) => compareByMode(a, b, customRank!));
+        const regular = group.filter(item => !isMemorabilia(item)).sort((a, b) =>
+          isTenYear ? compareTenYear(a, b) : compareByMode(a, b, customRank!));
+        const memorabilia = group.filter(isMemorabilia).sort((a, b) =>
+          isTenYear ? compareTenYear(a, b) : compareByMode(a, b, customRank!));
         const ordered = [...regular, ...memorabilia];
         indices.forEach((slot, index) => { result[slot] = ordered[index]; });
         continue;
