@@ -110,20 +110,75 @@ function Index() {
       if (/胶片特卡|胶片|film(?:\\s*strip)?(?:\\s*card)?|film cel/.test(label)) return 5;
       return 99;
     };
+    const compareByMode = (a: typeof items[number], b: typeof items[number], rank: (item: typeof items[number]) => number) => {
+      const numberCompare = collator.compare(cardNumber(a), cardNumber(b));
+      const rankCompare = rank(a) - rank(b);
+      const nameCompare = collator.compare(String(a.name ?? ""), String(b.name ?? ""));
+      return cardSortMode === "artwork"
+        ? numberCompare || rankCompare || nameCompare
+        : rankCompare || numberCompare || nameCompare;
+    };
+    const isMemorabilia = (item: typeof items[number]) =>
+      /衣料卡|memorabilia/i.test(`${item.item_type ?? ""} ${item.name ?? ""} ${item.card_title ?? ""}`);
+    const allureTypes = [
+      "Base Card", "Base High Series", "Black Rainbow", "Magenta", "Orange Slice Die-Cut",
+      "Portal", "Red Prism", "Steel", "Sunrise", "Yellow Taxi", "Storm", "Green Quartz",
+      "White Diamond", "Blue Line", "Pink", "Purple Rainbow Die-Cut",
+      "Infinity Stones - Mind Stone", "Infinity Stones - Power Stone", "Infinity Stones - Reality Stone",
+      "Infinity Stones - Soul Stone", "Infinity Stones - Space Stone", "Infinity Stones - Time Stone",
+      "Infinity Stones Gold Parallel - Mind Stone", "Infinity Stones Gold Parallel - Power Stone",
+      "Infinity Stones Gold Parallel - Reality Stone", "Infinity Stones Gold Parallel - Soul Stone",
+      "Infinity Stones Gold Parallel - Space Stone", "Infinity Stones Gold Parallel - Time Stone",
+      "Infinity Stones White Parallel - Soul Stone", "Infinity Stones White Parallel - Space Stone",
+    ];
+    const allureRank = (item: typeof items[number]) => {
+      const type = String(item.item_type ?? "").trim();
+      const exact = allureTypes.indexOf(type);
+      return exact >= 0 ? exact : 99;
+    };
+    const endgameRank = (item: typeof items[number]) => {
+      const label = `${item.item_type ?? ""} ${item.name ?? ""} ${item.card_title ?? ""}`.toLowerCase();
+      if (/胶片|film(?:\\s*strip|\\s*cel)?/.test(label)) return 10;
+      if (/沙盒|sandbox/.test(label)) return 11;
+      if (/钢板|steel[ -]?plate/.test(label)) return 12;
+      if (/大头肖像|big[ -]?head|portrait/.test(label)) return 13;
+      if (/战衣|suit/.test(label)) return 14;
+      if (/钻石木盒|diamond.*wood(?:en)?[ -]?box|wooden[ -]?box/.test(label)) return 15;
+      if (/base set|base card|普卡/.test(label)) return 0;
+      if (/silver foil|银折/.test(label)) return 1;
+      if (/red foil|红折/.test(label)) return 2;
+      if (/blue foil|蓝折/.test(label)) return 3;
+      if (/gold foil|金折/.test(label)) return 4;
+      return 9;
+    };
+    const series2Rank = (item: typeof items[number]) => {
+      const label = `${item.item_type ?? ""} ${item.name ?? ""} ${item.card_title ?? ""}`.toLowerCase();
+      if (/base set|base card|普卡/.test(label)) return 0;
+      if (/silver foil|银折/.test(label)) return 1;
+      if (/autograph|签名卡|签字卡/.test(label)) return 2;
+      if (/gold foil|金折/.test(label)) return 3;
+      if (/red foil|红折/.test(label)) return 4;
+      if (/blue foil|蓝折/.test(label)) return 5;
+      return 99;
+    };
     for (const indices of seriesGroups.values()) {
       const group = indices.map(index => shown[index]);
-      if (/2019.*mcu.*10th anniversary/i.test(seriesKey(group[0]))) {
-        const ordered = [...group].sort((a, b) => {
-          const rankA = tenYearRank(a), rankB = tenYearRank(b);
-          const numberCompare = () => collator.compare(cardNumber(a), cardNumber(b));
-          if (cardSortMode === "artwork") {
-            const regularA = rankA <= 1, regularB = rankB <= 1;
-            if (regularA !== regularB) return regularA ? -1 : 1;
-            if (regularA) return numberCompare() || rankA - rankB;
-          }
-          return rankA - rankB || numberCompare() ||
-            collator.compare(String(a.name ?? ""), String(b.name ?? ""));
-        });
+      const series = seriesKey(group[0]);
+      let customRank: ((item: typeof items[number]) => number) | null = null;
+      if (/2019.*mcu.*10th anniversary/i.test(series)) {
+        customRank = tenYearRank;
+      } else if (/2020.*avengers.*endgame/i.test(series)) {
+        customRank = endgameRank;
+      } else if (/2022.*marvel allure/i.test(series)) {
+        customRank = allureRank;
+      } else if (/2024.*marvel studios.*series 2.*cinematic/i.test(series)) {
+        customRank = series2Rank;
+      }
+      if (customRank) {
+        // Keep memorabilia at the end; all other cards obey the selected artwork/type mode.
+        const regular = group.filter(item => !isMemorabilia(item)).sort((a, b) => compareByMode(a, b, customRank!));
+        const memorabilia = group.filter(isMemorabilia).sort((a, b) => compareByMode(a, b, customRank!));
+        const ordered = [...regular, ...memorabilia];
         indices.forEach((slot, index) => { result[slot] = ordered[index]; });
         continue;
       }
