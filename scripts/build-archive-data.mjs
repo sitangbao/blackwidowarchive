@@ -176,6 +176,10 @@ async function main() {
     const seriesB = String(b.card_series ?? b.series ?? "");
     const seriesCompare = seriesA.localeCompare(seriesB, "zh-Hans", { numeric: true });
     if (seriesCompare) return seriesCompare;
+    // Memorabilia cards, including multi-person variants, always appear last within each series.
+    const isMemorabilia = item => /衣料卡|memorabilia/i.test([item.item_type, item.name, item.card_title].filter(Boolean).join(" "));
+    const memorabiliaA = isMemorabilia(a), memorabiliaB = isMemorabilia(b);
+    if (memorabiliaA !== memorabiliaB) return memorabiliaA ? 1 : -1;
     const numberCompare = () => getCardNumber(a).localeCompare(getCardNumber(b), "en", { numeric: true });
     const seriesLower = seriesA.trim().toLowerCase();
     const isAllure = seriesLower === "2022 marvel allure";
