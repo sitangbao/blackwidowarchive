@@ -204,15 +204,37 @@ function Index() {
           }
           return rankA - rankB || numberCompare || collator.compare(String(a.name ?? ""), String(b.name ?? ""));
         };
+        const allureStoneRank = (item: typeof items[number]) => {
+          const type = String(item.item_type ?? "").trim();
+          const name = String(item.name ?? "");
+          const stone = type.match(/(?:Mind|Power|Reality|Soul|Space|Time) Stone$/i)?.[0]?.toLowerCase() ??
+            name.match(/心灵宝石|力量宝石|现实宝石|灵魂宝石|空间宝石|时间宝石/)?.[0] ?? "";
+          const order = ["mind stone", "power stone", "reality stone", "soul stone", "space stone", "time stone",
+            "心灵宝石", "力量宝石", "现实宝石", "灵魂宝石", "空间宝石", "时间宝石"];
+          return order.indexOf(stone);
+        };
+        const allureParallelRank = (item: typeof items[number]) => {
+          const name = String(item.name ?? "");
+          if (/299\\s*编/i.test(name)) return 0;
+          if (/99\\s*编/i.test(name)) return 1;
+          if (/6\\s*编/i.test(name)) return 2;
+          const type = String(item.item_type ?? "");
+          if (/Gold Parallel/i.test(type)) return 1;
+          if (/White Parallel/i.test(type)) return 2;
+          return 0;
+        };
         const compareAllure = (a: typeof items[number], b: typeof items[number]) => {
           // Infinity Stones inserts always form the first block in both modes.
           const gemCompare = Number(isAllureGem(b)) - Number(isAllureGem(a));
           if (gemCompare) return gemCompare;
-          // In artwork mode, group the different parallels by gemstone name,
-          // since these inserts share numbering across the six stones.
-          if (isAllureGem(a) && isAllureGem(b) && cardSortMode === "artwork") {
-            return collator.compare(String(a.name ?? ""), String(b.name ?? "")) ||
-              compareByMode(a, b, customRank!);
+          if (isAllureGem(a) && isAllureGem(b)) {
+            const stoneCompare = allureStoneRank(a) - allureStoneRank(b);
+            const parallelCompare = allureParallelRank(a) - allureParallelRank(b);
+            // Artwork mode groups each gemstone with its 299/99/6 parallels.
+            // Type mode groups all 299s, then 99s, then 6s.
+            return cardSortMode === "artwork"
+              ? stoneCompare || parallelCompare || compareByMode(a, b, customRank!)
+              : parallelCompare || stoneCompare || compareByMode(a, b, customRank!);
           }
           return compareByMode(a, b, customRank!);
         };
