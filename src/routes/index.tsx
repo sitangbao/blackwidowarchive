@@ -274,7 +274,7 @@ function Index() {
       />
       <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-r from-[#211316] via-[#211316]/85 to-transparent" />
       <div className="relative z-10 mx-auto flex min-h-[390px] max-w-6xl items-center px-4 py-14 sm:min-h-[470px] sm:px-6 sm:py-20">
-        <div className="max-w-[ min(100%, 650px) ]">
+        <div className="max-w-[650px]">
           <p className="font-display text-lg tracking-[.2em] text-foreground sm:text-2xl">NATASHA ROMANOFF</p>
           <h1 className="mt-3 font-display text-[clamp(2.45rem,7.1vw,5.8rem)] leading-[.88] tracking-wide text-foreground">
             <span className="block whitespace-nowrap">BLACK WIDOW</span>
