@@ -67,7 +67,7 @@ function Index() {
     const seriesKey = (item: typeof items[number]) => String(item.card_series ?? item.series ?? "");
     const cardNumber = (item: typeof items[number]) => String(item.card_number ?? item.name.match(/#([A-Za-z0-9-]+)/)?.[1] ?? "");
     const typeOrder = (item: typeof items[number]) => {
-      const label = `${item.item_type ?? ""} ${item.name ?? ""}`.toLowerCase();
+      const label = `${item.item_type ?? ""} ${item.name ?? ""} ${item.card_title ?? ""}`.toLowerCase();
       const series = seriesKey(item);
       if (/2016.*captain america.*civil war/i.test(series)) {
         // Walmart parallels: base -> star foil -> lightning foil; red before blue in each type.
@@ -77,8 +77,22 @@ function Index() {
           if (kind !== null) return kind * 2 + color;
         }
       }
-      if (/2019.*mcu.*10th anniversary/i.test(series)) {
-        if (/color wheel|rainbow foil|彩虹折/.test(label)) return 1;
+      if (/2014.*captain america.*winter soldier/i.test(series)) {
+        if (/base card|base set|普卡/.test(label)) return 0;
+        if (/silver foil|银折/.test(label)) return 1;
+        if (/red foil|红折/.test(label)) return 2;
+        if (/blue foil|蓝折/.test(label)) return 3;
+        return 99;
+      }
+      if (/2015.*avengers.*age of ultron/i.test(series)) {
+        if (/base card|base set|普卡/.test(label)) return 0;
+        if (/silver foil|银折/.test(label)) return 1;
+        if (/blue foil|蓝折/.test(label)) return 2;
+        if (/patterned foil|闪标/.test(label)) return 3;
+        return 99;
+      }
+      if (/2019.*(?:mcu|marvel cinematic universe).*10th anniversary/i.test(series)) {
+        if (/color wheel|rainbow foil|彩虹折|彩虹条纹/.test(label)) return 1;
         if (/base set|base card|普卡/.test(label)) return 0;
       }
       if (/base card|base set|base high series|普卡/.test(label)) return 0;
@@ -165,7 +179,7 @@ function Index() {
       const group = indices.map(index => shown[index]);
       const series = seriesKey(group[0]);
       let customRank: ((item: typeof items[number]) => number) | null = null;
-      if (/2019.*mcu.*10th anniversary/i.test(series)) {
+      if (/2019.*(?:mcu|marvel cinematic universe).*10th anniversary/i.test(series)) {
         customRank = tenYearRank;
       } else if (/2020.*avengers.*endgame/i.test(series)) {
         customRank = endgameRank;
@@ -176,7 +190,7 @@ function Index() {
       }
       if (customRank) {
         // Ten-Year parallels stay together by artwork first; special inserts follow in the chosen type order.
-        const isTenYear = /2019.*mcu.*10th anniversary/i.test(series);
+        const isTenYear = /2019.*(?:mcu|marvel cinematic universe).*10th anniversary/i.test(series);
         const compareTenYear = (a: typeof items[number], b: typeof items[number]) => {
           const rankA = customRank!(a), rankB = customRank!(b);
           const numberCompare = collator.compare(cardNumber(a), cardNumber(b));
