@@ -195,9 +195,9 @@ async function main() {
       /2014.*captain america.*winter soldier/i,
       /2015.*avengers.*age of ultron/i,
       /2016.*captain america.*civil war/i,
-      /2019.*mcu.*10th anniversary/i,
+      /2019.*(?:mcu|marvel cinematic universe).*10th anniversary/i,
     ].some(re => re.test(seriesA));
-    const isTenAnniversary = upperDeck && /2019.*mcu.*10th anniversary/i.test(seriesA);
+    const isTenAnniversary = upperDeck && /2019.*(?:mcu|marvel cinematic universe).*10th anniversary/i.test(seriesA);
     if (isTenAnniversary) {
       const tenYearRank = item => {
         const type = String(item.item_type ?? "").trim().toLowerCase();
@@ -207,18 +207,18 @@ async function main() {
         if (/人物卡|人物特卡|character card|characters?|the marvel cinematic universe/.test(label)) return 3;
         if (/拍摄花絮|幕后|behind[ -]?the[ -]?scenes|bts|story of the mcu/.test(label)) return 4;
         if (/胶片特卡|胶片|film(?:\s*strip)?(?:\s*card)?|film cel/.test(label) || type === "film cel") return 5;
-        return 0;
+        if (/base set|base card|普卡/.test(label)) return 0;
+        return 99;
       };
       const rankA = tenYearRank(a), rankB = tenYearRank(b);
-      if (rankA !== rankB) return rankA - rankB;
-      // Regular cards: group by shared artwork, then number, then Base Set before Color Wheel.
-      const artworkKey = item => String(item.card_title ?? "").trim().toLowerCase() ||
-        String(item.name ?? "").replace(/(?:普卡|彩虹折|color wheel|rainbow foil|银折|红折|蓝折|金折|\bbase card\b|\bfoil\b).*$/i, "").trim().toLowerCase();
-      const artworkCompare = artworkKey(a).localeCompare(artworkKey(b), "zh-Hans", { numeric: true });
-      if (artworkCompare) return artworkCompare;
       const n = numberCompare();
-      if (n) return n;
-      return tenYearRank(a) - tenYearRank(b) ||
+      // Default mode is artwork-first: #13 Base Set, #13 Color Wheel, then #16, etc.
+      if (rankA <= 1 && rankB <= 1) {
+        return n || rankA - rankB ||
+          String(a.name ?? "").localeCompare(String(b.name ?? ""), "zh-Hans", { numeric: true });
+      }
+      // Special inserts follow the agreed type sequence, with numbers ascending within each type.
+      return rankA - rankB || n ||
         String(a.name ?? "").localeCompare(String(b.name ?? ""), "zh-Hans", { numeric: true });
     }
     if (numberFirst) {
