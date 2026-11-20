@@ -191,6 +191,9 @@ function Index() {
       if (customRank) {
         // Ten-Year parallels stay together by artwork first; special inserts follow in the chosen type order.
         const isTenYear = /2019.*(?:mcu|marvel cinematic universe).*10th anniversary/i.test(series);
+        const isAllure = /2022.*marvel allure/i.test(series);
+        const isAllureGem = (item: typeof items[number]) =>
+          /^infinity stones(?: gold parallel| white parallel)?\s*-/i.test(String(item.item_type ?? "").trim());
         const compareTenYear = (a: typeof items[number], b: typeof items[number]) => {
           const rankA = customRank!(a), rankB = customRank!(b);
           const numberCompare = collator.compare(cardNumber(a), cardNumber(b));
@@ -201,11 +204,16 @@ function Index() {
           }
           return rankA - rankB || numberCompare || collator.compare(String(a.name ?? ""), String(b.name ?? ""));
         };
+        const compareAllure = (a: typeof items[number], b: typeof items[number]) => {
+          // Infinity Stones inserts always form the first block in both modes.
+          const gemCompare = Number(isAllureGem(b)) - Number(isAllureGem(a));
+          return gemCompare || compareByMode(a, b, customRank!);
+        };
         // Keep memorabilia at the end; all other cards obey the selected artwork/type mode.
         const regular = group.filter(item => !isMemorabilia(item)).sort((a, b) =>
-          isTenYear ? compareTenYear(a, b) : compareByMode(a, b, customRank!));
+          isTenYear ? compareTenYear(a, b) : isAllure ? compareAllure(a, b) : compareByMode(a, b, customRank!));
         const memorabilia = group.filter(isMemorabilia).sort((a, b) =>
-          isTenYear ? compareTenYear(a, b) : compareByMode(a, b, customRank!));
+          isTenYear ? compareTenYear(a, b) : isAllure ? compareAllure(a, b) : compareByMode(a, b, customRank!));
         const ordered = [...regular, ...memorabilia];
         indices.forEach((slot, index) => { result[slot] = ordered[index]; });
         continue;
