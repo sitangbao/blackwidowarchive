@@ -262,29 +262,13 @@ function Index() {
     ...(key === "brand" ? { item_type: "", series: "" } : {}),
   }));
   return <>
-    <section className="relative isolate min-h-[390px] overflow-hidden border-b border-primary/20 bg-[#211316] sm:min-h-[470px]">
-      <div className="hero-glow absolute inset-0" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_72%_45%,rgba(153,30,48,0.42),transparent_48%),linear-gradient(90deg,#211316_0%,rgba(33,19,22,0.97)_34%,rgba(33,19,22,0.45)_68%,rgba(33,19,22,0.16)_100%)]" />
-      <Hourglass className="pointer-events-none absolute right-[8%] top-1/2 z-0 h-[88%] -translate-y-1/2 text-primary/10 sm:right-[17%]" />
-      <img
-        src="https://lumiere-a.akamaihd.net/v1/images/bbu-00091_r_048de94e.jpeg?region=0%2C0%2C3000%2C1686"
-        alt="Natasha Romanoff portrayed by Scarlett Johansson in Marvel Studios’ Black Widow"
-        fetchPriority="high"
-        className="pointer-events-none absolute inset-y-0 right-0 z-0 h-full w-[76%] object-cover object-[18%_center] opacity-80 sm:w-[62%] sm:object-[16%_center]"
-      />
-      <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-r from-[#211316] via-[#211316]/85 to-transparent" />
-      <div className="relative z-10 mx-auto flex min-h-[390px] max-w-6xl items-center px-4 py-14 sm:min-h-[470px] sm:px-6 sm:py-20">
-        <div className="max-w-[650px]">
-          <p className="font-display text-lg tracking-[.2em] text-foreground sm:text-2xl">NATASHA ROMANOFF</p>
-          <h1 className="mt-3 font-display text-[clamp(2.45rem,7.1vw,5.8rem)] leading-[.88] tracking-wide text-foreground">
-            <span className="block whitespace-nowrap">BLACK WIDOW</span>
-            <span className="mt-1 block text-primary">ARCHIVE</span>
-          </h1>
-          <p className="mt-5 max-w-[26rem] text-xs leading-relaxed tracking-[.08em] text-white/75 sm:text-sm">娜塔莎·罗曼诺夫官方周边收藏图鉴</p>
-          <p className="mt-3 text-[10px] tracking-[.22em] text-primary/90 sm:text-xs">粉丝制作 <span className="px-1.5 text-white/35">·</span> FAN-MADE ARCHIVE</p>
-        </div>
+    <section className="relative overflow-hidden border-b">
+      <div className="hero-glow absolute inset-0" /><Hourglass className="pointer-events-none absolute right-[-5%] top-1/2 h-[115%] -translate-y-1/2 text-primary/10 sm:right-[8%]" />
+      <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
+        <p className="font-display text-2xl tracking-[.18em] text-foreground sm:text-3xl">NATASHA ROMANOFF</p>
+        <h1 className="mt-2 whitespace-nowrap font-display text-[clamp(2.2rem,8.5vw,5.5rem)] leading-[.9] tracking-wide sm:text-8xl">BLACK WIDOW <span className="text-primary">ARCHIVE</span></h1>
+        <p className="mt-5 text-sm tracking-wide text-muted-foreground sm:text-base">娜塔莎·罗曼诺夫官方周边收藏图鉴</p>
       </div>
-      <p className="absolute bottom-2 right-3 z-10 text-[8px] tracking-wider text-white/35 sm:bottom-3 sm:right-6">© MARVEL STUDIOS</p>
     </section>
     <section id="collection" className="mx-auto max-w-6xl scroll-mt-4 px-3 pb-40 sm:px-6">
       <div className="pt-10 pb-5"><p className="archive-label">THE COLLECTION</p><h2 className="mt-1 text-xl font-medium tracking-widest">周边收藏图鉴</h2></div>
