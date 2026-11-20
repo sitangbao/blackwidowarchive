@@ -207,7 +207,14 @@ function Index() {
         const compareAllure = (a: typeof items[number], b: typeof items[number]) => {
           // Infinity Stones inserts always form the first block in both modes.
           const gemCompare = Number(isAllureGem(b)) - Number(isAllureGem(a));
-          return gemCompare || compareByMode(a, b, customRank!);
+          if (gemCompare) return gemCompare;
+          // In artwork mode, group the different parallels by gemstone name,
+          // since these inserts share numbering across the six stones.
+          if (isAllureGem(a) && isAllureGem(b) && cardSortMode === "artwork") {
+            return collator.compare(String(a.name ?? ""), String(b.name ?? "")) ||
+              compareByMode(a, b, customRank!);
+          }
+          return compareByMode(a, b, customRank!);
         };
         // Keep memorabilia at the end; all other cards obey the selected artwork/type mode.
         const regular = group.filter(item => !isMemorabilia(item)).sort((a, b) =>
